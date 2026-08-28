@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>miawstudio — dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFFFFF;--ink:#0B0B0C;--muted:#8E8E8A;--hair:#ECECEA;--soft:#F7F7F5;
+  --accent:#2E4A63;--accent-soft:#EAF0F5;--ok:#2E7D5B;--line:#E4E4E1;
+  --ease:cubic-bezier(.5,.05,.1,1);--ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-size:14px}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+.mono{font-family:"Space Mono",monospace}
+::selection{background:var(--accent);color:#fff}
+
+.app{display:grid;grid-template-columns:240px 1fr;height:100vh}
+
+/* sidebar */
+.side{border-right:1px solid var(--hair);display:flex;flex-direction:column;padding:22px 16px}
+.side .brand{font-weight:600;font-size:16px;letter-spacing:-.01em;padding:6px 10px 26px}
+.side .brand b{color:var(--accent)}
+.snav{display:flex;flex-direction:column;gap:2px}
+.snav button{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:7px;color:var(--muted);text-align:left;transition:.2s var(--ease);font-size:13.5px}
+.snav button:hover{background:var(--soft);color:var(--ink)}
+.snav button.on{background:var(--soft);color:var(--ink)}
+.snav button .ic{width:15px;height:15px;flex:none;opacity:.85}
+.snav button.on .ic{opacity:1}
+.side .foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--hair)}
+.side .vsite{display:flex;align-items:center;gap:8px;padding:9px 12px;color:var(--muted);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;transition:color .2s var(--ease)}
+.side .vsite:hover{color:var(--ink)}
+.side .usr{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-top:4px}
+.side .usr .av{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:600}
+.side .usr .nm{font-size:12.5px;line-height:1.2}
+.side .usr .rl{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted)}
+
+/* main */
+.main{overflow-y:auto;scrollbar-width:thin}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:20px 30px;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hair)}
+.topbar h1{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.topbar .sub{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:.04em}
+.topbar .acts{display:flex;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:7px;font-size:13px;border:1px solid var(--line);transition:.2s var(--ease)}
+.btn:hover{border-color:var(--ink)}
+.btn.pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.pri:hover{opacity:.88}
+.btn.ghost{border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);background:var(--soft)}
+.wrap{padding:30px}
+
+.view{display:none}
+.view.on{display:block;animation:fade .4s var(--ease-out)}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{border:1px solid var(--hair);border-radius:12px;padding:20px}
+.kpi .l{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:32px;font-weight:600;letter-spacing:-.02em;margin-top:14px;line-height:1}
+.kpi .d{font-size:11.5px;margin-top:9px;color:var(--muted)}
+.kpi .d b{color:var(--ok);font-weight:500}
+.kpi .d b.dn{color:#b4534b}
+
+.panels{display:grid;grid-template-columns:1.7fr 1fr;gap:14px;margin-top:14px}
+.card{border:1px solid var(--hair);border-radius:12px;padding:22px}
+.card .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.card .ch .t{font-size:14.5px;font-weight:600}
+.card .ch .m{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
+.chartwrap{margin-top:16px}
+.chartwrap svg{width:100%;height:200px;display:block;overflow:visible}
+.legend{display:flex;gap:18px;margin-top:12px;font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
+.legend b{color:var(--ink);font-weight:400}
+
+.toplist{display:flex;flex-direction:column;gap:2px;margin-top:10px}
+.topitem{display:grid;grid-template-columns:20px 1fr auto;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--hair)}
+.topitem:last-child{border-bottom:none}
+.topitem .rk{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
+.topitem .nm{font-size:13.5px;font-weight:500}
+.topitem .bar{grid-column:2;height:3px;background:var(--soft);border-radius:2px;overflow:hidden;margin-top:6px}
+.topitem .bar i{display:block;height:100%;background:var(--accent)}
+.topitem .vw{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted)}
+
+.sources{margin-top:14px;display:flex;flex-direction:column;gap:14px}
+.src{}
+.src .sr{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px}
+.src .sr .p{font-family:"Space Mono",monospace;color:var(--muted)}
+.src .tr{height:4px;background:var(--soft);border-radius:3px;overflow:hidden}
+.src .tr i{display:block;height:100%;background:var(--ink)}
+
+/* projects table */
+.ptable{border:1px solid var(--hair);border-radius:12px;overflow:hidden}
+.phead,.prow{display:grid;grid-template-columns:30px 56px 1.6fr 1.4fr 90px 80px 90px;align-items:center;gap:14px;padding:12px 18px}
+.phead{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--hair);background:var(--soft)}
+.prow{border-bottom:1px solid var(--hair);transition:background .2s var(--ease);cursor:default}
+.prow:last-child{border-bottom:none}
+.prow:hover{background:var(--soft)}
+.prow.dragging{opacity:.4}
+.prow.dragover{box-shadow:inset 0 2px 0 var(--accent)}
+.grip{cursor:grab;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.grip:active{cursor:grabbing}
+.pthumb{width:56px;height:40px;border-radius:5px;background-size:cover;background-position:center;background-color:var(--soft)}
+.pname{font-size:14px;font-weight:500}
+.pname .cap{font-size:11.5px;color:var(--muted);margin-top:2px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34ch}
+.pmeta{display:flex;flex-wrap:wrap;gap:5px}
+.pchip{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:100px;padding:2px 7px}
+.pstat{display:inline-flex;align-items:center;gap:6px;font-size:12px}
+.pstat .dot{width:6px;height:6px;border-radius:50%}
+.pstat.pub .dot{background:var(--ok)}
+.pstat.draft .dot{background:var(--muted)}
+.pviews{font-family:"Space Mono",monospace;font-size:12.5px;color:var(--muted)}
+.pacts{display:flex;gap:4px;justify-content:flex-end}
+.iaction{width:28px;height:28px;border-radius:6px;display:grid;place-items:center;color:var(--muted);transition:.2s var(--ease)}
+.iaction:hover{background:var(--paper);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+
+/* editor / forms */
+.editor{max-width:900px}
+.fld{margin-bottom:22px}
+.fld > label{display:block;font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.inp,.ta,.sel{width:100%;border:1px solid var(--line);border-radius:8px;padding:11px 13px;font-size:14px;background:var(--paper);transition:.2s var(--ease)}
+.inp:focus,.ta:focus,.sel:focus{outline:none;border-color:var(--accent)}
+.ta{resize:vertical;min-height:90px;line-height:1.55}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px}
+.esec{border-top:1px solid var(--hair);padding-top:26px;margin-top:26px}
+.esec .st{font-size:15px;font-weight:600;margin-bottom:18px}
+.cover{position:relative;border:1px dashed var(--line);border-radius:10px;aspect-ratio:16/9;background-size:cover;background-position:center;background-color:var(--soft);display:flex;align-items:flex-end;padding:14px;overflow:hidden}
+.cover .change{margin-left:auto;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font-size:12px}
+.gimgs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.gimg{position:relative;aspect-ratio:4/3;border-radius:8px;background-size:cover;background-position:center;background-color:var(--soft);overflow:hidden}
+.gimg .rm{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.92);display:grid;place-items:center;font-size:13px;color:var(--ink)}
+.gadd{border:1px dashed var(--line);border-radius:8px;aspect-ratio:4/3;display:grid;place-items:center;color:var(--muted);font-size:24px;transition:.2s var(--ease)}
+.gadd:hover{border-color:var(--accent);color:var(--accent)}
+.toggle{display:inline-flex;align-items:center;gap:10px;cursor:pointer}
+.toggle .sw{width:38px;height:22px;border-radius:100px;background:var(--line);position:relative;transition:.25s var(--ease)}
+.toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.25s var(--ease-out)}
+.toggle.on .sw{background:var(--ok)}
+.toggle.on .sw::after{left:18px}
+.toggle .tl{font-size:13px}
+
+/* about practice / contacts editable rows */
+.rowedit{display:flex;gap:10px;margin-bottom:8px;align-items:center}
+.rowedit .inp{flex:1}
+.rowedit .del{width:34px;height:38px;border:1px solid var(--line);border-radius:8px;color:var(--muted);flex:none}
+.rowedit .del:hover{color:#b4534b;border-color:#e3c9c6}
+.addrow{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-top:6px}
+
+/* filters manager */
+.fmgr{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.fcol{border:1px solid var(--hair);border-radius:12px;padding:20px}
+.fcol .ct{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.fopt{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--hair)}
+.fopt:last-of-type{border-bottom:none}
+.fopt .nm{flex:1;font-size:13.5px}
+.fopt .cnt{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted)}
+.fopt .x{color:var(--muted);width:24px;height:24px;border-radius:5px}
+.fopt .x:hover{color:#b4534b;background:var(--soft)}
+.fadd{display:flex;gap:8px;margin-top:14px}
+.fadd .inp{padding:8px 11px;font-size:13px}
+.fadd .btn{padding:8px 12px}
+
+/* image picker overlay */
+.picker{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(11,11,12,.32)}
+.picker.on{display:flex}
+.picker .pk{background:var(--paper);border-radius:14px;width:640px;max-width:92vw;max-height:80vh;overflow:hidden;display:flex;flex-direction:column}
+.picker .pkh{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--hair);font-weight:600}
+.picker .pkh button{color:var(--muted);font-family:"Space Mono",monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.picker .pkg{padding:18px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow-y:auto}
+.picker .pki{aspect-ratio:4/3;border-radius:8px;background-size:cover;background-position:center;cursor:pointer;transition:.2s var(--ease);border:2px solid transparent}
+.picker .pki:hover{border-color:var(--accent)}
+
+.empty{text-align:center;color:var(--muted);padding:60px;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:.35s var(--ease-out);z-index:90}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:1080px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .panels{grid-template-columns:1fr}
+  .fmgr{grid-template-columns:1fr}
+  .gimgs{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:820px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .phead,.prow{grid-template-columns:26px 48px 1.4fr 70px 70px}
+  .phead span:nth-child(4),.phead span:nth-child(7),.prow .pmeta,.prow .pacts{display:none}
+}
+
+/* auth gate */
+.authgate{position:fixed;inset:0;z-index:200;background:var(--paper);display:none;align-items:center;justify-content:center}
+.authbox{width:320px;display:flex;flex-direction:column;gap:12px}
+.authbox .ab-brand{font-size:20px;font-weight:600;letter-spacing:-.01em}
+.authbox .ab-brand b{color:var(--accent)}
+.authbox .ab-sub{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.authbox .btn{justify-content:center;margin-top:4px}
+.au-err{color:#b4534b;font-size:12.5px;min-height:16px}
+</style>
+</head>
+<body>
+<div class="authgate" id="authgate">
+  <form class="authbox" id="authform">
+    <div class="ab-brand">miaw<b>studio</b></div>
+    <div class="ab-sub">Dashboard sign in</div>
+    <input class="inp" id="au-email" type="email" placeholder="Email" autocomplete="username" value="admin@miaw.studio">
+    <input class="inp" id="au-pass" type="password" placeholder="Password" autocomplete="current-password">
+    <button class="btn pri" id="au-btn" type="submit">Sign in</button>
+    <div class="au-err" id="au-err"></div>
+  </form>
+</div>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="side">
+    <div class="brand">miaw<b>studio</b></div>
+    <nav class="snav" id="snav">
+      <button data-view="overview" class="on"><span class="ic">◍</span> Overview</button>
+      <button data-view="projects"><span class="ic">▦</span> Projects</button>
+      <button data-view="about"><span class="ic">✎</span> About</button>
+      <button data-view="filters"><span class="ic">⚑</span> Filters</button>
+    </nav>
+    <div class="foot">
+      <a class="vsite" href="index.html" target="_blank">↗ View site</a>
+      <div class="usr"><div class="av">T</div><div><div class="nm">Tjoa</div><div class="rl mono">Admin</div></div></div>
+      <a class="vsite" id="signout" style="cursor:pointer">⏏ Sign out</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div><h1 id="pg-title">Overview</h1><div class="sub mono" id="pg-sub">Last 30 days</div></div>
+      <div class="acts" id="pg-acts"></div>
+    </div>
+    <div class="wrap">
+
+      <!-- OVERVIEW -->
+      <section class="view on" id="v-overview">
+        <div class="kpis" id="kpis"></div>
+        <div class="panels">
+          <div class="card">
+            <div class="ch"><span class="t">Views</span><span class="m mono">30d</span></div>
+            <div class="chartwrap" id="chart"></div>
+            <div class="legend"><span>Total <b id="lg-total">—</b></span><span>Peak <b id="lg-peak">—</b></span></div>
+          </div>
+          <div class="card">
+            <div class="ch"><span class="t">Top projects</span><span class="m mono">by views</span></div>
+            <div class="toplist" id="toplist"></div>
+            <div class="ch" style="margin-top:26px"><span class="t">Sources</span><span class="m mono">traffic</span></div>
+            <div class="sources" id="sources"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="view" id="v-projects">
+        <div class="ptable">
+          <div class="phead"><span></span><span></span><span>Project</span><span>Meta</span><span>Status</span><span>Views</span><span></span></div>
+          <div id="prows"></div>
+        </div>
+      </section>
+
+      <!-- EDITOR -->
+      <section class="view" id="v-editor">
+        <div class="editor" id="editor"></div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="view" id="v-about">
+        <div class="editor" id="about-editor"></div>
+      </section>
+
+      <!-- FILTERS -->
+      <section class="view" id="v-filters">
+        <div class="fmgr" id="fmgr"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- image picker -->
+<div class="picker" id="picker"><div class="pk"><div class="pkh"><span>Select image</span><button id="pk-close">Close ×</button></div><div class="pkg" id="pk-grid"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const SB_URL='https://unhrdsxnyaiyrnngqasp.supabase.co';
+const SB_KEY='sb_publishable_0OpQDsYmbTlVBaDPPpofCA_-JrCRkNp';
+const sb=createClient(SB_URL,SB_KEY);
+
+const IMG=[
+ "https://pikaso.cdnpk.net/private/production/5287920337/render.jpg?token=exp=1788220800~hmac=142093d6e373ef93321b1ed43c3dd9957000bddf0039e9f05de75b62337b8667",
+ "https://pikaso.cdnpk.net/private/production/5287919057/render.jpg?token=exp=1788220800~hmac=d1c2e28fd9af3a3f6b6a4d0c1dc05c40938d2d2be25925a5c35b3689d7091f5e",
+ "https://pikaso.cdnpk.net/private/production/5287920783/render.jpg?token=exp=1788220800~hmac=7fc473dba1e9a4ff1d44523e02c81b61830c728dec06a917f78a95e7c97bd54d",
+ "https://pikaso.cdnpk.net/private/production/5287921019/render.jpg?token=exp=1788220800~hmac=55e2a475e8937bc1546c06a6acfe0dcc02c372cb73f475b478ce961d3369af6a",
+ "https://pikaso.cdnpk.net/private/production/5287921632/render.jpg?token=exp=1788220800~hmac=43741d7df84e2125c52c1c81aab1c06905f93f35ed7a9a59bc2b9896f04e4e28",
+ "https://pikaso.cdnpk.net/private/production/5287922366/render.jpg?token=exp=1788220800~hmac=33f5dd1b3f3c3bc23b320f0dca467a02a3d9ebb782d9f8a7f2edcacdd6737ac6",
+ "https://pikaso.cdnpk.net/private/production/5287922608/render.jpg?token=exp=1788220800~hmac=5f04e1aa253985c49deb6dec69d94984fab865f0a949b23d6be3054f29da5e9f",
+ "https://pikaso.cdnpk.net/private/production/5287921629/render.jpg?token=exp=1788220800~hmac=3ab5b0711b821a11d161b4dddbcc527ba00bac13db02ed0e0704788e7dba0735",
+ "https://pikaso.cdnpk.net/private/production/5287923250/render.jpg?token=exp=1788220800~hmac=f68dea05e6b69505804621ad9745faf4ec05b8184a951290ac98fef2a9f364ab",
+ "https://pikaso.cdnpk.net/private/production/5287922358/render.jpg?token=exp=1788220800~hmac=bc9f9e38e536f2e5431f9040e0ed4a1fcd3ef067ee9147d3b4e6dc3fdcc40480"
+];
+
+const state={projects:[],about:{headline:'',lead:'',practice:[],contacts:[]},filterRows:[],filters:{device:[],industry:[],type:[]}};
+const $=s=>document.querySelector(s);
+const pad=n=>String(n).padStart(2,'0');
+const fmt=n=>Number(n||0).toLocaleString('en-US');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),1900);}
+function rebuildFilterStrings(){state.filters={device:[],industry:[],type:[]};[...state.filterRows].sort((a,b)=>a.position-b.position).forEach(r=>{if(state.filters[r.grp])state.filters[r.grp].push(r.value);});}
+
+async function loadAll(){
+  const [pr,ab,fo]=await Promise.all([
+    sb.from('projects').select('*').order('position'),
+    sb.from('site_about').select('*').eq('id',1).single(),
+    sb.from('filter_options').select('*').order('position')
+  ]);
+  state.projects=pr.data||[];
+  if(ab.data)state.about=ab.data;
+  state.filterRows=fo.data||[];
+  rebuildFilterStrings();
+}
+async function persistOrder(){await sb.from('projects').upsert(state.projects.map((p,i)=>({id:p.id,position:i})));state.projects.forEach((p,i)=>p.position=i);}
+
+const TITLES={overview:["Overview","Last 30 days"],projects:["Projects","Manage front-site content"],editor:["Edit project","Front-site content"],about:["About page","Edit front-site about"],filters:["Filters","Manage filter options"]};
+function acts(view){
+  const el=$('#pg-acts');el.innerHTML='';
+  if(view==='projects'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add project';b.onclick=()=>openEditor(null);el.appendChild(b);}
+  if(view==='editor'){el.innerHTML='<button class="btn ghost" id="ed-cancel">Cancel</button><button class="btn pri" id="ed-save">Save project</button>';$('#ed-cancel').onclick=()=>nav('projects');$('#ed-save').onclick=saveEditor;}
+  if(view==='about'){const b=document.createElement('button');b.className='btn pri';b.textContent='Save changes';b.onclick=saveAbout;el.appendChild(b);}
+}
+function nav(view){
+  document.querySelectorAll('.snav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view||(view==='editor'&&b.dataset.view==='projects')));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  $('#v-'+view).classList.add('on');
+  $('#pg-title').textContent=TITLES[view][0];$('#pg-sub').textContent=TITLES[view][1];
+  acts(view);
+  if(view==='overview')renderOverview();
+  if(view==='projects')renderProjects();
+  if(view==='about')renderAbout();
+  if(view==='filters')renderFilters();
+}
+document.querySelectorAll('.snav button').forEach(b=>b.onclick=()=>nav(b.dataset.view));
+
+function renderOverview(){
+  const totalViews=state.projects.reduce((a,p)=>a+(p.views||0),0);
+  const pubs=state.projects.filter(p=>p.status==='Published').length;
+  const kpis=[["Total views",fmt(totalViews),'<b>+12.4%</b> vs prev'],["Unique visitors","11,240",'<b>+8.1%</b> vs prev'],["Avg. time","1m 48s",'<b class="dn">-3.2%</b> vs prev'],["Published",pubs+" / "+state.projects.length,'projects live']];
+  $('#kpis').innerHTML=kpis.map(k=>`<div class="kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="d">${k[2]}</div></div>`).join('');
+  const N=30;let v=520,pts=[];for(let i=0;i<N;i++){v+=Math.sin(i/3)*22+(i*6)+(Math.random()*40-20);pts.push(Math.max(380,Math.round(v)));}
+  const w=560,h=200,max=Math.max(...pts),min=Math.min(...pts);const x=i=>i/(N-1)*w,y=val=>h-((val-min)/(max-min))*(h-24)-12;
+  let d='',a=`M0 ${h} `;pts.forEach((p,i)=>{const cx=x(i),cy=y(p);d+=(i?'L':'M')+cx.toFixed(1)+' '+cy.toFixed(1)+' ';a+='L'+cx.toFixed(1)+' '+cy.toFixed(1)+' ';});a+=`L${w} ${h} Z`;
+  $('#chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E4A63" stop-opacity=".16"/><stop offset="1" stop-color="#2E4A63" stop-opacity="0"/></linearGradient></defs><path d="${a}" fill="url(#g)"/><path d="${d}" fill="none" stroke="#2E4A63" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${x(N-1)}" cy="${y(pts[N-1])}" r="3.5" fill="#2E4A63"/></svg>`;
+  $('#lg-total').textContent=fmt(pts.reduce((a,b)=>a+b,0));$('#lg-peak').textContent=fmt(max);
+  const top=[...state.projects].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,5);const mx=(top[0]&&top[0].views)||1;
+  $('#toplist').innerHTML=top.map((p,i)=>`<div class="topitem"><span class="rk mono">${pad(i+1)}</span><span class="nm">${p.name}</span><span class="vw mono">${fmt(p.views)}</span><div class="bar"><i style="width:${(p.views||0)/mx*100}%"></i></div></div>`).join('');
+  const src=[["Direct",42],["Search",31],["Social",18],["Referral",9]];
+  $('#sources').innerHTML=src.map(s=>`<div class="src"><div class="sr"><span>${s[0]}</span><span class="p mono">${s[1]}%</span></div><div class="tr"><i style="width:${s[1]}%"></i></div></div>`).join('');
+}
+
+let dragIdx=null;
+function renderProjects(){
+  const rows=$('#prows');rows.innerHTML='';
+  state.projects.forEach((p,i)=>{
+    const r=document.createElement('div');r.className='prow';r.draggable=true;r.dataset.i=i;
+    r.innerHTML=`<span class="grip" title="Drag to reorder">\u283f</span>
+      <div class="pthumb" style="background-image:url('${p.cover||''}')"></div>
+      <div class="pname">${p.name}<div class="cap">${p.caption||''}</div></div>
+      <div class="pmeta"><span class="pchip">${p.device}</span><span class="pchip">${p.industry}</span><span class="pchip">${p.type}</span></div>
+      <div><span class="pstat ${p.status==='Published'?'pub':'draft'}"><span class="dot"></span>${p.status}</span></div>
+      <div class="pviews mono">${fmt(p.views)}</div>
+      <div class="pacts">
+        <button class="iaction" title="Edit" data-a="edit">\u270e</button>
+        <button class="iaction" title="${p.status==='Published'?'Unpublish':'Publish'}" data-a="pub">${p.status==='Published'?'\u25d0':'\u25cb'}</button>
+        <button class="iaction" title="Duplicate" data-a="dup">\u29c9</button>
+        <button class="iaction" title="Delete" data-a="del">\u2715</button>
+      </div>`;
+    r.querySelector('[data-a=edit]').onclick=()=>openEditor(p.id);
+    r.querySelector('[data-a=pub]').onclick=async()=>{const ns=p.status==='Published'?'Draft':'Published';await sb.from('projects').update({status:ns}).eq('id',p.id);p.status=ns;renderProjects();toast(p.name+' \u2192 '+ns);};
+    r.querySelector('[data-a=dup]').onclick=async()=>{const {id,created_at,...rest}=p;const copy={...rest,name:p.name+' copy',status:'Draft',position:state.projects.length,images:[...(p.images||[])]};const {data,error}=await sb.from('projects').insert(copy).select().single();if(error){toast('Error');return;}state.projects.splice(i+1,0,data);await persistOrder();renderProjects();toast('Duplicated');};
+    r.querySelector('[data-a=del]').onclick=async()=>{if(confirm('Delete "'+p.name+'"?')){await sb.from('projects').delete().eq('id',p.id);state.projects.splice(i,1);renderProjects();toast('Deleted');}};
+    r.addEventListener('dragstart',()=>{dragIdx=i;r.classList.add('dragging');});
+    r.addEventListener('dragend',()=>{dragIdx=null;r.classList.remove('dragging');document.querySelectorAll('.prow').forEach(x=>x.classList.remove('dragover'));});
+    r.addEventListener('dragover',e=>{e.preventDefault();r.classList.add('dragover');});
+    r.addEventListener('dragleave',()=>r.classList.remove('dragover'));
+    r.addEventListener('drop',async e=>{e.preventDefault();const from=dragIdx,to=i;if(from===null||from===to)return;const m=state.projects.splice(from,1)[0];state.projects.splice(to,0,m);renderProjects();await persistOrder();toast('Order updated');});
+    rows.appendChild(r);
+  });
+}
+
+let editingId=null,editDraft=null;
+function opts(list,val){return (list||[]).map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('');}
+function openEditor(id){
+  editingId=id;
+  const src=id?state.projects.find(x=>x.id===id):null;
+  editDraft=src?JSON.parse(JSON.stringify(src)):{name:"",device:state.filters.device[0]||"Desktop",industry:state.filters.industry[0]||"Fintech",type:state.filters.type[0]||"Landing Page",year:new Date().getFullYear()+"",client:"",role:"Product designer",caption:"",overview:"",approach:"",cover:"",images:[],views:0,status:'Draft'};
+  nav('editor');renderEditor();
+}
+function renderEditor(){
+  const p=editDraft,f=state.filters;
+  $('#editor').innerHTML=`
+    <div class="fld"><label>Cover image</label><div class="cover" style="background-image:url('${p.cover||''}')"><button class="change" id="ed-cover">Upload cover</button></div></div>
+    <div class="grid2">
+      <div class="fld"><label>Project name</label><input class="inp" id="f-name" value="${(p.name||'').replace(/"/g,'&quot;')}" placeholder="e.g. Obsidian"></div>
+      <div class="fld"><label>Year</label><input class="inp" id="f-yr" value="${p.year||''}"></div>
+    </div>
+    <div class="fld"><label>Caption</label><input class="inp" id="f-cap" value="${(p.caption||'').replace(/"/g,'&quot;')}" placeholder="One line shown in the index"></div>
+    <div class="grid3">
+      <div class="fld"><label>Device</label><select class="sel" id="f-dev">${opts(f.device,p.device)}</select></div>
+      <div class="fld"><label>Industry</label><select class="sel" id="f-ind">${opts(f.industry,p.industry)}</select></div>
+      <div class="fld"><label>Category</label><select class="sel" id="f-typ">${opts(f.type,p.type)}</select></div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><label>Client</label><input class="inp" id="f-cli" value="${(p.client||'').replace(/"/g,'&quot;')}"></div>
+      <div class="fld"><label>Role</label><input class="inp" id="f-rol" value="${(p.role||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div class="esec"><div class="st">Detail content</div>
+      <div class="fld"><label>Overview</label><textarea class="ta" id="f-ov" placeholder="Short overview paragraph">${p.overview||''}</textarea></div>
+      <div class="fld"><label>Approach</label><textarea class="ta" id="f-ap" placeholder="Short approach paragraph">${p.approach||''}</textarea></div>
+    </div>
+    <div class="esec"><div class="st">Gallery images</div><div class="gimgs" id="ed-gimgs"></div></div>
+    <div class="esec"><label class="toggle ${p.status==='Published'?'on':''}" id="ed-toggle"><span class="sw"></span><span class="tl">Published on front site</span></label></div>`;
+  $('#ed-cover').onclick=()=>chooseFile(false,u=>{editDraft.cover=u;renderEditor();});
+  $('#ed-toggle').onclick=()=>{editDraft.status=editDraft.status==='Published'?'Draft':'Published';$('#ed-toggle').classList.toggle('on');};
+  renderGimgs();
+}
+function renderGimgs(){
+  const g=$('#ed-gimgs');
+  g.innerHTML=(editDraft.images||[]).map((src,i)=>`<div class="gimg" style="background-image:url('${src}')"><button class="rm" data-i="${i}">\u00d7</button></div>`).join('')+`<button class="gadd" id="ed-gadd">+</button>`;
+  g.querySelectorAll('.rm').forEach(b=>b.onclick=()=>{editDraft.images.splice(+b.dataset.i,1);renderGimgs();});
+  $('#ed-gadd').onclick=()=>chooseFile(true,u=>{editDraft.images=editDraft.images||[];editDraft.images.push(u);renderGimgs();});
+}
+function collectEditor(){
+  const p=editDraft;
+  p.name=$('#f-name').value.trim()||'Untitled';p.year=$('#f-yr').value.trim();p.caption=$('#f-cap').value.trim();
+  p.device=$('#f-dev').value;p.industry=$('#f-ind').value;p.type=$('#f-typ').value;
+  p.client=$('#f-cli').value.trim();p.role=$('#f-rol').value.trim();
+  p.overview=$('#f-ov').value.trim();p.approach=$('#f-ap').value.trim();
+  if(!(p.images&&p.images.length))p.images=p.cover?[p.cover]:[];
+  if(!p.cover&&p.images.length)p.cover=p.images[0];
+}
+async function saveEditor(){
+  collectEditor();const p=editDraft;
+  if(editingId){const {id,created_at,...rest}=p;const {error}=await sb.from('projects').update(rest).eq('id',editingId);if(error){toast('Save failed');return;}const idx=state.projects.findIndex(x=>x.id===editingId);state.projects[idx]={...state.projects[idx],...rest};}
+  else{p.position=state.projects.length;const {id,created_at,...rest}=p;const {data,error}=await sb.from('projects').insert(rest).select().single();if(error){toast('Save failed');return;}state.projects.push(data);}
+  toast('Project saved');nav('projects');
+}
+
+function renderAbout(){
+  const a=state.about;
+  $('#about-editor').innerHTML=`
+    <div class="fld"><label>Headline</label><textarea class="ta" id="a-head">${a.headline||''}</textarea></div>
+    <div class="fld"><label>Lead paragraph</label><textarea class="ta" id="a-lead">${a.lead||''}</textarea></div>
+    <div class="esec"><div class="st">Practice</div><div id="a-prac"></div><button class="addrow" id="a-prac-add">+ Add item</button></div>
+    <div class="esec"><div class="st">Contact links</div><div id="a-cont"></div><button class="addrow" id="a-cont-add">+ Add link</button></div>`;
+  a.practice=a.practice||[];a.contacts=a.contacts||[];
+  const prac=$('#a-prac');
+  const drawPrac=()=>{prac.innerHTML=a.practice.map((r,i)=>`<div class="rowedit"><input class="inp" data-k="t" data-i="${i}" value="${(r[0]||'').replace(/"/g,'&quot;')}" placeholder="Title"><input class="inp" data-k="d" data-i="${i}" value="${(r[1]||'').replace(/"/g,'&quot;')}" placeholder="Description"><button class="del" data-i="${i}">\u00d7</button></div>`).join('');
+    prac.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{a.practice[+inp.dataset.i][inp.dataset.k==='t'?0:1]=inp.value;});
+    prac.querySelectorAll('.del').forEach(b=>b.onclick=()=>{a.practice.splice(+b.dataset.i,1);drawPrac();});};
+  drawPrac();$('#a-prac-add').onclick=()=>{a.practice.push(["New","Description"]);drawPrac();};
+  const cont=$('#a-cont');
+  const drawCont=()=>{cont.innerHTML=a.contacts.map((r,i)=>`<div class="rowedit"><input class="inp" data-k="t" data-i="${i}" value="${(r[0]||'').replace(/"/g,'&quot;')}" placeholder="Label"><input class="inp" data-k="d" data-i="${i}" value="${(r[1]||'').replace(/"/g,'&quot;')}" placeholder="URL / email"><button class="del" data-i="${i}">\u00d7</button></div>`).join('');
+    cont.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{a.contacts[+inp.dataset.i][inp.dataset.k==='t'?0:1]=inp.value;});
+    cont.querySelectorAll('.del').forEach(b=>b.onclick=()=>{a.contacts.splice(+b.dataset.i,1);drawCont();});};
+  drawCont();$('#a-cont-add').onclick=()=>{a.contacts.push(["Label","#"]);drawCont();};
+}
+async function saveAbout(){
+  state.about.headline=$('#a-head').value;state.about.lead=$('#a-lead').value;
+  const {error}=await sb.from('site_about').update({headline:state.about.headline,lead:state.about.lead,practice:state.about.practice,contacts:state.about.contacts}).eq('id',1);
+  toast(error?'Save failed':'About saved');
+}
+
+function renderFilters(){
+  const groups=[["device","By device"],["industry","By industry"],["type","By category"]];
+  $('#fmgr').innerHTML=groups.map(([k,l])=>`<div class="fcol"><div class="ct">${l}</div><div id="fc-${k}"></div><div class="fadd"><input class="inp" id="fa-${k}" placeholder="Add option"><button class="btn" data-add="${k}">Add</button></div></div>`).join('');
+  groups.forEach(([k])=>{
+    const draw=()=>{const rows=state.filterRows.filter(r=>r.grp===k).sort((a,b)=>a.position-b.position);
+      $('#fc-'+k).innerHTML=rows.map(r=>{const cnt=state.projects.filter(p=>p[k]===r.value).length;return `<div class="fopt"><span class="nm">${r.value}</span><span class="cnt mono">${pad(cnt)}</span><button class="x" data-id="${r.id}">\u00d7</button></div>`;}).join('');
+      $('#fc-'+k).querySelectorAll('.x').forEach(b=>b.onclick=async()=>{await sb.from('filter_options').delete().eq('id',b.dataset.id);state.filterRows=state.filterRows.filter(x=>x.id!==b.dataset.id);rebuildFilterStrings();draw();toast('Removed');});};
+    draw();
+    $('#fmgr').querySelector(`[data-add="${k}"]`).onclick=async()=>{const inp=$('#fa-'+k);const v=inp.value.trim();if(!v)return;const pos=state.filterRows.filter(r=>r.grp===k).length;const {data,error}=await sb.from('filter_options').insert({grp:k,value:v,position:pos}).select().single();if(error){toast('Error');return;}state.filterRows.push(data);rebuildFilterStrings();inp.value='';draw();toast('Option added');};
+  });
+}
+
+async function uploadFile(file){const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const path='projects/'+Date.now()+'_'+Math.random().toString(36).slice(2,7)+'_'+safe;const {error}=await sb.storage.from('media').upload(path,file,{cacheControl:'3600',upsert:false});if(error){console.error(error);toast('Upload failed');return null;}return sb.storage.from('media').getPublicUrl(path).data.publicUrl;}
+function chooseFile(multiple,cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.multiple=!!multiple;inp.onchange=async()=>{const files=[...inp.files];if(!files.length)return;toast('Uploading\u2026');let ok=0;for(const f of files){const u=await uploadFile(f);if(u){cb(u);ok++;}}if(ok)toast(ok+' image'+(ok>1?'s':'')+' uploaded');};inp.click();}
+
+const authgate=$('#authgate');
+async function showApp(){authgate.style.display='none';try{await loadAll();nav('overview');}catch(err){console.error(err);$('#kpis').innerHTML='<div class="empty">Failed to load data.</div>';}}
+function showLogin(){authgate.style.display='flex';}
+$('#authform').addEventListener('submit',async e=>{e.preventDefault();$('#au-err').textContent='';const btn=$('#au-btn');btn.textContent='Signing in\u2026';const {error}=await sb.auth.signInWithPassword({email:$('#au-email').value.trim(),password:$('#au-pass').value});btn.textContent='Sign in';if(error){$('#au-err').textContent=error.message;return;}await showApp();});
+$('#signout').onclick=async()=>{await sb.auth.signOut();location.reload();};
+(async()=>{const {data}=await sb.auth.getSession();if(data.session){await showApp();}else{showLogin();}})();
+</script>
+</body>
+</html>
