@@ -72,7 +72,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .stage-img{position:absolute;inset:0;opacity:0;transition:opacity .7s var(--ease)}
 .stage-img.on{opacity:1}
 .stage-img .sb{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(38px) saturate(1.08);transform:scale(1.18);will-change:transform}
-.stage-img .sf{position:absolute;inset:0;background-size:contain;background-repeat:no-repeat;background-position:center}
+.stage-img .sf{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);height:82%;max-width:90%;aspect-ratio:4/5;background-size:cover;background-position:center;background-repeat:no-repeat;box-shadow:0 30px 70px rgba(0,0,0,.22)}
 .stage-open{position:absolute;right:24px;bottom:24px;z-index:4;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--paper);mix-blend-mode:difference;border-bottom:1px solid;padding-bottom:2px;opacity:0;transition:opacity .4s var(--ease)}
 .stage-col.has .stage-open{opacity:1}
 .stage-cap{position:absolute;left:26px;bottom:24px;z-index:3;color:var(--paper);mix-blend-mode:difference;pointer-events:none}
@@ -80,10 +80,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .stage-cap .c{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;opacity:.8;margin-top:8px}
 .stage-idx{position:absolute;right:24px;top:22px;z-index:3;font-family:"Space Mono",monospace;font-size:12px;color:var(--paper);mix-blend-mode:difference}
 
-/* GRID → bento, horizontal scroll */
-.grid-scroller{position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+/* GRID — bento, vertical scroll (looping) */
+.grid-scroller{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
 .grid-scroller::-webkit-scrollbar{display:none}
-.bento{display:grid;grid-auto-flow:column dense;grid-template-rows:repeat(3,1fr);grid-auto-columns:22vw;gap:2px;padding:2px;height:100%;box-sizing:border-box}
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:20vh;grid-auto-flow:dense;gap:2px;padding:2px}
 .tile{position:relative;overflow:hidden;background:var(--stage);cursor:pointer;background-size:cover;background-position:center}
 .tile.land{grid-column:span 2}
 .tile.port{grid-row:span 2}
@@ -199,7 +199,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .row.active .thumb{height:46vw;margin-top:16px}
   .about-grid{grid-template-columns:1fr;gap:20px}
   .svc-item .d{display:none}
-  .bento{grid-template-rows:repeat(2,1fr);grid-auto-columns:64vw}
+  .bento{grid-template-columns:repeat(2,1fr);grid-auto-rows:26vh}
   .search{width:120px}
   .d-toc{display:none}.d-wrap{max-width:none}
   .d-meta{grid-template-columns:1fr 1fr}
@@ -246,6 +246,31 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .c-lead{font-size:16px;line-height:1.55;color:#3a3a3a;margin-top:20px;max-width:44ch}
 .cta2{margin-top:36px;align-self:flex-start;border:1px solid var(--ink);padding:12px 20px;border-radius:100px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;transition:.25s var(--ease)}
 .cta2:hover{background:var(--ink);color:var(--paper)}
+
+/* LIST view */
+.list-view{position:absolute;inset:0;overflow:hidden}
+.lv-scroller{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+.lv-scroller::-webkit-scrollbar{display:none}
+.lv-set{padding:8px 0}
+.lrow{display:grid;grid-template-columns:70px 1fr auto;align-items:baseline;gap:20px;padding:26px 40px;border-bottom:1px solid var(--hair);cursor:pointer;transition:opacity .3s var(--ease),padding .4s var(--ease-out)}
+.lv-scroller:hover .lrow{opacity:.36}
+.lrow:hover{opacity:1;padding-left:50px}
+.lrow .lnum{font-size:12px;color:var(--muted)}
+.lrow .lname{font-size:clamp(24px,4vw,46px);font-weight:500;letter-spacing:-.02em;line-height:1}
+.lrow .lmeta{text-align:right;line-height:1.5}
+.lrow .lcat{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block}
+.lrow .lyr{font-size:11px;color:var(--muted)}
+.lrow .lthumb{display:none}
+.lv-peek{position:fixed;z-index:45;width:250px;height:172px;background-size:cover;background-position:center;border-radius:4px;box-shadow:0 22px 55px rgba(0,0,0,.30);opacity:0;transform:translate(-50%,-50%);transition:opacity .3s var(--ease),transform .25s var(--ease-out);pointer-events:none;will-change:left,top,transform}
+.lv-peek.on{opacity:1}
+@media(max-width:860px){
+  .lrow{grid-template-columns:44px 1fr;gap:14px;padding:14px 20px;align-items:center}
+  .lrow .lnum{display:none}
+  .lrow .lmeta{display:none}
+  .lrow .lname{font-size:20px}
+  .lrow .lthumb{display:block;width:44px;height:44px;border-radius:5px;background-size:cover;background-position:center}
+  .lv-scroller:hover .lrow{opacity:1}
+}
 </style>
 </head>
 <body>
@@ -263,6 +288,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   <div class="views">
     <button data-view="index" class="on">Index</button>
     <button data-view="grid">Grid</button>
+    <button data-view="list">List</button>
   </div>
   <div class="subright">
     <input class="search" id="search" type="text" placeholder="Search projects" autocomplete="off">
@@ -282,7 +308,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     </div>
   </div>
   <div class="grid-scroller" id="view-grid" style="display:none"></div>
-  <div class="grid-hint" id="grid-hint">Scroll →</div>
+  <div class="list-view" id="view-list" style="display:none"><div class="lv-scroller" id="lv-scroller"></div></div>
+  <div class="lv-peek" id="lv-peek"></div>
 </section>
 
 <!-- DETAIL -->
@@ -399,8 +426,9 @@ function setStage(w){
 /* ---- vertical loop (index) ---- */
 function makeLoop(scroller,buildSet){
   scroller.innerHTML='';
-  const setA=buildSet();const setB=buildSet();
-  scroller.append(setA,setB);
+  const setA=buildSet();scroller.appendChild(setA);
+  if(setA.offsetHeight<=scroller.clientHeight+2){scroller.onscroll=null;scroller.scrollTop=0;return;}
+  const setB=buildSet();scroller.appendChild(setB);
   let setH=setA.offsetHeight;const measure=()=>{setH=setA.offsetHeight;};
   window.addEventListener('resize',measure);scroller.scrollTop=1;
   scroller.onscroll=()=>{if(setH<=0)return;if(scroller.scrollTop>=setH)scroller.scrollTop-=setH;else if(scroller.scrollTop<=0)scroller.scrollTop+=setH;onScrollActive();};
@@ -455,9 +483,31 @@ function buildBentoSet(){
 function renderBento(){
   const fl=filtered();
   if(!fl.length){bentoScroller.innerHTML='<div class="grid-empty" style="display:flex">No works match</div>';return;}
-  const set=buildBentoSet();bentoScroller.innerHTML='';bentoScroller.appendChild(set);bentoScroller.scrollLeft=0;
+  makeLoop(bentoScroller,buildBentoSet);
 }
-bentoScroller.addEventListener('wheel',e=>{if(bentoScroller.style.display==='none')return;if(!bentoScroller.firstElementChild)return;e.preventDefault();bentoScroller.scrollLeft+=(Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX);},{passive:false});
+
+/* ---- LIST view (cursor peek, tilt) ---- */
+const lvScroller=document.getElementById('lv-scroller');
+const lvPeek=document.getElementById('lv-peek');
+function buildListViewSet(){
+  const set=document.createElement('div');set.className='lv-set';
+  filtered().forEach(w=>{
+    const r=document.createElement('div');r.className='lrow';r.dataset.n=w.n;
+    r.innerHTML=`<div class="lthumb" style="background-image:url('${w.thumb}')"></div><div class="lnum mono">${pad(w.n)}</div><div class="lname">${w.name}</div><div class="lmeta"><span class="lcat">${w.type}</span><span class="lyr mono">${w.yr}</span></div>`;
+    r.addEventListener('mouseenter',()=>{if(isMobile())return;lvPeek.style.backgroundImage=`url('${w.thumb}')`;lvPeek.classList.add('on');});
+    r.addEventListener('click',()=>openDetail(w.n));
+    set.appendChild(r);
+  });
+  return set;
+}
+function renderListView(){
+  const fl=filtered();
+  if(!fl.length){lvScroller.innerHTML='<div class="grid-empty" style="display:flex">No works match</div>';return;}
+  makeLoop(lvScroller,buildListViewSet);
+}
+let _llx=null,_lvx=0;
+lvScroller.addEventListener('mousemove',e=>{if(isMobile())return;if(_llx!=null)_lvx=e.clientX-_llx;_llx=e.clientX;lvPeek.style.left=e.clientX+'px';lvPeek.style.top=e.clientY+'px';const rot=Math.max(-12,Math.min(12,_lvx*0.6));lvPeek.style.transform=`translate(-50%,-50%) rotate(${rot}deg)`;});
+lvScroller.addEventListener('mouseleave',()=>lvPeek.classList.remove('on'));
 
 /* ---- DETAIL ---- */
 const detailInner=document.getElementById('detail-inner');
@@ -538,7 +588,7 @@ function buildDrawer(){
 }
 function applyFilters(){
   renderList();
-  if(curView==='grid')renderBento();
+  if(curView==='grid')renderBento();else if(curView==='list')renderListView();
   const f=filtered().length,a=activeCount();
   document.getElementById('res-count').textContent=f+" works";
   document.getElementById('foot-count').textContent=f;
@@ -555,15 +605,18 @@ document.getElementById('filter-clear').onclick=()=>{Object.values(selected).for
 const searchEl=document.getElementById('search');if(searchEl)searchEl.addEventListener('input',()=>{searchQ=searchEl.value.trim().toLowerCase();applyFilters();});
 
 /* ---- view toggle ---- */
-const viewIndex=document.getElementById('view-index');
+const VIEW_EL={index:document.getElementById('view-index'),grid:document.getElementById('view-grid'),list:document.getElementById('view-list')};
+function applyView(){
+  Object.entries(VIEW_EL).forEach(([k,el])=>{el.style.display=(k===curView)?(k==='index'?'flex':'block'):'none';});
+  if(curView!=='list')lvPeek.classList.remove('on');
+  if(curView==='index')renderList();
+  else if(curView==='grid')renderBento();
+  else if(curView==='list')renderListView();
+}
 document.querySelectorAll('.views button').forEach(b=>{
   b.onclick=()=>{const v=b.dataset.view;if(v===curView)return;curView=v;
     document.querySelectorAll('.views button').forEach(x=>x.classList.toggle('on',x===b));
-    const showIdx=v==='index';
-    viewIndex.style.display=showIdx?'flex':'none';
-    bentoScroller.style.display=showIdx?'none':'block';
-    const gh=document.getElementById('grid-hint');if(gh)gh.style.display=showIdx?'none':'block';
-    if(showIdx)renderList();else renderBento();
+    applyView();
   };
 });
 
