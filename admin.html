@@ -201,6 +201,24 @@ a{color:inherit;text-decoration:none}
 .authbox .ab-sub{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
 .authbox .btn{justify-content:center;margin-top:4px}
 .au-err{color:#b4534b;font-size:12.5px;min-height:16px}
+
+/* inbox */
+.inbox{border:1px solid var(--hair);border-radius:12px;overflow:hidden}
+.qrow{display:grid;grid-template-columns:10px 1.6fr 1.4fr 92px 90px 84px;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--hair);cursor:pointer;transition:background .2s var(--ease)}
+.qrow:last-child{border-bottom:none}
+.qrow:hover{background:var(--soft)}
+.qstat{width:8px;height:8px;border-radius:50%;background:transparent}
+.qstat.new{background:var(--accent)}
+.qname{font-size:14px;font-weight:500}
+.qname .qmail{font-size:11.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.qsvc{font-size:12.5px;color:var(--muted)}
+.qbud{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted)}
+.qdate{font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted)}
+.qtag{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:right}
+.qtag.arch{opacity:.45}
+.ibadge{font-family:"Space Mono",monospace;font-size:9px;background:var(--accent);color:#fff;border-radius:100px;padding:1px 6px;margin-left:2px}
+.iqlbl{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+@media(max-width:820px){.qrow{grid-template-columns:10px 1fr 70px}.qrow .qsvc,.qrow .qbud{display:none}}
 </style>
 </head>
 <body>
@@ -222,6 +240,7 @@ a{color:inherit;text-decoration:none}
     <nav class="snav" id="snav">
       <button data-view="overview" class="on"><span class="ic">◍</span> Overview</button>
       <button data-view="projects"><span class="ic">▦</span> Projects</button>
+      <button data-view="inbox"><span class="ic">✉</span> Inbox <span class="ibadge" id="ibadge" hidden>0</span></button>
       <button data-view="about"><span class="ic">✎</span> About</button>
       <button data-view="filters"><span class="ic">⚑</span> Filters</button>
     </nav>
@@ -281,6 +300,10 @@ a{color:inherit;text-decoration:none}
         <div class="fmgr" id="fmgr"></div>
       </section>
 
+      <!-- INBOX -->
+      <section class="view" id="v-inbox"><div class="inbox" id="inbox-list"></div></section>
+      <section class="view" id="v-inquiry"><div class="editor" id="inquiry"></div></section>
+
     </div>
   </main>
 </div>
@@ -308,7 +331,7 @@ const IMG=[
  "https://pikaso.cdnpk.net/private/production/5287922358/render.jpg?token=exp=1788220800~hmac=bc9f9e38e536f2e5431f9040e0ed4a1fcd3ef067ee9147d3b4e6dc3fdcc40480"
 ];
 
-const state={projects:[],about:{headline:'',lead:'',practice:[],contacts:[]},filterRows:[],filters:{device:[],industry:[],type:[]}};
+const state={projects:[],about:{headline:'',lead:'',practice:[],contacts:[]},filterRows:[],filters:{device:[],industry:[],type:[]},inquiries:[]};
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const fmt=n=>Number(n||0).toLocaleString('en-US');
@@ -316,19 +339,21 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 function rebuildFilterStrings(){state.filters={device:[],industry:[],type:[]};[...state.filterRows].sort((a,b)=>a.position-b.position).forEach(r=>{if(state.filters[r.grp])state.filters[r.grp].push(r.value);});}
 
 async function loadAll(){
-  const [pr,ab,fo]=await Promise.all([
+  const [pr,ab,fo,iq]=await Promise.all([
     sb.from('projects').select('*').order('position'),
     sb.from('site_about').select('*').eq('id',1).single(),
-    sb.from('filter_options').select('*').order('position')
+    sb.from('filter_options').select('*').order('position'),
+    sb.from('inquiries').select('*').order('created_at',{ascending:false})
   ]);
   state.projects=pr.data||[];
   if(ab.data)state.about=ab.data;
   state.filterRows=fo.data||[];
+  state.inquiries=iq.data||[];
   rebuildFilterStrings();
 }
 async function persistOrder(){await sb.from('projects').upsert(state.projects.map((p,i)=>({id:p.id,position:i})));state.projects.forEach((p,i)=>p.position=i);}
 
-const TITLES={overview:["Overview","Last 30 days"],projects:["Projects","Manage front-site content"],editor:["Edit project","Front-site content"],about:["About page","Edit front-site about"],filters:["Filters","Manage filter options"]};
+const TITLES={overview:["Overview","Last 30 days"],projects:["Projects","Manage front-site content"],editor:["Edit project","Front-site content"],about:["About page","Edit front-site about"],filters:["Filters","Manage filter options"],inbox:["Inbox","Incoming inquiries"],inquiry:["Inquiry","Inbox"]};
 function acts(view){
   const el=$('#pg-acts');el.innerHTML='';
   if(view==='projects'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add project';b.onclick=()=>openEditor(null);el.appendChild(b);}
@@ -336,7 +361,7 @@ function acts(view){
   if(view==='about'){const b=document.createElement('button');b.className='btn pri';b.textContent='Save changes';b.onclick=saveAbout;el.appendChild(b);}
 }
 function nav(view){
-  document.querySelectorAll('.snav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view||(view==='editor'&&b.dataset.view==='projects')));
+  document.querySelectorAll('.snav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view||(view==='editor'&&b.dataset.view==='projects')||(view==='inquiry'&&b.dataset.view==='inbox')));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   $('#v-'+view).classList.add('on');
   $('#pg-title').textContent=TITLES[view][0];$('#pg-sub').textContent=TITLES[view][1];
@@ -345,6 +370,7 @@ function nav(view){
   if(view==='projects')renderProjects();
   if(view==='about')renderAbout();
   if(view==='filters')renderFilters();
+  if(view==='inbox')renderInbox();
 }
 document.querySelectorAll('.snav button').forEach(b=>b.onclick=()=>nav(b.dataset.view));
 
@@ -369,20 +395,20 @@ function renderProjects(){
   const rows=$('#prows');rows.innerHTML='';
   state.projects.forEach((p,i)=>{
     const r=document.createElement('div');r.className='prow';r.draggable=true;r.dataset.i=i;
-    r.innerHTML=`<span class="grip" title="Drag to reorder">\u283f</span>
-      <div class="pthumb" style="background-image:url('${p.cover||''}')"></div>
+    r.innerHTML=`<span class="grip" title="Drag to reorder">⠿</span>
+      <div class="pthumb" style="background-image:url('${p.cover_thumb||p.cover||''}')"></div>
       <div class="pname">${p.name}<div class="cap">${p.caption||''}</div></div>
       <div class="pmeta"><span class="pchip">${p.device}</span><span class="pchip">${p.industry}</span><span class="pchip">${p.type}</span></div>
       <div><span class="pstat ${p.status==='Published'?'pub':'draft'}"><span class="dot"></span>${p.status}</span></div>
       <div class="pviews mono">${fmt(p.views)}</div>
       <div class="pacts">
-        <button class="iaction" title="Edit" data-a="edit">\u270e</button>
-        <button class="iaction" title="${p.status==='Published'?'Unpublish':'Publish'}" data-a="pub">${p.status==='Published'?'\u25d0':'\u25cb'}</button>
-        <button class="iaction" title="Duplicate" data-a="dup">\u29c9</button>
-        <button class="iaction" title="Delete" data-a="del">\u2715</button>
+        <button class="iaction" title="Edit" data-a="edit">✎</button>
+        <button class="iaction" title="${p.status==='Published'?'Unpublish':'Publish'}" data-a="pub">${p.status==='Published'?'◐':'○'}</button>
+        <button class="iaction" title="Duplicate" data-a="dup">⧉</button>
+        <button class="iaction" title="Delete" data-a="del">✕</button>
       </div>`;
     r.querySelector('[data-a=edit]').onclick=()=>openEditor(p.id);
-    r.querySelector('[data-a=pub]').onclick=async()=>{const ns=p.status==='Published'?'Draft':'Published';await sb.from('projects').update({status:ns}).eq('id',p.id);p.status=ns;renderProjects();toast(p.name+' \u2192 '+ns);};
+    r.querySelector('[data-a=pub]').onclick=async()=>{const ns=p.status==='Published'?'Draft':'Published';await sb.from('projects').update({status:ns}).eq('id',p.id);p.status=ns;renderProjects();toast(p.name+' → '+ns);};
     r.querySelector('[data-a=dup]').onclick=async()=>{const {id,created_at,...rest}=p;const copy={...rest,name:p.name+' copy',status:'Draft',position:state.projects.length,images:[...(p.images||[])]};const {data,error}=await sb.from('projects').insert(copy).select().single();if(error){toast('Error');return;}state.projects.splice(i+1,0,data);await persistOrder();renderProjects();toast('Duplicated');};
     r.querySelector('[data-a=del]').onclick=async()=>{if(confirm('Delete "'+p.name+'"?')){await sb.from('projects').delete().eq('id',p.id);state.projects.splice(i,1);renderProjects();toast('Deleted');}};
     r.addEventListener('dragstart',()=>{dragIdx=i;r.classList.add('dragging');});
@@ -399,7 +425,7 @@ function opts(list,val){return (list||[]).map(o=>`<option ${o===val?'selected':'
 function openEditor(id){
   editingId=id;
   const src=id?state.projects.find(x=>x.id===id):null;
-  editDraft=src?JSON.parse(JSON.stringify(src)):{name:"",device:state.filters.device[0]||"Desktop",industry:state.filters.industry[0]||"Fintech",type:state.filters.type[0]||"Landing Page",year:new Date().getFullYear()+"",client:"",role:"Product designer",caption:"",overview:"",approach:"",cover:"",images:[],views:0,status:'Draft'};
+  editDraft=src?JSON.parse(JSON.stringify(src)):{name:"",device:state.filters.device[0]||"Desktop",industry:state.filters.industry[0]||"Fintech",type:state.filters.type[0]||"Landing Page",year:new Date().getFullYear()+"",client:"",role:"Product designer",caption:"",overview:"",approach:"",cover:"",cover_thumb:"",images:[],views:0,status:'Draft'};
   nav('editor');renderEditor();
 }
 function renderEditor(){
@@ -426,15 +452,15 @@ function renderEditor(){
     </div>
     <div class="esec"><div class="st">Gallery images</div><div class="gimgs" id="ed-gimgs"></div></div>
     <div class="esec"><label class="toggle ${p.status==='Published'?'on':''}" id="ed-toggle"><span class="sw"></span><span class="tl">Published on front site</span></label></div>`;
-  $('#ed-cover').onclick=()=>chooseFile(false,u=>{editDraft.cover=u;renderEditor();});
+  $('#ed-cover').onclick=()=>chooseCover();
   $('#ed-toggle').onclick=()=>{editDraft.status=editDraft.status==='Published'?'Draft':'Published';$('#ed-toggle').classList.toggle('on');};
   renderGimgs();
 }
 function renderGimgs(){
   const g=$('#ed-gimgs');
-  g.innerHTML=(editDraft.images||[]).map((src,i)=>`<div class="gimg" style="background-image:url('${src}')"><button class="rm" data-i="${i}">\u00d7</button></div>`).join('')+`<button class="gadd" id="ed-gadd">+</button>`;
+  g.innerHTML=(editDraft.images||[]).map((src,i)=>`<div class="gimg" style="background-image:url('${src}')"><button class="rm" data-i="${i}">×</button></div>`).join('')+`<button class="gadd" id="ed-gadd">+</button>`;
   g.querySelectorAll('.rm').forEach(b=>b.onclick=()=>{editDraft.images.splice(+b.dataset.i,1);renderGimgs();});
-  $('#ed-gadd').onclick=()=>chooseFile(true,u=>{editDraft.images=editDraft.images||[];editDraft.images.push(u);renderGimgs();});
+  $('#ed-gadd').onclick=()=>chooseGallery();
 }
 function collectEditor(){
   const p=editDraft;
@@ -442,8 +468,7 @@ function collectEditor(){
   p.device=$('#f-dev').value;p.industry=$('#f-ind').value;p.type=$('#f-typ').value;
   p.client=$('#f-cli').value.trim();p.role=$('#f-rol').value.trim();
   p.overview=$('#f-ov').value.trim();p.approach=$('#f-ap').value.trim();
-  if(!(p.images&&p.images.length))p.images=p.cover?[p.cover]:[];
-  if(!p.cover&&p.images.length)p.cover=p.images[0];
+  p.images=p.images||[];
 }
 async function saveEditor(){
   collectEditor();const p=editDraft;
@@ -461,12 +486,12 @@ function renderAbout(){
     <div class="esec"><div class="st">Contact links</div><div id="a-cont"></div><button class="addrow" id="a-cont-add">+ Add link</button></div>`;
   a.practice=a.practice||[];a.contacts=a.contacts||[];
   const prac=$('#a-prac');
-  const drawPrac=()=>{prac.innerHTML=a.practice.map((r,i)=>`<div class="rowedit"><input class="inp" data-k="t" data-i="${i}" value="${(r[0]||'').replace(/"/g,'&quot;')}" placeholder="Title"><input class="inp" data-k="d" data-i="${i}" value="${(r[1]||'').replace(/"/g,'&quot;')}" placeholder="Description"><button class="del" data-i="${i}">\u00d7</button></div>`).join('');
+  const drawPrac=()=>{prac.innerHTML=a.practice.map((r,i)=>`<div class="rowedit"><input class="inp" data-k="t" data-i="${i}" value="${(r[0]||'').replace(/"/g,'&quot;')}" placeholder="Title"><input class="inp" data-k="d" data-i="${i}" value="${(r[1]||'').replace(/"/g,'&quot;')}" placeholder="Description"><button class="del" data-i="${i}">×</button></div>`).join('');
     prac.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{a.practice[+inp.dataset.i][inp.dataset.k==='t'?0:1]=inp.value;});
     prac.querySelectorAll('.del').forEach(b=>b.onclick=()=>{a.practice.splice(+b.dataset.i,1);drawPrac();});};
   drawPrac();$('#a-prac-add').onclick=()=>{a.practice.push(["New","Description"]);drawPrac();};
   const cont=$('#a-cont');
-  const drawCont=()=>{cont.innerHTML=a.contacts.map((r,i)=>`<div class="rowedit"><input class="inp" data-k="t" data-i="${i}" value="${(r[0]||'').replace(/"/g,'&quot;')}" placeholder="Label"><input class="inp" data-k="d" data-i="${i}" value="${(r[1]||'').replace(/"/g,'&quot;')}" placeholder="URL / email"><button class="del" data-i="${i}">\u00d7</button></div>`).join('');
+  const drawCont=()=>{cont.innerHTML=a.contacts.map((r,i)=>`<div class="rowedit"><input class="inp" data-k="t" data-i="${i}" value="${(r[0]||'').replace(/"/g,'&quot;')}" placeholder="Label"><input class="inp" data-k="d" data-i="${i}" value="${(r[1]||'').replace(/"/g,'&quot;')}" placeholder="URL / email"><button class="del" data-i="${i}">×</button></div>`).join('');
     cont.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{a.contacts[+inp.dataset.i][inp.dataset.k==='t'?0:1]=inp.value;});
     cont.querySelectorAll('.del').forEach(b=>b.onclick=()=>{a.contacts.splice(+b.dataset.i,1);drawCont();});};
   drawCont();$('#a-cont-add').onclick=()=>{a.contacts.push(["Label","#"]);drawCont();};
@@ -482,20 +507,61 @@ function renderFilters(){
   $('#fmgr').innerHTML=groups.map(([k,l])=>`<div class="fcol"><div class="ct">${l}</div><div id="fc-${k}"></div><div class="fadd"><input class="inp" id="fa-${k}" placeholder="Add option"><button class="btn" data-add="${k}">Add</button></div></div>`).join('');
   groups.forEach(([k])=>{
     const draw=()=>{const rows=state.filterRows.filter(r=>r.grp===k).sort((a,b)=>a.position-b.position);
-      $('#fc-'+k).innerHTML=rows.map(r=>{const cnt=state.projects.filter(p=>p[k]===r.value).length;return `<div class="fopt"><span class="nm">${r.value}</span><span class="cnt mono">${pad(cnt)}</span><button class="x" data-id="${r.id}">\u00d7</button></div>`;}).join('');
+      $('#fc-'+k).innerHTML=rows.map(r=>{const cnt=state.projects.filter(p=>p[k]===r.value).length;return `<div class="fopt"><span class="nm">${r.value}</span><span class="cnt mono">${pad(cnt)}</span><button class="x" data-id="${r.id}">×</button></div>`;}).join('');
       $('#fc-'+k).querySelectorAll('.x').forEach(b=>b.onclick=async()=>{await sb.from('filter_options').delete().eq('id',b.dataset.id);state.filterRows=state.filterRows.filter(x=>x.id!==b.dataset.id);rebuildFilterStrings();draw();toast('Removed');});};
     draw();
     $('#fmgr').querySelector(`[data-add="${k}"]`).onclick=async()=>{const inp=$('#fa-'+k);const v=inp.value.trim();if(!v)return;const pos=state.filterRows.filter(r=>r.grp===k).length;const {data,error}=await sb.from('filter_options').insert({grp:k,value:v,position:pos}).select().single();if(error){toast('Error');return;}state.filterRows.push(data);rebuildFilterStrings();inp.value='';draw();toast('Option added');};
   });
 }
 
-async function uploadFile(file){const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const path='projects/'+Date.now()+'_'+Math.random().toString(36).slice(2,7)+'_'+safe;const {error}=await sb.storage.from('media').upload(path,file,{cacheControl:'3600',upsert:false});if(error){console.error(error);toast('Upload failed');return null;}return sb.storage.from('media').getPublicUrl(path).data.publicUrl;}
-function chooseFile(multiple,cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.multiple=!!multiple;inp.onchange=async()=>{const files=[...inp.files];if(!files.length)return;toast('Uploading\u2026');let ok=0;for(const f of files){const u=await uploadFile(f);if(u){cb(u);ok++;}}if(ok)toast(ok+' image'+(ok>1?'s':'')+' uploaded');};inp.click();}
+function resizeWebp(file,maxW,q){return new Promise(res=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.drawImage(img,0,0,w,h);c.toBlob(b=>res(b),'image/webp',q);};img.onerror=()=>res(null);img.src=URL.createObjectURL(file);});}
+async function uploadBlob(blob){if(!blob)return null;const path='projects/'+Date.now()+'_'+Math.random().toString(36).slice(2,7)+'.webp';const {error}=await sb.storage.from('media').upload(path,blob,{contentType:'image/webp',cacheControl:'3600',upsert:false});if(error){console.error(error);return null;}return sb.storage.from('media').getPublicUrl(path).data.publicUrl;}
+function chooseCover(){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;toast('Uploading cover…');const [full,thumb]=await Promise.all([resizeWebp(f,2000,0.85),resizeWebp(f,800,0.8)]);const fu=await uploadBlob(full);const tu=await uploadBlob(thumb);if(fu){editDraft.cover=fu;editDraft.cover_thumb=tu||fu;renderEditor();toast('Cover uploaded');}else toast('Upload failed');};inp.click();}
+function chooseGallery(){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.multiple=true;inp.onchange=async()=>{const files=[...inp.files];if(!files.length)return;toast('Uploading…');let ok=0;for(const f of files){const full=await resizeWebp(f,2000,0.85);const u=await uploadBlob(full);if(u){editDraft.images=editDraft.images||[];editDraft.images.push(u);ok++;}}renderGimgs();if(ok)toast(ok+' image'+(ok>1?'s':'')+' uploaded');};inp.click();}
 
+function updateInboxBadge(){const n=state.inquiries.filter(q=>q.status==='New').length;const b=$('#ibadge');if(!b)return;if(n){b.hidden=false;b.textContent=n;}else b.hidden=true;}
+function renderInbox(){
+  const rows=state.inquiries;
+  if(!rows.length){$('#inbox-list').innerHTML='<div class="empty">No inquiries yet.</div>';return;}
+  $('#inbox-list').innerHTML=rows.map(q=>`<div class="qrow" data-id="${q.id}">
+    <div class="qstat ${q.status==='New'?'new':''}"></div>
+    <div class="qname">${q.name}<div class="qmail">${q.email}${q.company?' · '+q.company:''}</div></div>
+    <div class="qsvc">${(q.services||[]).slice(0,2).join(', ')}${(q.services||[]).length>2?' +'+((q.services||[]).length-2):''}</div>
+    <div class="qbud">${q.budget||'—'}</div>
+    <div class="qdate">${new Date(q.created_at).toLocaleDateString()}</div>
+    <div class="qtag ${q.status==='Archived'?'arch':''}">${q.status}</div>
+  </div>`).join('');
+  $('#inbox-list').querySelectorAll('.qrow').forEach(r=>r.onclick=()=>openInquiry(r.dataset.id));
+}
+let currentInq=null;
+async function openInquiry(id){
+  const q=state.inquiries.find(x=>x.id===id);if(!q)return;
+  if(q.status==='New'){await sb.from('inquiries').update({status:'Read'}).eq('id',id);q.status='Read';updateInboxBadge();}
+  currentInq=q;nav('inquiry');renderInquiry();
+}
+function renderInquiry(){
+  const q=currentInq;if(!q)return;
+  $('#inquiry').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <button class="btn ghost" id="iq-back">← Inbox</button>
+      <div style="display:flex;gap:8px"><button class="btn" id="iq-arch">${q.status==='Archived'?'Unarchive':'Archive'}</button><button class="btn" id="iq-del">Delete</button></div>
+    </div>
+    <h1 style="font-size:30px;font-weight:600;letter-spacing:-.02em">${q.name}</h1>
+    <div class="mono" style="color:var(--muted);margin-top:6px;font-size:13px">${q.email}${q.company?' · '+q.company:''}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px;border-top:1px solid var(--hair);padding-top:22px">
+      <div><span class="iqlbl">Budget</span>${q.budget||'—'}</div>
+      <div><span class="iqlbl">Received</span>${new Date(q.created_at).toLocaleString()}</div>
+    </div>
+    <div style="margin-top:24px"><span class="iqlbl">Services</span><div style="display:flex;flex-wrap:wrap;gap:6px">${(q.services||[]).map(sv=>`<span class="pchip">${sv}</span>`).join('')||'—'}</div></div>
+    <div style="margin-top:24px"><span class="iqlbl">Brief</span><p style="line-height:1.6;font-size:15px;white-space:pre-wrap;color:#2c2c2c">${q.brief||''}</p></div>`;
+  $('#iq-back').onclick=()=>nav('inbox');
+  $('#iq-arch').onclick=async()=>{const ns=q.status==='Archived'?'Read':'Archived';await sb.from('inquiries').update({status:ns}).eq('id',q.id);q.status=ns;updateInboxBadge();nav('inbox');};
+  $('#iq-del').onclick=async()=>{if(confirm('Delete this inquiry?')){await sb.from('inquiries').delete().eq('id',q.id);state.inquiries=state.inquiries.filter(x=>x.id!==q.id);updateInboxBadge();nav('inbox');}};
+}
 const authgate=$('#authgate');
-async function showApp(){authgate.style.display='none';try{await loadAll();nav('overview');}catch(err){console.error(err);$('#kpis').innerHTML='<div class="empty">Failed to load data.</div>';}}
+async function showApp(){authgate.style.display='none';try{await loadAll();updateInboxBadge();nav('overview');}catch(err){console.error(err);$('#kpis').innerHTML='<div class="empty">Failed to load data.</div>';}}
 function showLogin(){authgate.style.display='flex';}
-$('#authform').addEventListener('submit',async e=>{e.preventDefault();$('#au-err').textContent='';const btn=$('#au-btn');btn.textContent='Signing in\u2026';const {error}=await sb.auth.signInWithPassword({email:$('#au-email').value.trim(),password:$('#au-pass').value});btn.textContent='Sign in';if(error){$('#au-err').textContent=error.message;return;}await showApp();});
+$('#authform').addEventListener('submit',async e=>{e.preventDefault();$('#au-err').textContent='';const btn=$('#au-btn');btn.textContent='Signing in…';const {error}=await sb.auth.signInWithPassword({email:$('#au-email').value.trim(),password:$('#au-pass').value});btn.textContent='Sign in';if(error){$('#au-err').textContent=error.message;return;}await showApp();});
 $('#signout').onclick=async()=>{await sb.auth.signOut();location.reload();};
 (async()=>{const {data}=await sb.auth.getSession();if(data.session){await showApp();}else{showLogin();}})();
 </script>

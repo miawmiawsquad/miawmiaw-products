@@ -69,8 +69,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .row.active .desc{max-height:60px;opacity:1;margin-top:12px}
 
 .stage-col{position:relative;flex:1;height:100%;overflow:hidden;background:var(--stage)}
-.stage-img{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:scale(1.06);transition:opacity .7s var(--ease),transform 1.2s var(--ease-out)}
-.stage-img.on{opacity:1;transform:scale(1)}
+.stage-img{position:absolute;inset:0;opacity:0;transition:opacity .7s var(--ease)}
+.stage-img.on{opacity:1}
+.stage-img .sb{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(38px) saturate(1.08);transform:scale(1.18);will-change:transform}
+.stage-img .sf{position:absolute;inset:0;background-size:contain;background-repeat:no-repeat;background-position:center}
 .stage-open{position:absolute;right:24px;bottom:24px;z-index:4;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--paper);mix-blend-mode:difference;border-bottom:1px solid;padding-bottom:2px;opacity:0;transition:opacity .4s var(--ease)}
 .stage-col.has .stage-open{opacity:1}
 .stage-cap{position:absolute;left:26px;bottom:24px;z-index:3;color:var(--paper);mix-blend-mode:difference;pointer-events:none}
@@ -78,10 +80,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .stage-cap .c{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;opacity:.8;margin-top:8px}
 .stage-idx{position:absolute;right:24px;top:22px;z-index:3;font-family:"Space Mono",monospace;font-size:12px;color:var(--paper);mix-blend-mode:difference}
 
-/* GRID → vertical bento (looping) */
-.grid-scroller{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+/* GRID → bento, horizontal scroll */
+.grid-scroller{position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
 .grid-scroller::-webkit-scrollbar{display:none}
-.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:20vh;grid-auto-flow:dense;gap:2px;padding:2px}
+.bento{display:grid;grid-auto-flow:column dense;grid-template-rows:repeat(3,1fr);grid-auto-columns:22vw;gap:2px;padding:2px;height:100%;box-sizing:border-box}
 .tile{position:relative;overflow:hidden;background:var(--stage);cursor:pointer;background-size:cover;background-position:center}
 .tile.land{grid-column:span 2}
 .tile.port{grid-row:span 2}
@@ -94,6 +96,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .tile .cap .c{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;opacity:.85;margin-top:3px}
 .tile .tidx{position:absolute;left:14px;top:12px;z-index:2;font-family:"Space Mono",monospace;font-size:11px;color:var(--paper);mix-blend-mode:difference}
 .grid-empty{position:absolute;inset:0;align-items:center;justify-content:center;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.grid-hint{position:absolute;right:16px;bottom:14px;z-index:5;display:none;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);pointer-events:none}
 
 /* DRAWER */
 .backdrop{position:fixed;inset:0;z-index:90;background:rgba(11,11,12,.28);opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
@@ -196,7 +199,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .row.active .thumb{height:46vw;margin-top:16px}
   .about-grid{grid-template-columns:1fr;gap:20px}
   .svc-item .d{display:none}
-  .bento{grid-template-columns:repeat(2,1fr);grid-auto-rows:26vh}
+  .bento{grid-template-rows:repeat(2,1fr);grid-auto-columns:64vw}
   .search{width:120px}
   .d-toc{display:none}.d-wrap{max-width:none}
   .d-meta{grid-template-columns:1fr 1fr}
@@ -205,6 +208,44 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 @media(max-width:1024px){.d-toc{display:none}.d-wrap{max-width:640px}}
 @media(min-width:861px){.row .thumb{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation:none!important}}
+
+/* CONTACT (get in touch stepper) */
+.contact{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+.contact::-webkit-scrollbar{display:none}
+.c-inner,.c-success{max-width:620px;margin:0 auto;padding:9vh 24px 12vh;min-height:100%;display:flex;flex-direction:column;justify-content:center}
+.c-prog{display:flex;gap:8px;margin-bottom:38px}
+.c-prog .cd{width:26px;height:3px;border-radius:2px;background:var(--hair);transition:background .3s var(--ease)}
+.c-prog .cd.on{background:var(--accent)}
+.c-step{display:none}
+.c-step.on{display:block;animation:cfade .45s var(--ease-out)}
+@keyframes cfade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.c-eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.c-h{font-size:clamp(30px,5vw,52px);font-weight:500;letter-spacing:-.03em;line-height:1.03;margin-bottom:34px}
+.c-field{margin-bottom:24px}
+.c-field label{display:block;font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.c-field label .opt{color:var(--muted);text-transform:none;letter-spacing:0;font-family:"Space Grotesk",sans-serif;font-size:11px}
+.c-inp,.c-ta{width:100%;border:none;border-bottom:1px solid var(--hair);background:transparent;font-family:"Space Grotesk",sans-serif;font-size:20px;padding:8px 0;color:var(--ink);transition:border-color .25s var(--ease)}
+.c-inp:focus,.c-ta:focus{outline:none;border-color:var(--ink)}
+.c-inp::placeholder,.c-ta::placeholder{color:var(--muted)}
+.c-ta{min-height:120px;resize:vertical;font-size:17px;line-height:1.5}
+.c-chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:34px}
+.c-chip{border:1px solid var(--hair);border-radius:100px;padding:10px 15px;font-size:13.5px;color:var(--ink);transition:.2s var(--ease);text-align:left}
+.c-chip:hover{border-color:var(--muted)}
+.c-chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.c-sub{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.c-budget{display:flex;flex-wrap:wrap;gap:9px}
+.c-bud{border:1px solid var(--hair);border-radius:8px;padding:11px 16px;font-size:14px;transition:.2s var(--ease)}
+.c-bud:hover{border-color:var(--muted)}
+.c-bud.on{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.c-nav{display:flex;align-items:center;gap:12px;margin-top:44px}
+.c-back{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.c-back:hover{color:var(--ink)}
+.c-next,.c-submit{margin-left:auto;background:var(--ink);color:var(--paper);padding:13px 22px;border-radius:8px;font-size:14px;transition:opacity .2s var(--ease)}
+.c-next:hover,.c-submit:hover{opacity:.88}
+.c-err{color:#b4534b;font-size:13px;margin-top:16px;min-height:18px}
+.c-lead{font-size:16px;line-height:1.55;color:#3a3a3a;margin-top:20px;max-width:44ch}
+.cta2{margin-top:36px;align-self:flex-start;border:1px solid var(--ink);padding:12px 20px;border-radius:100px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;transition:.25s var(--ease)}
+.cta2:hover{background:var(--ink);color:var(--paper)}
 </style>
 </head>
 <body>
@@ -214,7 +255,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   <nav class="nav">
     <button data-go="portfolio" class="on">Work</button>
     <button data-go="about">About</button>
-    <a class="cta" href="mailto:studio@miaw.studio">Get in touch</a>
+    <button class="cta" data-go="contact">Get in touch</button>
   </nav>
 </header>
 
@@ -241,6 +282,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     </div>
   </div>
   <div class="grid-scroller" id="view-grid" style="display:none"></div>
+  <div class="grid-hint" id="grid-hint">Scroll →</div>
 </section>
 
 <!-- DETAIL -->
@@ -250,6 +292,47 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 <section class="page" id="page-about">
   <div class="about">
     <div class="about-in" id="about-in"></div></div></section>
+
+<!-- CONTACT -->
+<section class="page" id="page-contact">
+  <div class="contact">
+    <div class="c-inner" id="c-form">
+      <div class="c-prog"><span class="cd on" data-s="1"></span><span class="cd" data-s="2"></span><span class="cd" data-s="3"></span></div>
+      <div class="c-step on" data-step="1">
+        <div class="c-eyebrow mono">01 — You</div>
+        <h2 class="c-h">Let’s start with you.</h2>
+        <div class="c-field"><label>Name *</label><input id="q-name" class="c-inp" type="text" placeholder="Your name" autocomplete="name"></div>
+        <div class="c-field"><label>Email *</label><input id="q-email" class="c-inp" type="email" placeholder="you@email.com" autocomplete="email"></div>
+        <div class="c-field"><label>Company <span class="opt">optional</span></label><input id="q-company" class="c-inp" type="text" placeholder="Company"></div>
+        <div class="c-err" id="c-err1"></div>
+      </div>
+      <div class="c-step" data-step="2">
+        <div class="c-eyebrow mono">02 — Services</div>
+        <h2 class="c-h">What do you need?</h2>
+        <div class="c-chips" id="q-services"></div>
+        <div class="c-sub mono">Budget</div>
+        <div class="c-budget" id="q-budget"></div>
+      </div>
+      <div class="c-step" data-step="3">
+        <div class="c-eyebrow mono">03 — Brief</div>
+        <h2 class="c-h">Tell us about it.</h2>
+        <div class="c-field"><label>Project brief *</label><textarea id="q-brief" class="c-ta" placeholder="A few lines about your project, goals, and timeline…"></textarea></div>
+        <div class="c-err" id="c-err3"></div>
+      </div>
+      <div class="c-nav">
+        <button class="c-back" id="c-back">← Back</button>
+        <button class="c-next" id="c-next">Next →</button>
+        <button class="c-submit" id="c-submit" style="display:none">Send inquiry</button>
+      </div>
+    </div>
+    <div class="c-success" id="c-success" style="display:none">
+      <div class="c-eyebrow mono">Sent</div>
+      <h2 class="c-h">Thanks — we’ll get back to you shortly.</h2>
+      <p class="c-lead">We’ve received your inquiry and will reply to your email as soon as we can.</p>
+      <button class="cta2" data-go="portfolio">Back to work</button>
+    </div>
+  </div>
+</section>
 
 <!-- FILTER DRAWER -->
 <div class="backdrop" id="backdrop"></div>
@@ -262,7 +345,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   </div>
 </aside>
 
-<button class="tag" data-go="about">Contact</button>
+<button class="tag" data-go="contact">Contact</button>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -296,7 +379,9 @@ const stageEl=document.getElementById('stage');
 let stageImgs=[];
 function buildStage(){
   stageEl.querySelectorAll('.stage-img').forEach(e=>e.remove());
-  WORKS.forEach(w=>{const d=document.createElement('div');d.className='stage-img';d.dataset.n=w.n;d.style.backgroundImage=`url("${w.images[0]}")`;stageEl.insertBefore(d,stageEl.firstChild);});
+  WORKS.forEach(w=>{const d=document.createElement('div');d.className='stage-img';d.dataset.n=w.n;
+    d.innerHTML=`<div class="sb" style="background-image:url('${w.thumb}')"></div><div class="sf" style="background-image:url('${w.cover}')"></div>`;
+    stageEl.insertBefore(d,stageEl.firstChild);});
   stageImgs=[...stageEl.querySelectorAll('.stage-img')];
 }
 const stageName=document.getElementById('stage-name');
@@ -322,6 +407,9 @@ function makeLoop(scroller,buildSet){
   requestAnimationFrame(measure);setTimeout(measure,400);
 }
 const listScroller=document.getElementById('list-scroller');
+let _lmx=null,_lmy=null,mvx=0,mvy=0;
+const listColEl=document.querySelector('.list-col');
+if(listColEl)listColEl.addEventListener('mousemove',e=>{if(_lmx!=null){mvx=e.clientX-_lmx;mvy=e.clientY-_lmy;}_lmx=e.clientX;_lmy=e.clientY;});
 function buildListSet(){
   const set=document.createElement('div');set.className='list-set';
   filtered().forEach(w=>{
@@ -330,9 +418,9 @@ function buildListSet(){
       <div class="name">${w.name}</div>
       <div class="meta"><span class="cat">${w.type}</span><span class="yr">${w.yr}</span></div>
       <div class="desc">${w.desc}</div>
-      <div class="thumb" style="background-image:url('${w.images[0]}')"></div>`;
-    r.addEventListener('mouseenter',()=>{if(!isMobile()){hovering=true;activate(w.n);}});
-    r.addEventListener('click',()=>openDetail(w.n));
+      <div class="thumb" style="background-image:url('${w.thumb}')"></div>`;
+    r.addEventListener('mouseenter',()=>{if(isMobile())return;hovering=true;if(mvx>3&&mvx>Math.abs(mvy))return;activate(w.n);});
+    r.addEventListener('click',()=>{if(isMobile()){if(activeWork&&activeWork.n===w.n){openDetail(w.n);}else{activate(w.n);}}else{openDetail(w.n);}});
     set.appendChild(r);
   });
   return set;
@@ -347,8 +435,8 @@ function onScrollActive(){
   let best=null,bd=1e9;
   listScroller.querySelectorAll('.row').forEach(r=>{const b=r.getBoundingClientRect();const c=b.top+b.height/2;const dist=Math.abs(c-target);if(dist<bd){bd=dist;best=r;}});
   if(best){const n=+best.dataset.n;if(n!==activeWork.n)activate(n);}
-  const p=(listScroller.scrollTop%400)/400;const cur=stageEl.querySelector('.stage-img.on');
-  if(cur&&!reduce)cur.style.transform=`scale(1.04) translateY(${(p-0.5)*-16}px)`;
+  const p=(listScroller.scrollTop%400)/400;const cur=stageEl.querySelector('.stage-img.on .sb');
+  if(cur&&!reduce)cur.style.transform=`scale(1.18) translateY(${(p-0.5)*-14}px)`;
 }
 
 /* ---- vertical bento (grid) ---- */
@@ -357,7 +445,7 @@ function buildBentoSet(){
   const set=document.createElement('div');set.className='bento';
   filtered().forEach(w=>{
     const t=document.createElement('div');t.className='tile '+(w.shape||'sq');t.dataset.n=w.n;
-    t.style.backgroundImage=`url('${w.images[0]}')`;
+    t.style.backgroundImage=`url('${w.thumb}')`;
     t.innerHTML=`<div class="tidx mono">${pad(w.n)}</div><div class="veil"></div><div class="cap"><div class="n">${w.name}</div><div class="c">${w.type} — ${w.yr}</div></div>`;
     t.addEventListener('click',()=>openDetail(w.n));
     set.appendChild(t);
@@ -367,48 +455,53 @@ function buildBentoSet(){
 function renderBento(){
   const fl=filtered();
   if(!fl.length){bentoScroller.innerHTML='<div class="grid-empty" style="display:flex">No works match</div>';return;}
-  makeLoop(bentoScroller,buildBentoSet);
+  const set=buildBentoSet();bentoScroller.innerHTML='';bentoScroller.appendChild(set);bentoScroller.scrollLeft=0;
 }
+bentoScroller.addEventListener('wheel',e=>{if(bentoScroller.style.display==='none')return;if(!bentoScroller.firstElementChild)return;e.preventDefault();bentoScroller.scrollLeft+=(Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX);},{passive:false});
 
 /* ---- DETAIL ---- */
 const detailInner=document.getElementById('detail-inner');
 function nextWork(n){const i=WORKS.findIndex(w=>w.n===n);return WORKS[(i+1)%WORKS.length];}
-const D_SECTIONS=[["cover","Cover"],["overview","Overview"],["gallery","Gallery"],["approach","Approach"],["next","Next"]];
+let dSecs=[];
 function buildDetail(w){
   const nx=nextWork(w.n);
-  const gallery=w.images.map(src=>`<img class="d-gimg" src="${src}" alt="${w.name}" loading="lazy">`).join('');
+  const hasG=(w.images&&w.images.length>0);
+  dSecs=[["cover","Cover"],["overview","Overview"],["approach","Approach"]];
+  if(hasG)dSecs.push(["gallery","Gallery"]);
+  dSecs.push(["next","Next"]);
+  const galleryImgs=hasG?w.images.map(src=>`<img class="d-gimg" src="${src}" alt="${w.name}" loading="lazy" decoding="async">`).join(''):'';
   const toc=`<div class="d-toc" id="d-toc"><div class="spine"><i id="d-fill"></i></div>
-    ${D_SECTIONS.map((s,i)=>`<div class="ti" data-target="s-${s[0]}"><span class="dot"></span><span class="lb">${pad(i+1)} ${s[1]}</span></div>`).join('')}
+    ${dSecs.map((sn,i)=>`<div class="ti" data-target="s-${sn[0]}"><span class="dot"></span><span class="lb">${pad(i+1)} ${sn[1]}</span></div>`).join('')}
     <div class="pct mono" id="d-pct">0%</div></div>`;
+  const coverSec=`<section class="d-section cover" id="s-cover">
+      <span class="d-k">${w.type} — ${w.yr}</span>
+      <h1 class="d-title">${w.name}</h1>
+      <p class="d-lead">${w.desc}</p>
+      <div class="d-cover-img" style="background-image:url('${w.cover}')"></div>
+    </section>`;
+  const overviewSec=`<section class="d-section" id="s-overview">
+      <div class="d-h">Overview</div><p>${w.overview}</p>
+      <div class="d-meta">
+        <div class="m"><span class="l">Client</span><span class="v">${w.client}</span></div>
+        <div class="m"><span class="l">Role</span><span class="v">${w.role}</span></div>
+        <div class="m"><span class="l">Device</span><span class="v">${w.device}</span></div>
+        <div class="m"><span class="l">Industry</span><span class="v">${w.industry}</span></div>
+        <div class="m"><span class="l">Category</span><span class="v">${w.type}</span></div>
+        <div class="m"><span class="l">Year</span><span class="v">${w.yr}</span></div>
+      </div>
+    </section>`;
+  const approachSec=`<section class="d-section" id="s-approach">
+      <div class="d-h">Approach</div>
+      <div class="d-two"><p>${w.approach}</p><p>Every deliverable ships as a single-file, developer-ready handoff — no ambiguity between design and build. The system is documented so it holds up as the work scales beyond this first release.</p></div>
+    </section>`;
+  const gallerySec=hasG?`<section class="d-section" id="s-gallery"><div class="d-h">Gallery</div>${galleryImgs}</section>`:'';
+  const nextSec=`<section class="d-section" id="s-next"><div class="d-h">Next</div>
+      <div class="d-nextrow" id="d-next"><span class="lbl">Project ${pad(nx.n)}</span><span class="nm">${nx.name} →</span></div>
+    </section>`;
   detailInner.innerHTML=`
     <div class="d-top"><button class="d-back" id="d-back">← Back</button><span class="d-count mono">${pad(w.n)} / ${pad(WORKS.length)}</span></div>
     ${toc}
-    <div class="d-wrap">
-      <section class="d-section cover" id="s-cover">
-        <span class="d-k">${w.type} — ${w.yr}</span>
-        <h1 class="d-title">${w.name}</h1>
-        <p class="d-lead">${w.desc}</p>
-        <div class="d-cover-img" style="background-image:url('${w.images[0]}')"></div>
-      </section>
-      <section class="d-section" id="s-overview">
-        <div class="d-h">Overview</div><p>${w.overview}</p>
-        <div class="d-meta">
-          <div class="m"><span class="l">Client</span><span class="v">${w.client}</span></div>
-          <div class="m"><span class="l">Role</span><span class="v">${w.role}</span></div>
-          <div class="m"><span class="l">Device</span><span class="v">${w.device}</span></div>
-          <div class="m"><span class="l">Industry</span><span class="v">${w.industry}</span></div>
-          <div class="m"><span class="l">Category</span><span class="v">${w.type}</span></div>
-          <div class="m"><span class="l">Year</span><span class="v">${w.yr}</span></div>
-        </div>
-      </section>
-      <section class="d-section" id="s-gallery"><div class="d-h">Gallery</div>${gallery}</section>
-      <section class="d-section" id="s-approach"><div class="d-h">Approach</div>
-        <div class="d-two"><p>${w.approach}</p><p>Delivered as a single-file, developer-ready handoff — layout, tokens, and states documented so build matches design with no ambiguity.</p></div>
-      </section>
-      <section class="d-section" id="s-next"><div class="d-h">Next</div>
-        <div class="d-nextrow" id="d-next"><span class="lbl">Project ${pad(nx.n)}</span><span class="nm">${nx.name} →</span></div>
-      </section>
-    </div>`;
+    <div class="d-wrap">${coverSec}${overviewSec}${approachSec}${gallerySec}${nextSec}</div>`;
   document.getElementById('d-back').onclick=()=>go('portfolio');
   document.getElementById('d-next').onclick=()=>openDetail(nx.n);
   const sc=document.querySelector('.detail');
@@ -416,7 +509,7 @@ function buildDetail(w){
 }
 function setupDetailScroll(){
   const sc=document.querySelector('.detail');const fill=document.getElementById('d-fill');const pct=document.getElementById('d-pct');
-  const items=[...document.querySelectorAll('#d-toc .ti')];const secs=D_SECTIONS.map(s=>document.getElementById('s-'+s[0]));
+  const items=[...document.querySelectorAll('#d-toc .ti')];const secs=dSecs.map(s=>document.getElementById('s-'+s[0]));
   function upd(){
     const max=sc.scrollHeight-sc.clientHeight;const p=max>0?sc.scrollTop/max:0;
     if(fill)fill.style.height=(p*100)+'%';if(pct)pct.textContent=Math.round(p*100)+'%';
@@ -469,22 +562,61 @@ document.querySelectorAll('.views button').forEach(b=>{
     const showIdx=v==='index';
     viewIndex.style.display=showIdx?'flex':'none';
     bentoScroller.style.display=showIdx?'none':'block';
+    const gh=document.getElementById('grid-hint');if(gh)gh.style.display=showIdx?'none':'block';
     if(showIdx)renderList();else renderBento();
   };
 });
 
 /* ---- router ---- */
-const pP=document.getElementById('page-portfolio'),pA=document.getElementById('page-about'),pD=document.getElementById('page-detail');
+/* ---- contact stepper ---- */
+const SERVICES_LIST=["Landing Page UI/UX Design HTML","Website Design","SaaS Dashboard / CRM / ERP","Mobile App Design","UX Audit","Clean Up Vibe-Coded Apps","Custom UI/UX Design"];
+const BUDGETS=["Under $500","$500–2k","$2k–5k","$5k+"];
+const cState={step:1,services:new Set(),budget:''};
+function renderContactOptions(){
+  const sv=document.getElementById('q-services'),bd=document.getElementById('q-budget');
+  if(!sv||!bd)return;
+  sv.innerHTML=SERVICES_LIST.map(x=>`<button type="button" class="c-chip" data-v="${x}">${x}</button>`).join('');
+  bd.innerHTML=BUDGETS.map(x=>`<button type="button" class="c-bud" data-v="${x}">${x}</button>`).join('');
+  sv.querySelectorAll('.c-chip').forEach(c=>c.onclick=()=>{const v=c.dataset.v;if(cState.services.has(v))cState.services.delete(v);else cState.services.add(v);c.classList.toggle('on');});
+  bd.querySelectorAll('.c-bud').forEach(c=>c.onclick=()=>{cState.budget=c.dataset.v;bd.querySelectorAll('.c-bud').forEach(x=>x.classList.toggle('on',x===c));});
+}
+function cShowStep(n){
+  cState.step=n;
+  document.querySelectorAll('#c-form .c-step').forEach(st=>st.classList.toggle('on',+st.dataset.step===n));
+  document.querySelectorAll('.c-prog .cd').forEach(d=>d.classList.toggle('on',+d.dataset.s<=n));
+  document.getElementById('c-back').style.visibility=n>1?'visible':'hidden';
+  document.getElementById('c-next').style.display=n<3?'inline-flex':'none';
+  document.getElementById('c-submit').style.display=n===3?'inline-flex':'none';
+}
+function cValid1(){const nm=document.getElementById('q-name').value.trim();const em=document.getElementById('q-email').value.trim();const ok=!!nm&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em);document.getElementById('c-err1').textContent=ok?'':'Please enter your name and a valid email.';return ok;}
+function cValid3(){const b=document.getElementById('q-brief').value.trim();const ok=b.length>=10;document.getElementById('c-err3').textContent=ok?'':'Please add a short brief (at least a sentence).';return ok;}
+function resetContact(){cState.step=1;cState.services.clear();cState.budget='';const fm=document.getElementById('c-form'),su=document.getElementById('c-success');if(fm)fm.style.display='flex';if(su)su.style.display='none';['q-name','q-email','q-company','q-brief'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.querySelectorAll('#q-services .c-chip,#q-budget .c-bud').forEach(x=>x.classList.remove('on'));cShowStep(1);}
+document.getElementById('c-next').onclick=()=>{if(cState.step===1&&!cValid1())return;cShowStep(Math.min(3,cState.step+1));};
+document.getElementById('c-back').onclick=()=>cShowStep(Math.max(1,cState.step-1));
+document.getElementById('c-submit').onclick=async()=>{
+  if(!cValid3())return;
+  const btn=document.getElementById('c-submit');btn.textContent='Sending…';btn.disabled=true;
+  const payload={name:document.getElementById('q-name').value.trim(),email:document.getElementById('q-email').value.trim(),company:document.getElementById('q-company').value.trim(),services:[...cState.services],budget:cState.budget,brief:document.getElementById('q-brief').value.trim()};
+  const {error}=await sb.from('inquiries').insert(payload);
+  btn.textContent='Send inquiry';btn.disabled=false;
+  if(error){document.getElementById('c-err3').textContent='Something went wrong — please try again.';console.error(error);return;}
+  document.getElementById('c-form').style.display='none';document.getElementById('c-success').style.display='flex';
+};
+
+/* ---- router ---- */
+const pP=document.getElementById('page-portfolio'),pA=document.getElementById('page-about'),pD=document.getElementById('page-detail'),pC=document.getElementById('page-contact');
 const sub=document.getElementById('sub'),tag=document.querySelector('.tag');
 function go(page){
   pP.classList.toggle('show',page==='portfolio');
   pA.classList.toggle('show',page==='about');
   pD.classList.toggle('show',page==='detail');
+  pC.classList.toggle('show',page==='contact');
   const showSub=page==='portfolio';
   sub.style.opacity=showSub?'1':'0';sub.style.transform=showSub?'none':'translateY(-6px)';sub.style.pointerEvents=showSub?'auto':'none';
-  tag.style.opacity=(page==='detail')?'0':'1';
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===page||(page==='detail'&&b.dataset.go==='portfolio')));
+  tag.style.opacity=(page==='detail'||page==='contact')?'0':'1';
+  document.querySelectorAll('.nav button,.nav .cta').forEach(b=>b.classList.toggle('on',b.dataset.go===page||(page==='detail'&&b.dataset.go==='portfolio')));
   if(page==='about')document.querySelectorAll('#page-about .rv').forEach((el,i)=>setTimeout(()=>el.classList.add('in'),80+i*90));
+  if(page==='contact')resetContact();
 }
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 
@@ -499,7 +631,7 @@ function renderAboutData(ab){
 
 /* ---- init after data ---- */
 function init(){
-  buildStage();applyFilters();
+  buildStage();applyFilters();renderContactOptions();
   setTimeout(()=>{document.querySelectorAll('#list-scroller .row').forEach((r,i)=>{if(i>7)return;r.style.opacity='0';r.style.transform='translateY(12px)';r.style.transition='opacity .6s var(--ease-out),transform .6s var(--ease-out)';setTimeout(()=>{r.style.opacity='';r.style.transform='';},60+i*55);});},60);
 }
 
@@ -512,7 +644,7 @@ function init(){
       sb.from('site_about').select('*').eq('id',1).single()
     ]);
     const projs=pr.data||[];
-    WORKS=projs.map((p,i)=>({n:i+1,name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,images:(p.images&&p.images.length?p.images:[p.cover])}));
+    WORKS=projs.map((p,i)=>({n:i+1,name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,cover:p.cover,thumb:(p.cover_thumb||p.cover),images:(p.images||[])}));
     FILTERS={device:[],industry:[],type:[]};(fo.data||[]).forEach(o=>{if(FILTERS[o.grp])FILTERS[o.grp].push(o.value);});
     if(ab.data)renderAboutData(ab.data);
     init();
