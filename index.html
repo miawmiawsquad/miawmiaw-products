@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>miawstudio — ui/ux</title>
+<title>miawmiaw studio — portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -23,7 +23,12 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .head{position:fixed;inset:0 0 auto 0;height:var(--head-h);z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--hair);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px)}
 .brand{font-weight:600;font-size:15px;letter-spacing:-.01em}
 .brand b{color:var(--accent)}
-.nav{display:flex;gap:26px;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.nav{display:flex;align-items:center;gap:24px;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.nav .cta{border:1px solid var(--ink);color:var(--ink);padding:7px 14px;border-radius:100px;transition:.25s var(--ease)}
+.nav .cta:hover{background:var(--ink);color:var(--paper)}
+.search{border:none;border-bottom:1px solid var(--hair);background:transparent;font-family:"Space Grotesk",sans-serif;font-size:12.5px;padding:6px 4px;width:150px;color:var(--ink);transition:border-color .25s var(--ease)}
+.search::placeholder{color:var(--muted)}
+.search:focus{outline:none;border-color:var(--ink)}
 .nav button{color:var(--muted);transition:color .3s var(--ease);position:relative}
 .nav button:hover{color:var(--ink)}
 .nav button.on{color:var(--ink)}
@@ -73,21 +78,22 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .stage-cap .c{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;opacity:.8;margin-top:8px}
 .stage-idx{position:absolute;right:24px;top:22px;z-index:3;font-family:"Space Mono",monospace;font-size:12px;color:var(--paper);mix-blend-mode:difference}
 
-/* GRID → horizontal filmstrip */
-.film-scroller{position:absolute;inset:0;overflow:hidden;cursor:grab}
-.film-scroller.drag{cursor:grabbing}
-.film-track{position:absolute;top:0;left:0;height:100%;display:flex;will-change:transform}
-.ftile{position:relative;height:100%;flex:none;margin-right:2px;overflow:hidden;background:var(--stage);cursor:pointer}
-.ftile img{height:100%;width:auto;display:block;object-fit:cover;pointer-events:none}
-.ftile .veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(11,11,12,.72),transparent 55%);opacity:0;transition:opacity .4s var(--ease)}
-.ftile:hover .veil{opacity:1}
-.ftile .cap{position:absolute;left:16px;bottom:14px;color:#fff;z-index:2;opacity:0;transform:translateY(8px);transition:.5s var(--ease-out)}
-.ftile:hover .cap{opacity:1;transform:none}
-.ftile .cap .n{font-size:20px;font-weight:600;letter-spacing:-.01em}
-.ftile .cap .c{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;opacity:.85;margin-top:3px}
-.ftile .tidx{position:absolute;left:14px;top:12px;z-index:2;font-family:"Space Mono",monospace;font-size:11px;color:#fff;mix-blend-mode:difference}
-.film-hint{position:absolute;right:16px;top:16px;z-index:5;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);pointer-events:none}
-.film-empty{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+/* GRID → vertical bento (looping) */
+.grid-scroller{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+.grid-scroller::-webkit-scrollbar{display:none}
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:20vh;grid-auto-flow:dense;gap:2px;padding:2px}
+.tile{position:relative;overflow:hidden;background:var(--stage);cursor:pointer;background-size:cover;background-position:center}
+.tile.land{grid-column:span 2}
+.tile.port{grid-row:span 2}
+.tile.sq{grid-row:span 1}
+.tile .veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(11,11,12,.72),transparent 55%);opacity:0;transition:opacity .45s var(--ease)}
+.tile:hover .veil{opacity:1}
+.tile .cap{position:absolute;left:16px;bottom:14px;color:var(--paper);z-index:2;opacity:0;transform:translateY(8px);transition:.5s var(--ease-out)}
+.tile:hover .cap{opacity:1;transform:none}
+.tile .cap .n{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.tile .cap .c{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;opacity:.85;margin-top:3px}
+.tile .tidx{position:absolute;left:14px;top:12px;z-index:2;font-family:"Space Mono",monospace;font-size:11px;color:var(--paper);mix-blend-mode:difference}
+.grid-empty{position:absolute;inset:0;align-items:center;justify-content:center;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 
 /* DRAWER */
 .backdrop{position:fixed;inset:0;z-index:90;background:rgba(11,11,12,.28);opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
@@ -190,6 +196,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .row.active .thumb{height:46vw;margin-top:16px}
   .about-grid{grid-template-columns:1fr;gap:20px}
   .svc-item .d{display:none}
+  .bento{grid-template-columns:repeat(2,1fr);grid-auto-rows:26vh}
+  .search{width:120px}
   .d-toc{display:none}.d-wrap{max-width:none}
   .d-meta{grid-template-columns:1fr 1fr}
   .d-two{grid-template-columns:1fr;gap:18px}
@@ -202,10 +210,11 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 <body>
 
 <header class="head">
-  <button class="brand" data-go="portfolio">miaw<b>studio</b></button>
+  <button class="brand" data-go="portfolio">miawmiaw <b>studio</b></button>
   <nav class="nav">
     <button data-go="portfolio" class="on">Work</button>
     <button data-go="about">About</button>
+    <a class="cta" href="mailto:studio@miaw.studio">Get in touch</a>
   </nav>
 </header>
 
@@ -215,6 +224,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <button data-view="grid">Grid</button>
   </div>
   <div class="subright">
+    <input class="search" id="search" type="text" placeholder="Search projects" autocomplete="off">
     <span class="rescount mono" id="res-count">10 works</span>
     <button class="filterbtn" id="filter-open">Filter <span class="fbadge" id="fbadge" hidden>0</span></button>
   </div>
@@ -230,11 +240,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       <button class="stage-open" id="stage-open">Open project →</button>
     </div>
   </div>
-  <div class="film-scroller" id="view-grid" style="display:none">
-    <div class="film-track" id="film-track"></div>
-    <div class="film-hint">Scroll →</div>
-    <div class="film-empty" id="film-empty">No works match</div>
-  </div>
+  <div class="grid-scroller" id="view-grid" style="display:none"></div>
 </section>
 
 <!-- DETAIL -->
@@ -274,8 +280,14 @@ const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 const isMobile=()=>window.matchMedia('(max-width:860px)').matches;
 
 let activeWork=null;
+let curView='index';
+let searchQ='';
 
-function match(w){return Object.keys(selected).every(g=>selected[g].size===0||selected[g].has(w[g]));}
+function match(w){
+  if(!Object.keys(selected).every(g=>selected[g].size===0||selected[g].has(w[g])))return false;
+  if(searchQ){const hay=(w.name+' '+w.type+' '+w.industry+' '+w.device+' '+(w.desc||'')).toLowerCase();if(!hay.includes(searchQ))return false;}
+  return true;
+}
 function filtered(){return WORKS.filter(match);}
 function activeCount(){return Object.values(selected).reduce((a,s)=>a+s.size,0);}
 
@@ -339,51 +351,24 @@ function onScrollActive(){
   if(cur&&!reduce)cur.style.transform=`scale(1.04) translateY(${(p-0.5)*-16}px)`;
 }
 
-/* ---- horizontal filmstrip (grid) ---- */
-const filmScroller=document.getElementById('view-grid');
-const filmTrack=document.getElementById('film-track');
-const filmEmpty=document.getElementById('film-empty');
-let perSet=0,setW=0,hx=0,htarget=0,gridActive=false;
-function buildFilmSet(){
-  const frag=document.createDocumentFragment();
+/* ---- vertical bento (grid) ---- */
+const bentoScroller=document.getElementById('view-grid');
+function buildBentoSet(){
+  const set=document.createElement('div');set.className='bento';
   filtered().forEach(w=>{
-    const t=document.createElement('div');t.className='ftile';t.dataset.n=w.n;
-    t.innerHTML=`<img src="${w.images[0]}" alt="${w.name}" draggable="false" onload="filmLayout()">
-      <div class="veil"></div><div class="tidx mono">${pad(w.n)}</div>
-      <div class="cap"><div class="n">${w.name}</div><div class="c">${w.type} — ${w.yr}</div></div>`;
-    t.addEventListener('click',()=>{if(!filmMoved)openDetail(w.n);});
-    frag.appendChild(t);
+    const t=document.createElement('div');t.className='tile '+(w.shape||'sq');t.dataset.n=w.n;
+    t.style.backgroundImage=`url('${w.images[0]}')`;
+    t.innerHTML=`<div class="tidx mono">${pad(w.n)}</div><div class="veil"></div><div class="cap"><div class="n">${w.name}</div><div class="c">${w.type} — ${w.yr}</div></div>`;
+    t.addEventListener('click',()=>openDetail(w.n));
+    set.appendChild(t);
   });
-  return frag;
+  return set;
 }
-function renderFilm(){
-  filmTrack.innerHTML='';perSet=filtered().length;
-  filmEmpty.style.display=perSet?'none':'flex';
-  if(!perSet)return;
-  filmTrack.appendChild(buildFilmSet());filmTrack.appendChild(buildFilmSet());
-  hx=0;htarget=0;filmLayout();
+function renderBento(){
+  const fl=filtered();
+  if(!fl.length){bentoScroller.innerHTML='<div class="grid-empty" style="display:flex">No works match</div>';return;}
+  makeLoop(bentoScroller,buildBentoSet);
 }
-function filmLayout(){
-  const tiles=[...filmTrack.querySelectorAll('.ftile')];
-  if(tiles.length<perSet)return;setW=0;
-  for(let i=0;i<perSet;i++)setW+=tiles[i].offsetWidth+2;
-}
-window.filmLayout=filmLayout;
-let filmDown=false,flx=0,filmMoved=false;
-filmScroller.addEventListener('wheel',e=>{if(!gridActive)return;e.preventDefault();htarget+=(Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX);},{passive:false});
-filmScroller.addEventListener('mousedown',e=>{filmDown=true;filmMoved=false;flx=e.clientX;filmScroller.classList.add('drag');});
-window.addEventListener('mousemove',e=>{if(filmDown){const d=e.clientX-flx;if(Math.abs(d)>3)filmMoved=true;htarget-=d;flx=e.clientX;}});
-window.addEventListener('mouseup',()=>{filmDown=false;filmScroller.classList.remove('drag');});
-filmScroller.addEventListener('touchstart',e=>{filmDown=true;filmMoved=false;flx=e.touches[0].clientX;},{passive:true});
-filmScroller.addEventListener('touchmove',e=>{if(filmDown){const d=e.touches[0].clientX-flx;if(Math.abs(d)>3)filmMoved=true;htarget-=d;flx=e.touches[0].clientX;}},{passive:true});
-filmScroller.addEventListener('touchend',()=>filmDown=false);
-function filmLoop(){
-  if(gridActive&&perSet){
-    hx+=(htarget-hx)*0.09;
-    if(setW>0){if(hx>=setW){hx-=setW;htarget-=setW;}else if(hx<0){hx+=setW;htarget+=setW;}}
-    filmTrack.style.transform=`translateX(${-hx}px)`;
-  }
-  requestAnimationFrame(filmLoop);
 }
 requestAnimationFrame(filmLoop);
 
@@ -462,7 +447,7 @@ function buildDrawer(){
 }
 function applyFilters(){
   renderList();
-  if(gridActive)renderFilm();
+  if(curView==='grid')renderBento();
   const f=filtered().length,a=activeCount();
   document.getElementById('res-count').textContent=f+" works";
   document.getElementById('foot-count').textContent=f;
@@ -476,18 +461,17 @@ document.getElementById('filter-close').onclick=closeDrawer;
 document.getElementById('filter-apply').onclick=closeDrawer;
 backdrop.onclick=closeDrawer;
 document.getElementById('filter-clear').onclick=()=>{Object.values(selected).forEach(s=>s.clear());buildDrawer();applyFilters();};
+const searchEl=document.getElementById('search');if(searchEl)searchEl.addEventListener('input',()=>{searchQ=searchEl.value.trim().toLowerCase();applyFilters();});
 
 /* ---- view toggle ---- */
 const viewIndex=document.getElementById('view-index');
-let curView='index';
 document.querySelectorAll('.views button').forEach(b=>{
   b.onclick=()=>{const v=b.dataset.view;if(v===curView)return;curView=v;
     document.querySelectorAll('.views button').forEach(x=>x.classList.toggle('on',x===b));
     const showIdx=v==='index';
     viewIndex.style.display=showIdx?'flex':'none';
-    filmScroller.style.display=showIdx?'none':'block';
-    gridActive=!showIdx;
-    if(showIdx)renderList();else renderFilm();
+    bentoScroller.style.display=showIdx?'none':'block';
+    if(showIdx)renderList();else renderBento();
   };
 });
 
@@ -530,7 +514,7 @@ function init(){
       sb.from('site_about').select('*').eq('id',1).single()
     ]);
     const projs=pr.data||[];
-    WORKS=projs.map((p,i)=>({n:i+1,name:p.name,device:p.device,industry:p.industry,type:p.type,yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,images:(p.images&&p.images.length?p.images:[p.cover])}));
+    WORKS=projs.map((p,i)=>({n:i+1,name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,images:(p.images&&p.images.length?p.images:[p.cover])}));
     FILTERS={device:[],industry:[],type:[]};(fo.data||[]).forEach(o=>{if(FILTERS[o.grp])FILTERS[o.grp].push(o.value);});
     if(ab.data)renderAboutData(ab.data);
     init();
