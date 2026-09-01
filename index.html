@@ -92,11 +92,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 /* GRID — bento, vertical scroll (looping) */
 .grid-scroller{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
 .grid-scroller::-webkit-scrollbar{display:none}
-.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:20vh;grid-auto-flow:dense;gap:2px;padding:2px}
-.tile{position:relative;overflow:hidden;background:var(--stage);cursor:pointer;background-size:cover;background-position:center}
-.tile.land{grid-column:span 2}
-.tile.port{grid-row:span 2}
-.tile.sq{grid-row:span 1}
+.bento{column-count:4;column-gap:2px;padding:2px}
+.tile{position:relative;break-inside:avoid;margin:0 0 2px;overflow:hidden;background:var(--stage);cursor:pointer}
+.tile img{display:block;width:100%;height:auto}
 .tile .veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(11,11,12,.72),transparent 55%);opacity:0;transition:opacity .45s var(--ease)}
 .tile:hover .veil{opacity:1}
 .tile .cap{position:absolute;left:16px;bottom:14px;color:var(--paper);z-index:2;opacity:0;transform:translateY(8px);transition:.5s var(--ease-out)}
@@ -188,15 +186,17 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .contact-row a{font-size:clamp(18px,2.4vw,30px);font-weight:500;letter-spacing:-.01em;border-bottom:1px solid transparent;transition:border-color .3s var(--ease),color .3s var(--ease)}
 .contact-row a:hover{border-color:var(--accent);color:var(--accent)}
 
-.tag{position:fixed;right:18px;bottom:14px;z-index:58;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .3s var(--ease)}
-.tag:hover{color:var(--ink)}
 
 .rv{opacity:0;transform:translateY(14px);transition:opacity .7s var(--ease-out),transform .7s var(--ease-out)}
 .rv.in{opacity:1;transform:none}
 
 @media(max-width:860px){
-  :root{--head-h:52px;--sub-h:42px}
-  .nav{gap:18px}
+  :root{--head-h:52px;--sub-h:94px}
+  .nav{display:none}
+  .sub{flex-direction:column;align-items:stretch;justify-content:center;gap:8px;padding:8px 20px}
+  .views{justify-content:flex-start}
+  .subright{justify-content:space-between;gap:12px}
+  .search{flex:1;width:auto;min-width:0}
   .rescount{display:none}
   .index-wrap{flex-direction:column}
   .list-col{width:100%;border-right:none}
@@ -204,12 +204,14 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .row{grid-template-columns:44px 1fr;padding:18px 20px}
   .row .meta{grid-column:2;text-align:left;margin-top:6px}
   .row .cat{display:inline;margin-right:12px}
-  .row .thumb{grid-column:1/-1;height:0;overflow:hidden;border-radius:2px;margin-top:0;background-size:cover;background-position:center;transition:height .5s var(--ease-out),margin .5s var(--ease-out)}
-  .row.active .thumb{height:46vw;margin-top:16px}
+  .row .thumb{grid-column:1/-1;height:0;overflow:hidden;border-radius:2px;margin-top:0;position:relative;background:var(--stage);transition:height .5s var(--ease-out),margin .5s var(--ease-out)}
+  .row.active .thumb{height:calc((100vw - 40px)*0.75);margin-top:16px}
+  .row .thumb .tb{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(22px) saturate(1.05);transform:scale(1.15)}
+  .row .thumb .tf{position:absolute;inset:0;background-size:contain;background-repeat:no-repeat;background-position:center}
   .about-grid{grid-template-columns:1fr;gap:20px}
   .svc-item .d{display:none}
-  .bento{grid-template-columns:repeat(2,1fr);grid-auto-rows:26vh}
-  .search{width:120px}
+  .bento{column-count:2}
+  
   .d-toc{display:none}.d-wrap{max-width:none}
   .d-meta{grid-template-columns:1fr 1fr}
   .d-two{grid-template-columns:1fr;gap:18px}
@@ -280,6 +282,23 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .lrow .lthumb{display:block;width:44px;height:44px;border-radius:5px;background-size:cover;background-position:center}
   .lv-scroller:hover .lrow{opacity:1}
 }
+
+/* mobile hamburger + menu */
+.burger{display:none;flex-direction:column;justify-content:center;align-items:flex-end;gap:5px;width:34px;height:34px;z-index:70}
+.burger span{display:block;height:1.6px;width:22px;background:var(--ink);transition:transform .3s var(--ease),opacity .3s var(--ease)}
+.burger.open span:nth-child(1){transform:translateY(3.3px) rotate(45deg)}
+.burger.open span:nth-child(2){transform:translateY(-3.3px) rotate(-45deg)}
+.mnav{position:fixed;inset:0;z-index:65;background:var(--paper);display:flex;flex-direction:column;padding:calc(var(--head-h) + 6vh) 24px 40px;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .4s var(--ease),transform .45s var(--ease-out)}
+.mnav.open{opacity:1;pointer-events:auto;transform:none}
+.mnav-links{display:flex;flex-direction:column}
+.mnav-links button{text-align:left;font-size:clamp(34px,11vw,54px);font-weight:500;letter-spacing:-.03em;line-height:1.1;color:var(--muted);padding:18px 0;border-bottom:1px solid var(--hair);transition:color .25s var(--ease)}
+.mnav-links button:hover,.mnav-links button:active{color:var(--ink)}
+.mnav-links .mcta{color:var(--accent)}
+.mnav-foot{margin-top:auto;display:flex;align-items:center;justify-content:flex-start;padding-top:24px}
+.mlang{font-size:14px;letter-spacing:.06em}
+.mlang button{color:var(--muted)}
+.mlang button.on{color:var(--ink)}
+@media(max-width:860px){.burger{display:flex}}
 </style>
 </head>
 <body>
@@ -292,7 +311,19 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <div class="lang" id="lang"><button data-lang="en" class="on">EN</button><span class="sep">/</span><button data-lang="zh">繁</button></div>
     <button class="cta" data-go="contact" data-i18n="getInTouch">Get in touch</button>
   </nav>
+  <button class="burger" id="burger" aria-label="Menu"><span></span><span></span></button>
 </header>
+
+<div class="mnav" id="mnav">
+  <nav class="mnav-links">
+    <button data-go="portfolio" data-i18n="work">Work</button>
+    <button data-go="about" data-i18n="about">About</button>
+    <button data-go="contact" class="mcta" data-i18n="getInTouch">Get in touch</button>
+  </nav>
+  <div class="mnav-foot">
+    <div class="lang mlang"><button data-lang="en">EN</button><span class="sep">/</span><button data-lang="zh">繁</button></div>
+  </div>
+</div>
 
 <div class="sub" id="sub">
   <div class="views">
@@ -385,7 +416,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   </div>
 </aside>
 
-<button class="tag" data-go="contact" data-i18n="contactTag">Contact</button>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -399,6 +429,7 @@ let FILTERS={device:[],industry:[],type:[]};
 const GROUP_LABEL={device:"By device",industry:"By industry",type:"By category"};
 const selected={device:new Set(),industry:new Set(),type:new Set()};
 const pad=n=>String(n).padStart(2,'0');
+const firstImg=w=>(w.images&&w.images.length?w.images[0]:w.thumb);
 const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 const isMobile=()=>window.matchMedia('(max-width:860px)').matches;
 
@@ -416,7 +447,7 @@ const I18N={
 function t(k){return (I18N[LANG]&&I18N[LANG][k])||I18N.en[k]||k;}
 function applyStatic(){document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.setAttribute('placeholder',t(el.dataset.i18nPh));});}
 function setLang(l){LANG=l;try{localStorage.setItem('miaw_lang',l);}catch(e){}
-  document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));
+  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));
   applyStatic();
   buildDrawer();applyFilters();
   renderContactOptions();
@@ -425,7 +456,11 @@ function setLang(l){LANG=l;try{localStorage.setItem('miaw_lang',l);}catch(e){}
   const pd=document.getElementById('page-detail');if(pd&&pd.classList.contains('show')&&currentDetailN!=null)openDetail(currentDetailN);
   const pa=document.getElementById('page-about');if(pa&&pa.classList.contains('show')&&aboutData)renderAboutData(aboutData);
 }
-document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+const burger=document.getElementById('burger'),mnav=document.getElementById('mnav');
+function toggleMenu(o){const open=(o===undefined)?!mnav.classList.contains('open'):o;mnav.classList.toggle('open',open);if(burger)burger.classList.toggle('open',open);document.body.style.overflow=open?'hidden':'';}
+if(burger)burger.onclick=()=>toggleMenu();
+window.addEventListener('resize',()=>{if(!isMobile())toggleMenu(false);});
 
 function match(w){
   if(!Object.keys(selected).every(g=>selected[g].size===0||selected[g].has(w[g])))return false;
@@ -480,7 +515,7 @@ function buildListSet(){
       <div class="name">${w.name}</div>
       <div class="meta"><span class="cat">${w.type}</span><span class="yr">${w.yr}</span></div>
       <div class="desc">${w.desc}</div>
-      <div class="thumb" style="background-image:url('${w.thumb}')"></div>`;
+      <div class="thumb"><div class="tb" style="background-image:url('${firstImg(w)}')"></div><div class="tf" style="background-image:url('${firstImg(w)}')"></div></div>`;
     r.addEventListener('mouseenter',()=>{if(isMobile())return;hovering=true;if(mvx>3&&mvx>Math.abs(mvy))return;activate(w.n);});
     r.addEventListener('click',()=>{if(isMobile()){if(activeWork&&activeWork.n===w.n){openDetail(w.n);}else{activate(w.n);}}else{openDetail(w.n);}});
     set.appendChild(r);
@@ -506,11 +541,10 @@ const bentoScroller=document.getElementById('view-grid');
 function buildBentoSet(){
   const set=document.createElement('div');set.className='bento';
   filtered().forEach(w=>{
-    const t=document.createElement('div');t.className='tile '+(w.shape||'sq');t.dataset.n=w.n;
-    t.style.backgroundImage=`url('${w.thumb}')`;
-    t.innerHTML=`<div class="tidx mono">${pad(w.n)}</div><div class="veil"></div><div class="cap"><div class="n">${w.name}</div><div class="c">${w.type} — ${w.yr}</div></div>`;
-    t.addEventListener('click',()=>openDetail(w.n));
-    set.appendChild(t);
+    const ti=document.createElement('div');ti.className='tile';ti.dataset.n=w.n;
+    ti.innerHTML=`<img src="${w.thumb}" alt="${w.name}" loading="lazy"><div class="veil"></div><div class="tidx mono">${pad(w.n)}</div><div class="cap"><div class="n">${w.name}</div><div class="c">${w.type} — ${w.yr}</div></div>`;
+    ti.addEventListener('click',()=>openDetail(w.n));
+    set.appendChild(ti);
   });
   return set;
 }
@@ -527,8 +561,8 @@ function buildListViewSet(){
   const set=document.createElement('div');set.className='lv-set';
   filtered().forEach(w=>{
     const r=document.createElement('div');r.className='lrow';r.dataset.n=w.n;
-    r.innerHTML=`<div class="lthumb" style="background-image:url('${w.thumb}')"></div><div class="lnum mono">${pad(w.n)}</div><div class="lname">${w.name}</div><div class="lmeta"><span class="lcat">${w.type}</span><span class="lyr mono">${w.yr}</span></div>`;
-    r.addEventListener('mouseenter',()=>{if(isMobile())return;lvPeek.style.backgroundImage=`url('${w.thumb}')`;lvPeek.classList.add('on');});
+    r.innerHTML=`<div class="lthumb" style="background-image:url('${firstImg(w)}')"></div><div class="lnum mono">${pad(w.n)}</div><div class="lname">${w.name}</div><div class="lmeta"><span class="lcat">${w.type}</span><span class="lyr mono">${w.yr}</span></div>`;
+    r.addEventListener('mouseenter',()=>{if(isMobile())return;lvPeek.style.backgroundImage=`url('${firstImg(w)}')`;lvPeek.classList.add('on');});
     r.addEventListener('click',()=>openDetail(w.n));
     set.appendChild(r);
   });
@@ -691,7 +725,7 @@ document.getElementById('c-submit').onclick=async()=>{
 
 /* ---- router ---- */
 const pP=document.getElementById('page-portfolio'),pA=document.getElementById('page-about'),pD=document.getElementById('page-detail'),pC=document.getElementById('page-contact');
-const sub=document.getElementById('sub'),tag=document.querySelector('.tag');
+const sub=document.getElementById('sub');
 function go(page){
   pP.classList.toggle('show',page==='portfolio');
   pA.classList.toggle('show',page==='about');
@@ -699,11 +733,11 @@ function go(page){
   pC.classList.toggle('show',page==='contact');
   const showSub=page==='portfolio';
   sub.style.opacity=showSub?'1':'0';sub.style.transform=showSub?'none':'translateY(-6px)';sub.style.pointerEvents=showSub?'auto':'none';
-  tag.style.opacity=(page==='detail'||page==='contact')?'0':'1';
   const _cta=document.querySelector('.nav .cta');if(_cta)_cta.style.display=(page==='contact')?'none':'';
   document.querySelectorAll('.nav [data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===page||(page==='detail'&&b.dataset.go==='portfolio')));
   if(page==='about')document.querySelectorAll('#page-about .rv').forEach((el,i)=>setTimeout(()=>el.classList.add('in'),80+i*90));
   if(page==='contact')resetContact();
+  try{toggleMenu(false);}catch(e){}
 }
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 
