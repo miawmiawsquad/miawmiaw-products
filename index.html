@@ -4,6 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>miawmiaw studio — portfolio</title>
+<link rel="icon" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon-16.png">
+<link rel="apple-touch-icon" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/apple-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -21,10 +25,15 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .mono{font-family:"Space Mono",monospace}
 
 .head{position:fixed;inset:0 0 auto 0;height:var(--head-h);z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--hair);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px)}
-.brand{font-weight:600;font-size:15px;letter-spacing:-.01em}
+.brand{font-weight:600;font-size:15px;letter-spacing:-.01em;display:inline-flex;align-items:center;gap:9px}
+.brand .blogo{width:22px;height:22px;border-radius:6px;display:block}
 .brand b{color:var(--accent)}
 .nav{display:flex;align-items:center;gap:24px;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
 .nav .cta{border:1px solid var(--ink);color:var(--ink);padding:7px 14px;border-radius:100px;transition:.25s var(--ease)}
+.lang{display:inline-flex;align-items:center;gap:6px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em}
+.lang button{color:var(--muted);transition:color .25s var(--ease)}
+.lang button.on{color:var(--ink)}
+.lang .sep{color:var(--hair)}
 .nav .cta:hover{background:var(--ink);color:var(--paper)}
 .search{border:none;border-bottom:1px solid var(--hair);background:transparent;font-family:"Space Grotesk",sans-serif;font-size:12.5px;padding:6px 4px;width:150px;color:var(--ink);transition:border-color .25s var(--ease)}
 .search::placeholder{color:var(--muted)}
@@ -234,9 +243,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .c-chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .c-sub{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
 .c-budget{display:flex;flex-wrap:wrap;gap:9px}
-.c-bud{border:1px solid var(--hair);border-radius:8px;padding:11px 16px;font-size:14px;transition:.2s var(--ease)}
+.c-bud{border:1px solid var(--hair);border-radius:100px;padding:10px 15px;font-size:13.5px;color:var(--ink);transition:.2s var(--ease)}
 .c-bud:hover{border-color:var(--muted)}
-.c-bud.on{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.c-bud.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .c-nav{display:flex;align-items:center;gap:12px;margin-top:44px}
 .c-back{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .c-back:hover{color:var(--ink)}
@@ -276,24 +285,25 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 <body>
 
 <header class="head">
-  <button class="brand" data-go="portfolio">miawmiaw <b>studio</b></button>
+  <button class="brand" data-go="portfolio"><img class="blogo" src="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/logo_256.png" alt="miawmiaw studio"> miawmiaw <b>studio</b></button>
   <nav class="nav">
-    <button data-go="portfolio" class="on">Work</button>
-    <button data-go="about">About</button>
-    <button class="cta" data-go="contact">Get in touch</button>
+    <button data-go="portfolio" class="on" data-i18n="work">Work</button>
+    <button data-go="about" data-i18n="about">About</button>
+    <div class="lang" id="lang"><button data-lang="en" class="on">EN</button><span class="sep">/</span><button data-lang="zh">繁</button></div>
+    <button class="cta" data-go="contact" data-i18n="getInTouch">Get in touch</button>
   </nav>
 </header>
 
 <div class="sub" id="sub">
   <div class="views">
-    <button data-view="index" class="on">Index</button>
-    <button data-view="grid">Grid</button>
-    <button data-view="list">List</button>
+    <button data-view="index" class="on" data-i18n="vIndex">Index</button>
+    <button data-view="grid" data-i18n="vGrid">Grid</button>
+    <button data-view="list" data-i18n="vList">List</button>
   </div>
   <div class="subright">
-    <input class="search" id="search" type="text" placeholder="Search projects" autocomplete="off">
+    <input class="search" id="search" type="text" placeholder="Search projects" data-i18n-ph="searchPh" autocomplete="off">
     <span class="rescount mono" id="res-count">10 works</span>
-    <button class="filterbtn" id="filter-open">Filter <span class="fbadge" id="fbadge" hidden>0</span></button>
+    <button class="filterbtn" id="filter-open"><span data-i18n="filter">Filter</span> <span class="fbadge" id="fbadge" hidden>0</span></button>
   </div>
 </div>
 
@@ -326,37 +336,40 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <div class="c-inner" id="c-form">
       <div class="c-prog"><span class="cd on" data-s="1"></span><span class="cd" data-s="2"></span><span class="cd" data-s="3"></span></div>
       <div class="c-step on" data-step="1">
-        <div class="c-eyebrow mono">01 — You</div>
-        <h2 class="c-h">Let’s start with you.</h2>
-        <div class="c-field"><label>Name *</label><input id="q-name" class="c-inp" type="text" placeholder="Your name" autocomplete="name"></div>
-        <div class="c-field"><label>Email *</label><input id="q-email" class="c-inp" type="email" placeholder="you@email.com" autocomplete="email"></div>
-        <div class="c-field"><label>Company <span class="opt">optional</span></label><input id="q-company" class="c-inp" type="text" placeholder="Company"></div>
+        <div class="c-eyebrow mono" data-i18n="st1eyebrow">01 — You</div>
+        <h2 class="c-h" data-i18n="st1h">Let’s start with you.</h2>
+        <div class="c-field"><label><span data-i18n="lName">Name *</span></label><input id="q-name" class="c-inp" type="text" placeholder="Your name" data-i18n-ph="phName" autocomplete="name"></div>
+        <div class="c-field"><label><span data-i18n="lEmail">Email *</span></label><input id="q-email" class="c-inp" type="email" placeholder="you@email.com" autocomplete="email"></div>
+        <div class="c-field"><label><span data-i18n="lCompany">Company</span> <span class="opt" data-i18n="optional">optional</span></label><input id="q-company" class="c-inp" type="text" placeholder="Company" data-i18n-ph="phCompany"></div>
+        <div class="c-field"><label><span data-i18n="lPhone">Phone / WhatsApp</span> <span class="opt" data-i18n="optional">optional</span></label><input id="q-phone" class="c-inp" type="tel" placeholder="+62…"></div>
+        <div class="c-field"><label><span data-i18n="lReferrer">Referred by</span> <span class="opt" data-i18n="optionalTeam">optional — team member</span></label><input id="q-referrer" class="c-inp" type="text" placeholder="Who referred you?" data-i18n-ph="phReferrer"></div>
         <div class="c-err" id="c-err1"></div>
       </div>
       <div class="c-step" data-step="2">
-        <div class="c-eyebrow mono">02 — Services</div>
-        <h2 class="c-h">What do you need?</h2>
+        <div class="c-eyebrow mono" data-i18n="st2eyebrow">02 — Services</div>
+        <h2 class="c-h" data-i18n="st2h">What do you need?</h2>
         <div class="c-chips" id="q-services"></div>
-        <div class="c-sub mono">Budget</div>
+        <div class="c-sub mono" data-i18n="budget">Budget</div>
         <div class="c-budget" id="q-budget"></div>
+        <div class="c-err" id="c-err2"></div>
       </div>
       <div class="c-step" data-step="3">
-        <div class="c-eyebrow mono">03 — Brief</div>
-        <h2 class="c-h">Tell us about it.</h2>
-        <div class="c-field"><label>Project brief *</label><textarea id="q-brief" class="c-ta" placeholder="A few lines about your project, goals, and timeline…"></textarea></div>
+        <div class="c-eyebrow mono" data-i18n="st3eyebrow">03 — Brief</div>
+        <h2 class="c-h" data-i18n="st3h">Tell us about it.</h2>
+        <div class="c-field"><label><span data-i18n="lBrief">Project brief *</span></label><textarea id="q-brief" class="c-ta" placeholder="A few lines about your project, goals, and timeline…" data-i18n-ph="phBrief"></textarea></div>
         <div class="c-err" id="c-err3"></div>
       </div>
       <div class="c-nav">
-        <button class="c-back" id="c-back">← Back</button>
-        <button class="c-next" id="c-next">Next →</button>
-        <button class="c-submit" id="c-submit" style="display:none">Send inquiry</button>
+        <button class="c-back" id="c-back" data-i18n="cBack">← Back</button>
+        <button class="c-next" id="c-next" data-i18n="next">Next →</button>
+        <button class="c-submit" id="c-submit" style="display:none" data-i18n="send">Send inquiry</button>
       </div>
     </div>
     <div class="c-success" id="c-success" style="display:none">
-      <div class="c-eyebrow mono">Sent</div>
-      <h2 class="c-h">Thanks — we’ll get back to you shortly.</h2>
-      <p class="c-lead">We’ve received your inquiry and will reply to your email as soon as we can.</p>
-      <button class="cta2" data-go="portfolio">Back to work</button>
+      <div class="c-eyebrow mono" data-i18n="sent">Sent</div>
+      <h2 class="c-h" data-i18n="thanks">Thanks — we’ll get back to you shortly.</h2>
+      <p class="c-lead" data-i18n="thanksLead">We’ve received your inquiry and will reply to your email as soon as we can.</p>
+      <button class="cta2" data-go="portfolio" data-i18n="backHome">Back to homepage</button>
     </div>
   </div>
 </section>
@@ -364,15 +377,15 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 <!-- FILTER DRAWER -->
 <div class="backdrop" id="backdrop"></div>
 <aside class="drawer" id="drawer" aria-hidden="true">
-  <div class="drawer-head"><span class="t">Filter</span><button id="filter-close">Close ×</button></div>
+  <div class="drawer-head"><span class="t" data-i18n="filter">Filter</span><button id="filter-close" data-i18n="close">Close ×</button></div>
   <div class="drawer-body" id="drawer-body"></div>
   <div class="drawer-foot">
-    <button class="clr" id="filter-clear">Clear all</button>
+    <button class="clr" id="filter-clear" data-i18n="clearAll">Clear all</button>
     <button class="apply" id="filter-apply"><span id="foot-count">10</span> works — View</button>
   </div>
 </aside>
 
-<button class="tag" data-go="contact">Contact</button>
+<button class="tag" data-go="contact" data-i18n="contactTag">Contact</button>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -392,6 +405,27 @@ const isMobile=()=>window.matchMedia('(max-width:860px)').matches;
 let activeWork=null;
 let curView='index';
 let searchQ='';
+let currentDetailN=null,aboutData=null,LANG='en';
+const GROUP_KEY={device:'byDevice',industry:'byIndustry',type:'byCategory'};
+const SERVICES=[["Landing Page UI/UX Design HTML","svc1"],["Website Design","svc2"],["SaaS Dashboard / CRM / ERP","svc3"],["Mobile App Design","svc4"],["UX Audit","svc5"],["Clean Up Vibe-Coded Apps","svc6"],["Custom UI/UX Design","svc7"]];
+const BUDGETS=[["Under $500","bud1"],["$500–2k","bud2"],["$2k–5k","bud3"],["$5k+","bud4"]];
+const I18N={
+ en:{work:"Work",about:"About",getInTouch:"Get in touch",vIndex:"Index",vGrid:"Grid",vList:"List",filter:"Filter",close:"Close ×",clearAll:"Clear all",searchPh:"Search projects",works:"works",worksView:"works — View",byDevice:"By device",byIndustry:"By industry",byCategory:"By category",noMatch:"No works match",contactTag:"Contact",back:"← Back",project:"Project",secCover:"Cover",secOverview:"Overview",secApproach:"Approach",secGallery:"Gallery",secNext:"Next",mClient:"Client",mRole:"Role",mDevice:"Device",mIndustry:"Industry",mCategory:"Category",mYear:"Year",approach2:"Every deliverable ships as a single-file, developer-ready handoff — no ambiguity between design and build. The system is documented so it holds up as the work scales beyond this first release.",practice:"Practice",contact:"Contact",st1eyebrow:"01 — You",st2eyebrow:"02 — Services",st3eyebrow:"03 — Brief",st1h:"Let’s start with you.",st2h:"What do you need?",st3h:"Tell us about it.",lName:"Name *",lEmail:"Email *",lCompany:"Company",lPhone:"Phone / WhatsApp",lReferrer:"Referred by",lBrief:"Project brief *",optional:"optional",optionalTeam:"optional — team member",phName:"Your name",phCompany:"Company",phReferrer:"Who referred you?",phBrief:"A few lines about your project, goals, and timeline…",budget:"Budget",cBack:"← Back",next:"Next →",send:"Send inquiry",sending:"Sending…",err1:"Please enter your name and a valid email.",err2:"Please select at least one service and a budget.",err3:"Please add a short brief (at least a sentence).",errSubmit:"Something went wrong — please try again.",sent:"Sent",thanks:"Thanks — we’ll get back to you shortly.",thanksLead:"We’ve received your inquiry and will reply to your email as soon as we can.",backHome:"Back to homepage",svc1:"Landing Page UI/UX Design HTML",svc2:"Website Design",svc3:"SaaS Dashboard / CRM / ERP",svc4:"Mobile App Design",svc5:"UX Audit",svc6:"Clean Up Vibe-Coded Apps",svc7:"Custom UI/UX Design",bud1:"Under $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"},
+ zh:{work:"作品",about:"關於",getInTouch:"聯絡我們",vIndex:"索引",vGrid:"網格",vList:"清單",filter:"篩選",close:"關閉 ×",clearAll:"全部清除",searchPh:"搜尋作品",works:"件作品",worksView:"件作品 — 查看",byDevice:"依裝置",byIndustry:"依產業",byCategory:"依類別",noMatch:"沒有符合的作品",contactTag:"聯絡",back:"← 返回",project:"專案",secCover:"封面",secOverview:"概覽",secApproach:"方法",secGallery:"作品集",secNext:"下一個",mClient:"客戶",mRole:"角色",mDevice:"裝置",mIndustry:"產業",mCategory:"類別",mYear:"年份",approach2:"每個交付物都是單一檔案、可直接交給開發者的成果 — 設計與實作之間毫無歧義。系統皆有文件記錄，讓作品在首次發佈之後持續擴充時依然穩固。",practice:"服務項目",contact:"聯絡",st1eyebrow:"01 — 您",st2eyebrow:"02 — 服務",st3eyebrow:"03 — 需求",st1h:"先從您開始。",st2h:"您需要什麼？",st3h:"告訴我們細節。",lName:"姓名 *",lEmail:"電郵 *",lCompany:"公司",lPhone:"電話 / WhatsApp",lReferrer:"推薦人",lBrief:"專案需求 *",optional:"選填",optionalTeam:"選填 — 團隊成員",phName:"您的姓名",phCompany:"公司",phReferrer:"誰推薦您？",phBrief:"簡述您的專案、目標與時程…",budget:"預算",cBack:"← 返回",next:"下一步 →",send:"送出需求",sending:"送出中…",err1:"請輸入姓名與有效電郵。",err2:"請至少選擇一項服務與預算。",err3:"請簡短描述需求（至少一句）。",errSubmit:"發生錯誤 — 請再試一次。",sent:"已送出",thanks:"感謝您 — 我們會盡快回覆。",thanksLead:"我們已收到您的需求，會盡快回覆您的電郵。",backHome:"返回首頁",svc1:"到達頁 UI/UX 設計 (HTML)",svc2:"網站設計",svc3:"SaaS 儀表板 / CRM / ERP",svc4:"行動應用程式設計",svc5:"UX 稽核",svc6:"整理 Vibe-Coded 應用程式",svc7:"客製 UI/UX 設計",bud1:"低於 $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"}
+};
+function t(k){return (I18N[LANG]&&I18N[LANG][k])||I18N.en[k]||k;}
+function applyStatic(){document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.setAttribute('placeholder',t(el.dataset.i18nPh));});}
+function setLang(l){LANG=l;try{localStorage.setItem('miaw_lang',l);}catch(e){}
+  document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));
+  applyStatic();
+  buildDrawer();applyFilters();
+  renderContactOptions();
+  document.querySelectorAll('#q-services .c-chip').forEach(c=>c.classList.toggle('on',cState.services.has(c.dataset.v)));
+  document.querySelectorAll('#q-budget .c-bud').forEach(c=>c.classList.toggle('on',c.dataset.v===cState.budget));
+  const pd=document.getElementById('page-detail');if(pd&&pd.classList.contains('show')&&currentDetailN!=null)openDetail(currentDetailN);
+  const pa=document.getElementById('page-about');if(pa&&pa.classList.contains('show')&&aboutData)renderAboutData(aboutData);
+}
+document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 
 function match(w){
   if(!Object.keys(selected).every(g=>selected[g].size===0||selected[g].has(w[g])))return false;
@@ -482,7 +516,7 @@ function buildBentoSet(){
 }
 function renderBento(){
   const fl=filtered();
-  if(!fl.length){bentoScroller.innerHTML='<div class="grid-empty" style="display:flex">No works match</div>';return;}
+  if(!fl.length){bentoScroller.innerHTML='<div class="grid-empty" style="display:flex">'+t('noMatch')+'</div>';return;}
   makeLoop(bentoScroller,buildBentoSet);
 }
 
@@ -502,7 +536,7 @@ function buildListViewSet(){
 }
 function renderListView(){
   const fl=filtered();
-  if(!fl.length){lvScroller.innerHTML='<div class="grid-empty" style="display:flex">No works match</div>';return;}
+  if(!fl.length){lvScroller.innerHTML='<div class="grid-empty" style="display:flex">'+t('noMatch')+'</div>';return;}
   makeLoop(lvScroller,buildListViewSet);
 }
 let _llx=null,_lvx=0;
@@ -516,9 +550,9 @@ let dSecs=[];
 function buildDetail(w){
   const nx=nextWork(w.n);
   const hasG=(w.images&&w.images.length>0);
-  dSecs=[["cover","Cover"],["overview","Overview"],["approach","Approach"]];
-  if(hasG)dSecs.push(["gallery","Gallery"]);
-  dSecs.push(["next","Next"]);
+  dSecs=[["cover",t('secCover')],["overview",t('secOverview')],["approach",t('secApproach')]];
+  if(hasG)dSecs.push(["gallery",t('secGallery')]);
+  dSecs.push(["next",t('secNext')]);
   const galleryImgs=hasG?w.images.map(src=>`<img class="d-gimg" src="${src}" alt="${w.name}" loading="lazy" decoding="async">`).join(''):'';
   const toc=`<div class="d-toc" id="d-toc"><div class="spine"><i id="d-fill"></i></div>
     ${dSecs.map((sn,i)=>`<div class="ti" data-target="s-${sn[0]}"><span class="dot"></span><span class="lb">${pad(i+1)} ${sn[1]}</span></div>`).join('')}
@@ -530,26 +564,26 @@ function buildDetail(w){
       <div class="d-cover-img" style="background-image:url('${w.cover}')"></div>
     </section>`;
   const overviewSec=`<section class="d-section" id="s-overview">
-      <div class="d-h">Overview</div><p>${w.overview}</p>
+      <div class="d-h">${t('secOverview')}</div><p>${w.overview}</p>
       <div class="d-meta">
-        <div class="m"><span class="l">Client</span><span class="v">${w.client}</span></div>
-        <div class="m"><span class="l">Role</span><span class="v">${w.role}</span></div>
-        <div class="m"><span class="l">Device</span><span class="v">${w.device}</span></div>
-        <div class="m"><span class="l">Industry</span><span class="v">${w.industry}</span></div>
-        <div class="m"><span class="l">Category</span><span class="v">${w.type}</span></div>
-        <div class="m"><span class="l">Year</span><span class="v">${w.yr}</span></div>
+        <div class="m"><span class="l">${t('mClient')}</span><span class="v">${w.client}</span></div>
+        <div class="m"><span class="l">${t('mRole')}</span><span class="v">${w.role}</span></div>
+        <div class="m"><span class="l">${t('mDevice')}</span><span class="v">${w.device}</span></div>
+        <div class="m"><span class="l">${t('mIndustry')}</span><span class="v">${w.industry}</span></div>
+        <div class="m"><span class="l">${t('mCategory')}</span><span class="v">${w.type}</span></div>
+        <div class="m"><span class="l">${t('mYear')}</span><span class="v">${w.yr}</span></div>
       </div>
     </section>`;
   const approachSec=`<section class="d-section" id="s-approach">
-      <div class="d-h">Approach</div>
-      <div class="d-two"><p>${w.approach}</p><p>Every deliverable ships as a single-file, developer-ready handoff — no ambiguity between design and build. The system is documented so it holds up as the work scales beyond this first release.</p></div>
+      <div class="d-h">${t('secApproach')}</div>
+      <div class="d-two"><p>${w.approach}</p><p>${t('approach2')}</p></div>
     </section>`;
-  const gallerySec=hasG?`<section class="d-section" id="s-gallery"><div class="d-h">Gallery</div>${galleryImgs}</section>`:'';
-  const nextSec=`<section class="d-section" id="s-next"><div class="d-h">Next</div>
-      <div class="d-nextrow" id="d-next"><span class="lbl">Project ${pad(nx.n)}</span><span class="nm">${nx.name} →</span></div>
+  const gallerySec=hasG?`<section class="d-section" id="s-gallery"><div class="d-h">${t('secGallery')}</div>${galleryImgs}</section>`:'';
+  const nextSec=`<section class="d-section" id="s-next"><div class="d-h">${t('secNext')}</div>
+      <div class="d-nextrow" id="d-next"><span class="lbl">${t('project')} ${pad(nx.n)}</span><span class="nm">${nx.name} →</span></div>
     </section>`;
   detailInner.innerHTML=`
-    <div class="d-top"><button class="d-back" id="d-back">← Back</button><span class="d-count mono">${pad(w.n)} / ${pad(WORKS.length)}</span></div>
+    <div class="d-top"><button class="d-back" id="d-back">${t('back')}</button><span class="d-count mono">${pad(w.n)} / ${pad(WORKS.length)}</span></div>
     ${toc}
     <div class="d-wrap">${coverSec}${overviewSec}${approachSec}${gallerySec}${nextSec}</div>`;
   document.getElementById('d-back').onclick=()=>go('portfolio');
@@ -568,7 +602,7 @@ function setupDetailScroll(){
   }
   sc.onscroll=upd;upd();
 }
-function openDetail(n){const w=WORKS.find(x=>x.n===n);if(!w)return;buildDetail(w);document.querySelector('.detail').scrollTop=0;go('detail');requestAnimationFrame(setupDetailScroll);}
+function openDetail(n){const w=WORKS.find(x=>x.n===n);if(!w)return;currentDetailN=n;buildDetail(w);document.querySelector('.detail').scrollTop=0;go('detail');requestAnimationFrame(setupDetailScroll);}
 
 /* ---- FILTER DRAWER ---- */
 const drawer=document.getElementById('drawer');const backdrop=document.getElementById('backdrop');
@@ -577,7 +611,7 @@ function optCount(g,v){return WORKS.filter(w=>w[g]===v).length;}
 function buildDrawer(){
   drawerBody.innerHTML=Object.keys(FILTERS).map(g=>`
     <div class="fgroup">
-      <div class="glabel">${GROUP_LABEL[g]}</div>
+      <div class="glabel">${t(GROUP_KEY[g])}</div>
       <div class="chips">${FILTERS[g].map(v=>`<button class="chip ${selected[g].has(v)?'on':''}" data-g="${g}" data-v="${v}">${v}<span class="cc">${pad(optCount(g,v))}</span></button>`).join('')}</div>
     </div>`).join('');
   drawerBody.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
@@ -590,8 +624,8 @@ function applyFilters(){
   renderList();
   if(curView==='grid')renderBento();else if(curView==='list')renderListView();
   const f=filtered().length,a=activeCount();
-  document.getElementById('res-count').textContent=f+" works";
-  document.getElementById('foot-count').textContent=f;
+  document.getElementById('res-count').textContent=f+" "+t('works');
+  const _ap=document.getElementById('filter-apply');if(_ap)_ap.innerHTML=f+" "+t('worksView');
   const badge=document.getElementById('fbadge');
   if(a){badge.hidden=false;badge.textContent=a;}else badge.hidden=true;
 }
@@ -622,14 +656,12 @@ document.querySelectorAll('.views button').forEach(b=>{
 
 /* ---- router ---- */
 /* ---- contact stepper ---- */
-const SERVICES_LIST=["Landing Page UI/UX Design HTML","Website Design","SaaS Dashboard / CRM / ERP","Mobile App Design","UX Audit","Clean Up Vibe-Coded Apps","Custom UI/UX Design"];
-const BUDGETS=["Under $500","$500–2k","$2k–5k","$5k+"];
 const cState={step:1,services:new Set(),budget:''};
 function renderContactOptions(){
   const sv=document.getElementById('q-services'),bd=document.getElementById('q-budget');
   if(!sv||!bd)return;
-  sv.innerHTML=SERVICES_LIST.map(x=>`<button type="button" class="c-chip" data-v="${x}">${x}</button>`).join('');
-  bd.innerHTML=BUDGETS.map(x=>`<button type="button" class="c-bud" data-v="${x}">${x}</button>`).join('');
+  sv.innerHTML=SERVICES.map(([v,k])=>`<button type="button" class="c-chip" data-v="${v}">${t(k)}</button>`).join('');
+  bd.innerHTML=BUDGETS.map(([v,k])=>`<button type="button" class="c-bud" data-v="${v}">${t(k)}</button>`).join('');
   sv.querySelectorAll('.c-chip').forEach(c=>c.onclick=()=>{const v=c.dataset.v;if(cState.services.has(v))cState.services.delete(v);else cState.services.add(v);c.classList.toggle('on');});
   bd.querySelectorAll('.c-bud').forEach(c=>c.onclick=()=>{cState.budget=c.dataset.v;bd.querySelectorAll('.c-bud').forEach(x=>x.classList.toggle('on',x===c));});
 }
@@ -641,18 +673,19 @@ function cShowStep(n){
   document.getElementById('c-next').style.display=n<3?'inline-flex':'none';
   document.getElementById('c-submit').style.display=n===3?'inline-flex':'none';
 }
-function cValid1(){const nm=document.getElementById('q-name').value.trim();const em=document.getElementById('q-email').value.trim();const ok=!!nm&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em);document.getElementById('c-err1').textContent=ok?'':'Please enter your name and a valid email.';return ok;}
-function cValid3(){const b=document.getElementById('q-brief').value.trim();const ok=b.length>=10;document.getElementById('c-err3').textContent=ok?'':'Please add a short brief (at least a sentence).';return ok;}
-function resetContact(){cState.step=1;cState.services.clear();cState.budget='';const fm=document.getElementById('c-form'),su=document.getElementById('c-success');if(fm)fm.style.display='flex';if(su)su.style.display='none';['q-name','q-email','q-company','q-brief'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.querySelectorAll('#q-services .c-chip,#q-budget .c-bud').forEach(x=>x.classList.remove('on'));cShowStep(1);}
-document.getElementById('c-next').onclick=()=>{if(cState.step===1&&!cValid1())return;cShowStep(Math.min(3,cState.step+1));};
+function cValid1(){const nm=document.getElementById('q-name').value.trim();const em=document.getElementById('q-email').value.trim();const ok=!!nm&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em);document.getElementById('c-err1').textContent=ok?'':t('err1');return ok;}
+function cValid2(){const ok=cState.services.size>0&&!!cState.budget;const el=document.getElementById('c-err2');if(el)el.textContent=ok?'':t('err2');return ok;}
+function cValid3(){const b=document.getElementById('q-brief').value.trim();const ok=b.length>=10;document.getElementById('c-err3').textContent=ok?'':t('err3');return ok;}
+function resetContact(){cState.step=1;cState.services.clear();cState.budget='';const fm=document.getElementById('c-form'),su=document.getElementById('c-success');if(fm)fm.style.display='flex';if(su)su.style.display='none';['q-name','q-email','q-company','q-phone','q-referrer','q-brief'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.querySelectorAll('#q-services .c-chip,#q-budget .c-bud').forEach(x=>x.classList.remove('on'));cShowStep(1);}
+document.getElementById('c-next').onclick=()=>{if(cState.step===1&&!cValid1())return;if(cState.step===2&&!cValid2())return;cShowStep(Math.min(3,cState.step+1));};
 document.getElementById('c-back').onclick=()=>cShowStep(Math.max(1,cState.step-1));
 document.getElementById('c-submit').onclick=async()=>{
   if(!cValid3())return;
-  const btn=document.getElementById('c-submit');btn.textContent='Sending…';btn.disabled=true;
-  const payload={name:document.getElementById('q-name').value.trim(),email:document.getElementById('q-email').value.trim(),company:document.getElementById('q-company').value.trim(),services:[...cState.services],budget:cState.budget,brief:document.getElementById('q-brief').value.trim()};
+  const btn=document.getElementById('c-submit');btn.textContent=t('sending');btn.disabled=true;
+  const payload={name:document.getElementById('q-name').value.trim(),email:document.getElementById('q-email').value.trim(),company:document.getElementById('q-company').value.trim(),phone:document.getElementById('q-phone').value.trim(),referrer:document.getElementById('q-referrer').value.trim(),services:[...cState.services],budget:cState.budget,brief:document.getElementById('q-brief').value.trim()};
   const {error}=await sb.from('inquiries').insert(payload);
-  btn.textContent='Send inquiry';btn.disabled=false;
-  if(error){document.getElementById('c-err3').textContent='Something went wrong — please try again.';console.error(error);return;}
+  btn.textContent=t('send');btn.disabled=false;
+  if(error){document.getElementById('c-err3').textContent=t('errSubmit');console.error(error);return;}
   document.getElementById('c-form').style.display='none';document.getElementById('c-success').style.display='flex';
 };
 
@@ -667,7 +700,8 @@ function go(page){
   const showSub=page==='portfolio';
   sub.style.opacity=showSub?'1':'0';sub.style.transform=showSub?'none':'translateY(-6px)';sub.style.pointerEvents=showSub?'auto':'none';
   tag.style.opacity=(page==='detail'||page==='contact')?'0':'1';
-  document.querySelectorAll('.nav button,.nav .cta').forEach(b=>b.classList.toggle('on',b.dataset.go===page||(page==='detail'&&b.dataset.go==='portfolio')));
+  const _cta=document.querySelector('.nav .cta');if(_cta)_cta.style.display=(page==='contact')?'none':'';
+  document.querySelectorAll('.nav [data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===page||(page==='detail'&&b.dataset.go==='portfolio')));
   if(page==='about')document.querySelectorAll('#page-about .rv').forEach((el,i)=>setTimeout(()=>el.classList.add('in'),80+i*90));
   if(page==='contact')resetContact();
 }
@@ -678,13 +712,14 @@ function renderAboutData(ab){
   const el=document.getElementById('about-in');if(!el)return;
   el.innerHTML=`<h1 class="rv">${ab.headline||''}</h1>
     <p class="about-lead rv">${ab.lead||''}</p>
-    <div class="about-grid rv"><h3>Practice</h3><div class="svc">${(ab.practice||[]).map(r=>`<div class="svc-item"><span class="t">${r[0]}</span><span class="d">${r[1]}</span></div>`).join('')}</div></div>
-    <div class="about-grid rv"><h3>Contact</h3><div class="contact-row">${(ab.contacts||[]).map(r=>`<a href="${String(r[1]).includes('@')?'mailto:'+r[1]:r[1]}">${r[0]}</a>`).join('')}</div></div>`;
+    <div class="about-grid rv"><h3>${t('practice')}</h3><div class="svc">${(ab.practice||[]).map(r=>`<div class="svc-item"><span class="t">${r[0]}</span><span class="d">${r[1]}</span></div>`).join('')}</div></div>
+    <div class="about-grid rv"><h3>${t('contact')}</h3><div class="contact-row">${(ab.contacts||[]).map(r=>`<a href="${String(r[1]).includes('@')?'mailto:'+r[1]:r[1]}">${r[0]}</a>`).join('')}</div></div>`;
 }
 
 /* ---- init after data ---- */
 function init(){
   buildStage();applyFilters();renderContactOptions();
+  let _sl="en";try{_sl=localStorage.getItem("miaw_lang")||"en";}catch(e){}setLang(_sl);
   setTimeout(()=>{document.querySelectorAll('#list-scroller .row').forEach((r,i)=>{if(i>7)return;r.style.opacity='0';r.style.transform='translateY(12px)';r.style.transition='opacity .6s var(--ease-out),transform .6s var(--ease-out)';setTimeout(()=>{r.style.opacity='';r.style.transform='';},60+i*55);});},60);
 }
 
@@ -699,7 +734,7 @@ function init(){
     const projs=pr.data||[];
     WORKS=projs.map((p,i)=>({n:i+1,name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,cover:p.cover,thumb:(p.cover_thumb||p.cover),images:(p.images||[])}));
     FILTERS={device:[],industry:[],type:[]};(fo.data||[]).forEach(o=>{if(FILTERS[o.grp])FILTERS[o.grp].push(o.value);});
-    if(ab.data)renderAboutData(ab.data);
+    if(ab.data){aboutData=ab.data;renderAboutData(ab.data);}
     init();
   }catch(err){
     console.error('load failed',err);
