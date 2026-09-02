@@ -4,10 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>miawmiaw studio — dashboard</title>
-<link rel="icon" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon-16.png">
-<link rel="apple-touch-icon" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/apple-180.png">
+<link rel="icon" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon.ico?v=3" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon-32.png?v=3">
+<link rel="icon" type="image/png" sizes="16x16" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon-16.png?v=3">
+<link rel="apple-touch-icon" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/apple-180.png?v=3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@ a{color:inherit;text-decoration:none}
 /* sidebar */
 .side{border-right:1px solid var(--hair);display:flex;flex-direction:column;padding:22px 16px}
 .side .brand{font-weight:600;font-size:16px;letter-spacing:-.01em;padding:6px 10px 26px;display:flex;align-items:center;gap:9px}
-.side .brand .blogo{width:22px;height:22px;border-radius:6px;display:block}
+.side .brand .blogo{width:22px;height:22px;border-radius:50%;display:block}
 .side .brand b{color:var(--accent)}
 .snav{display:flex;flex-direction:column;gap:2px}
 .snav button{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:7px;color:var(--muted);text-align:left;transition:.2s var(--ease);font-size:13.5px}
@@ -202,7 +202,7 @@ a{color:inherit;text-decoration:none}
 .authgate{position:fixed;inset:0;z-index:200;background:var(--paper);display:none;align-items:center;justify-content:center}
 .authbox{width:320px;display:flex;flex-direction:column;gap:12px}
 .authbox .ab-brand{font-size:20px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
-.authbox .ab-brand .blogo{width:26px;height:26px;border-radius:7px;display:block}
+.authbox .ab-brand .blogo{width:26px;height:26px;border-radius:50%;display:block}
 .authbox .ab-brand b{color:var(--accent)}
 .authbox .ab-sub{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
 .authbox .btn{justify-content:center;margin-top:4px}
@@ -230,7 +230,7 @@ a{color:inherit;text-decoration:none}
 <body>
 <div class="authgate" id="authgate">
   <form class="authbox" id="authform">
-    <div class="ab-brand"><img class="blogo" src="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/logo_256.png" alt="miawmiaw studio"> miawmiaw <b>studio</b></div>
+    <div class="ab-brand"><img class="blogo" src="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/logo_256.png?v=3" alt="miawmiaw studio"> miawmiaw <b>studio</b></div>
     <div class="ab-sub">Dashboard sign in</div>
     <input class="inp" id="au-email" type="email" placeholder="Email" autocomplete="username" value="admin@miaw.studio">
     <input class="inp" id="au-pass" type="password" placeholder="Password" autocomplete="current-password">
@@ -242,7 +242,7 @@ a{color:inherit;text-decoration:none}
 
   <!-- SIDEBAR -->
   <aside class="side">
-    <div class="brand"><img class="blogo" src="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/logo_256.png" alt="miawmiaw studio"> miawmiaw <b>studio</b></div>
+    <div class="brand"><img class="blogo" src="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/logo_256.png?v=3" alt="miawmiaw studio"> miawmiaw <b>studio</b></div>
     <nav class="snav" id="snav">
       <button data-view="overview" class="on"><span class="ic">◍</span> Overview</button>
       <button data-view="projects"><span class="ic">▦</span> Projects</button>
@@ -431,7 +431,7 @@ function opts(list,val){return (list||[]).map(o=>`<option ${o===val?'selected':'
 function openEditor(id){
   editingId=id;
   const src=id?state.projects.find(x=>x.id===id):null;
-  editDraft=src?JSON.parse(JSON.stringify(src)):{name:"",device:state.filters.device[0]||"Desktop",industry:state.filters.industry[0]||"Fintech",type:state.filters.type[0]||"Landing Page",year:new Date().getFullYear()+"",client:"",role:"Product designer",caption:"",overview:"",approach:"",cover:"",cover_thumb:"",images:[],views:0,status:'Draft'};
+  editDraft=src?JSON.parse(JSON.stringify(src)):{name:"",device:state.filters.device[0]||"Desktop",industry:state.filters.industry[0]||"Fintech",type:state.filters.type[0]||"Landing Page",year:new Date().getFullYear()+"",client:"",role:"Product designer",caption:"",overview:"",approach:"",link:"",cover:"",cover_thumb:"",images:[],views:0,status:'Draft'};
   nav('editor');renderEditor();
 }
 function renderEditor(){
@@ -452,9 +452,9 @@ function renderEditor(){
       <div class="fld"><label>Client</label><input class="inp" id="f-cli" value="${(p.client||'').replace(/"/g,'&quot;')}"></div>
       <div class="fld"><label>Role</label><input class="inp" id="f-rol" value="${(p.role||'').replace(/"/g,'&quot;')}"></div>
     </div>
+    <div class="fld"><label>Link <span style="text-transform:none;letter-spacing:0;color:var(--muted)">optional</span></label><input class="inp" id="f-link" value="${(p.link||'').replace(/"/g,'&quot;')}" placeholder="https://…"></div>
     <div class="esec"><div class="st">Detail content</div>
-      <div class="fld"><label>Overview</label><textarea class="ta" id="f-ov" placeholder="Short overview paragraph">${p.overview||''}</textarea></div>
-      <div class="fld"><label>Approach</label><textarea class="ta" id="f-ap" placeholder="Short approach paragraph">${p.approach||''}</textarea></div>
+      <div class="fld"><label>Overview</label><textarea class="ta" id="f-ov" placeholder="Use a blank line to separate paragraphs" style="min-height:180px">${p.overview||''}</textarea></div>
     </div>
     <div class="esec"><div class="st">Gallery images</div><div class="gimgs" id="ed-gimgs"></div></div>
     <div class="esec"><label class="toggle ${p.status==='Published'?'on':''}" id="ed-toggle"><span class="sw"></span><span class="tl">Published on front site</span></label></div>`;
@@ -473,7 +473,7 @@ function collectEditor(){
   p.name=$('#f-name').value.trim()||'Untitled';p.year=$('#f-yr').value.trim();p.caption=$('#f-cap').value.trim();
   p.device=$('#f-dev').value;p.industry=$('#f-ind').value;p.type=$('#f-typ').value;
   p.client=$('#f-cli').value.trim();p.role=$('#f-rol').value.trim();
-  p.overview=$('#f-ov').value.trim();p.approach=$('#f-ap').value.trim();
+  p.overview=$('#f-ov').value.trim();p.link=$('#f-link').value.trim();
   p.images=p.images||[];
 }
 async function saveEditor(){
