@@ -225,6 +225,12 @@ a{color:inherit;text-decoration:none}
 .ibadge{font-family:"Space Mono",monospace;font-size:9px;background:var(--accent);color:#fff;border-radius:100px;padding:1px 6px;margin-left:2px}
 .iqlbl{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
 @media(max-width:820px){.qrow{grid-template-columns:10px 1fr 70px}.qrow .qsvc,.qrow .qbud{display:none}}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:100px;font-size:12.5px;color:var(--ink);transition:.2s var(--ease);cursor:pointer}
+.chip:hover{border-color:var(--muted)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.prow.strow{grid-template-columns:30px 1.8fr 120px 90px 100px}
+.prow.tstrow{grid-template-columns:30px 1.8fr 1fr 90px 100px}
 </style>
 </head>
 <body>
@@ -246,6 +252,8 @@ a{color:inherit;text-decoration:none}
     <nav class="snav" id="snav">
       <button data-view="overview" class="on"><span class="ic">◍</span> Overview</button>
       <button data-view="projects"><span class="ic">▦</span> Projects</button>
+      <button data-view="services"><span class="ic">▤</span> Services</button>
+      <button data-view="testimonials"><span class="ic">❝</span> Testimonials</button>
       <button data-view="inbox"><span class="ic">✉</span> Inbox <span class="ibadge" id="ibadge" hidden>0</span></button>
       <button data-view="about"><span class="ic">✎</span> About</button>
       <button data-view="filters"><span class="ic">⚑</span> Filters</button>
@@ -310,6 +318,14 @@ a{color:inherit;text-decoration:none}
       <section class="view" id="v-inbox"><div class="inbox" id="inbox-list"></div></section>
       <section class="view" id="v-inquiry"><div class="editor" id="inquiry"></div></section>
 
+      <!-- SERVICES -->
+      <section class="view" id="v-services"><div class="ptable"><div class="phead" style="grid-template-columns:30px 1.8fr 120px 90px 100px"><span></span><span>Service</span><span>Timeline</span><span>Status</span><span></span></div><div id="svrows"></div></div></section>
+      <section class="view" id="v-svcedit"><div class="editor" id="svcedit"></div></section>
+
+      <!-- TESTIMONIALS -->
+      <section class="view" id="v-testimonials"><div class="ptable"><div class="phead" style="grid-template-columns:30px 1.8fr 1fr 90px 100px"><span></span><span>Quote</span><span>Author</span><span>Status</span><span></span></div><div id="tstrows"></div></div></section>
+      <section class="view" id="v-tstedit"><div class="editor" id="tstedit"></div></section>
+
     </div>
   </main>
 </div>
@@ -337,7 +353,7 @@ const IMG=[
  "https://pikaso.cdnpk.net/private/production/5287922358/render.jpg?token=exp=1788220800~hmac=bc9f9e38e536f2e5431f9040e0ed4a1fcd3ef067ee9147d3b4e6dc3fdcc40480"
 ];
 
-const state={projects:[],about:{headline:'',lead:'',practice:[],contacts:[]},filterRows:[],filters:{device:[],industry:[],type:[]},inquiries:[]};
+const state={projects:[],about:{headline:'',lead:'',practice:[],contacts:[]},filterRows:[],filters:{device:[],industry:[],type:[]},inquiries:[],services:[],testimonials:[]};
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const fmt=n=>Number(n||0).toLocaleString('en-US');
@@ -345,29 +361,37 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 function rebuildFilterStrings(){state.filters={device:[],industry:[],type:[]};[...state.filterRows].sort((a,b)=>a.position-b.position).forEach(r=>{if(state.filters[r.grp])state.filters[r.grp].push(r.value);});}
 
 async function loadAll(){
-  const [pr,ab,fo,iq]=await Promise.all([
+  const [pr,ab,fo,iq,svc,tst]=await Promise.all([
     sb.from('projects').select('*').order('position'),
     sb.from('site_about').select('*').eq('id',1).single(),
     sb.from('filter_options').select('*').order('position'),
-    sb.from('inquiries').select('*').order('created_at',{ascending:false})
+    sb.from('inquiries').select('*').order('created_at',{ascending:false}),
+    sb.from('services').select('*').order('position'),
+    sb.from('testimonials').select('*').order('position')
   ]);
   state.projects=pr.data||[];
   if(ab.data)state.about=ab.data;
   state.filterRows=fo.data||[];
   state.inquiries=iq.data||[];
+  state.services=svc.data||[];
+  state.testimonials=tst.data||[];
   rebuildFilterStrings();
 }
 async function persistOrder(){await sb.from('projects').upsert(state.projects.map((p,i)=>({id:p.id,position:i})));state.projects.forEach((p,i)=>p.position=i);}
 
-const TITLES={overview:["Overview","Last 30 days"],projects:["Projects","Manage front-site content"],editor:["Edit project","Front-site content"],about:["About page","Edit front-site about"],filters:["Filters","Manage filter options"],inbox:["Inbox","Incoming inquiries"],inquiry:["Inquiry","Inbox"]};
+const TITLES={overview:["Overview","Last 30 days"],projects:["Projects","Manage front-site content"],editor:["Edit project","Front-site content"],about:["About page","Edit front-site about"],filters:["Filters","Manage filter options"],inbox:["Inbox","Incoming inquiries"],inquiry:["Inquiry","Inbox"],services:["Services","Manage service offerings"],svcedit:["Edit service","Service offering"],testimonials:["Testimonials","Manage client testimonials"],tstedit:["Edit testimonial","Testimonial"]};
 function acts(view){
   const el=$('#pg-acts');el.innerHTML='';
   if(view==='projects'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add project';b.onclick=()=>openEditor(null);el.appendChild(b);}
   if(view==='editor'){el.innerHTML='<button class="btn ghost" id="ed-cancel">Cancel</button><button class="btn pri" id="ed-save">Save project</button>';$('#ed-cancel').onclick=()=>nav('projects');$('#ed-save').onclick=saveEditor;}
   if(view==='about'){const b=document.createElement('button');b.className='btn pri';b.textContent='Save changes';b.onclick=saveAbout;el.appendChild(b);}
+  if(view==='services'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add service';b.onclick=()=>openSvc(null);el.appendChild(b);}
+  if(view==='svcedit'){el.innerHTML='<button class="btn ghost" id="sv-cancel">Cancel</button><button class="btn pri" id="sv-save">Save service</button>';$('#sv-cancel').onclick=()=>nav('services');$('#sv-save').onclick=saveSvc;}
+  if(view==='testimonials'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add testimonial';b.onclick=()=>openTst(null);el.appendChild(b);}
+  if(view==='tstedit'){el.innerHTML='<button class="btn ghost" id="t-cancel">Cancel</button><button class="btn pri" id="t-save">Save testimonial</button>';$('#t-cancel').onclick=()=>nav('testimonials');$('#t-save').onclick=saveTst;}
 }
 function nav(view){
-  document.querySelectorAll('.snav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view||(view==='editor'&&b.dataset.view==='projects')||(view==='inquiry'&&b.dataset.view==='inbox')));
+  document.querySelectorAll('.snav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view||(view==='editor'&&b.dataset.view==='projects')||(view==='inquiry'&&b.dataset.view==='inbox')||(view==='svcedit'&&b.dataset.view==='services')||(view==='tstedit'&&b.dataset.view==='testimonials')));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   $('#v-'+view).classList.add('on');
   $('#pg-title').textContent=TITLES[view][0];$('#pg-sub').textContent=TITLES[view][1];
@@ -377,6 +401,8 @@ function nav(view){
   if(view==='about')renderAbout();
   if(view==='filters')renderFilters();
   if(view==='inbox')renderInbox();
+  if(view==='services')renderServicesTable();
+  if(view==='testimonials')renderTestiTable();
 }
 document.querySelectorAll('.snav button').forEach(b=>b.onclick=()=>nav(b.dataset.view));
 
@@ -566,6 +592,98 @@ function renderInquiry(){
   $('#iq-arch').onclick=async()=>{const ns=q.status==='Archived'?'Read':'Archived';await sb.from('inquiries').update({status:ns}).eq('id',q.id);q.status=ns;updateInboxBadge();nav('inbox');};
   $('#iq-del').onclick=async()=>{if(confirm('Delete this inquiry?')){await sb.from('inquiries').delete().eq('id',q.id);state.inquiries=state.inquiries.filter(x=>x.id!==q.id);updateInboxBadge();nav('inbox');}};
 }
+let sdragIdx=null;
+function renderServicesTable(){
+  const rows=$('#svrows');rows.innerHTML='';
+  state.services.forEach((sv,i)=>{
+    const r=document.createElement('div');r.className='prow strow';r.draggable=true;
+    r.innerHTML=`<span class="grip">⠿</span>
+      <div class="pname">${sv.name}<div class="cap">${sv.tagline||''}</div></div>
+      <div class="pviews mono">${sv.timeline||'—'}</div>
+      <div><span class="pstat ${sv.status==='Published'?'pub':'draft'}"><span class="dot"></span>${sv.status}</span></div>
+      <div class="pacts">
+        <button class="iaction" data-a="edit">✎</button>
+        <button class="iaction" data-a="pub">${sv.status==='Published'?'◐':'○'}</button>
+        <button class="iaction" data-a="del">✕</button>
+      </div>`;
+    r.querySelector('[data-a=edit]').onclick=()=>openSvc(sv.id);
+    r.querySelector('[data-a=pub]').onclick=async()=>{const ns=sv.status==='Published'?'Draft':'Published';await sb.from('services').update({status:ns}).eq('id',sv.id);sv.status=ns;renderServicesTable();toast(sv.name+' → '+ns);};
+    r.querySelector('[data-a=del]').onclick=async()=>{if(confirm('Delete "'+sv.name+'"?')){await sb.from('services').delete().eq('id',sv.id);state.services.splice(i,1);renderServicesTable();toast('Deleted');}};
+    r.addEventListener('dragstart',()=>{sdragIdx=i;r.classList.add('dragging');});
+    r.addEventListener('dragend',()=>{sdragIdx=null;r.classList.remove('dragging');document.querySelectorAll('#svrows .prow').forEach(x=>x.classList.remove('dragover'));});
+    r.addEventListener('dragover',e=>{e.preventDefault();r.classList.add('dragover');});
+    r.addEventListener('dragleave',()=>r.classList.remove('dragover'));
+    r.addEventListener('drop',async e=>{e.preventDefault();const from=sdragIdx,to=i;if(from===null||from===to)return;const m=state.services.splice(from,1)[0];state.services.splice(to,0,m);renderServicesTable();await sb.from('services').upsert(state.services.map((x,idx)=>({id:x.id,position:idx})));state.services.forEach((x,idx)=>x.position=idx);toast('Order updated');});
+    rows.appendChild(r);
+  });
+}
+let editingSvc=null,svcDraft=null;
+function openSvc(id){editingSvc=id;const src=id?state.services.find(x=>x.id===id):null;
+  svcDraft=src?JSON.parse(JSON.stringify(src)):{name:'',tagline:'',overview:'',timeline:'',best_for:[],deliverables:[],related:[],status:'Draft'};
+  nav('svcedit');renderSvcEditor();}
+function renderSvcEditor(){
+  const p=svcDraft;
+  $('#svcedit').innerHTML=`
+    <div class="fld"><label>Service name</label><input class="inp" id="s-name" value="${(p.name||'').replace(/"/g,'&quot;')}"></div>
+    <div class="fld"><label>Tagline</label><input class="inp" id="s-tag" value="${(p.tagline||'').replace(/"/g,'&quot;')}"></div>
+    <div class="fld"><label>Overview</label><textarea class="ta" id="s-ov" style="min-height:150px" placeholder="Use a blank line to separate paragraphs">${p.overview||''}</textarea></div>
+    <div class="fld"><label>Timeline</label><input class="inp" id="s-time" value="${(p.timeline||'').replace(/"/g,'&quot;')}" placeholder="e.g. 1–2 weeks"></div>
+    <div class="esec"><div class="st">Best for</div><div id="s-bf"></div><button class="addrow" id="s-bf-add">+ Add item</button></div>
+    <div class="esec"><div class="st">What’s included</div><div id="s-dl"></div><button class="addrow" id="s-dl-add">+ Add item</button></div>
+    <div class="esec"><div class="st">Relevant work</div><div class="chips" id="s-rel"></div></div>
+    <div class="esec"><label class="toggle ${p.status==='Published'?'on':''}" id="s-toggle"><span class="sw"></span><span class="tl">Published on front site</span></label></div>`;
+  const drawList=(key,cid)=>{const el=$('#'+cid);el.innerHTML=p[key].map((v,i)=>`<div class="rowedit"><input class="inp" data-i="${i}" value="${(v||'').replace(/"/g,'&quot;')}"><button class="del" data-i="${i}">×</button></div>`).join('');
+    el.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{p[key][+inp.dataset.i]=inp.value;});
+    el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{p[key].splice(+b.dataset.i,1);drawList(key,cid);});};
+  drawList('best_for','s-bf');drawList('deliverables','s-dl');
+  $('#s-bf-add').onclick=()=>{p.best_for.push('');drawList('best_for','s-bf');};
+  $('#s-dl-add').onclick=()=>{p.deliverables.push('');drawList('deliverables','s-dl');};
+  const rel=$('#s-rel');
+  rel.innerHTML=state.projects.map(pr=>`<button type="button" class="chip ${p.related.includes(pr.id)?'on':''}" data-id="${pr.id}">${pr.name}</button>`).join('');
+  rel.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{const id=c.dataset.id;const idx=p.related.indexOf(id);if(idx>=0)p.related.splice(idx,1);else p.related.push(id);c.classList.toggle('on');});
+  $('#s-toggle').onclick=()=>{p.status=p.status==='Published'?'Draft':'Published';$('#s-toggle').classList.toggle('on');};
+}
+function collectSvc(){const p=svcDraft;p.name=$('#s-name').value.trim()||'Untitled';p.tagline=$('#s-tag').value.trim();p.overview=$('#s-ov').value.trim();p.timeline=$('#s-time').value.trim();p.best_for=(p.best_for||[]).filter(x=>x.trim());p.deliverables=(p.deliverables||[]).filter(x=>x.trim());}
+async function saveSvc(){collectSvc();const p=svcDraft;
+  if(editingSvc){const {id,created_at,...rest}=p;const {error}=await sb.from('services').update(rest).eq('id',editingSvc);if(error){toast('Save failed');return;}const i=state.services.findIndex(x=>x.id===editingSvc);state.services[i]={...state.services[i],...rest};}
+  else{p.position=state.services.length;const {id,created_at,...rest}=p;const {data,error}=await sb.from('services').insert(rest).select().single();if(error){toast('Save failed');return;}state.services.push(data);}
+  toast('Service saved');nav('services');}
+let tdragIdx=null;
+function renderTestiTable(){
+  const rows=$('#tstrows');rows.innerHTML='';
+  state.testimonials.forEach((tv,i)=>{
+    const r=document.createElement('div');r.className='prow tstrow';r.draggable=true;
+    r.innerHTML=`<span class="grip">⠿</span>
+      <div class="pname" style="font-weight:400"><div class="cap" style="max-width:56ch;white-space:normal">${(tv.quote||'').slice(0,120)}${(tv.quote||'').length>120?'…':''}</div></div>
+      <div style="font-size:13px">${tv.author||'—'}</div>
+      <div><span class="pstat ${tv.status==='Published'?'pub':'draft'}"><span class="dot"></span>${tv.status}</span></div>
+      <div class="pacts"><button class="iaction" data-a="edit">✎</button><button class="iaction" data-a="pub">${tv.status==='Published'?'◐':'○'}</button><button class="iaction" data-a="del">✕</button></div>`;
+    r.querySelector('[data-a=edit]').onclick=()=>openTst(tv.id);
+    r.querySelector('[data-a=pub]').onclick=async()=>{const ns=tv.status==='Published'?'Draft':'Published';await sb.from('testimonials').update({status:ns}).eq('id',tv.id);tv.status=ns;renderTestiTable();toast(ns);};
+    r.querySelector('[data-a=del]').onclick=async()=>{if(confirm('Delete this testimonial?')){await sb.from('testimonials').delete().eq('id',tv.id);state.testimonials.splice(i,1);renderTestiTable();toast('Deleted');}};
+    r.addEventListener('dragstart',()=>{tdragIdx=i;r.classList.add('dragging');});
+    r.addEventListener('dragend',()=>{tdragIdx=null;r.classList.remove('dragging');document.querySelectorAll('#tstrows .prow').forEach(x=>x.classList.remove('dragover'));});
+    r.addEventListener('dragover',e=>{e.preventDefault();r.classList.add('dragover');});
+    r.addEventListener('dragleave',()=>r.classList.remove('dragover'));
+    r.addEventListener('drop',async e=>{e.preventDefault();const from=tdragIdx,to=i;if(from===null||from===to)return;const m=state.testimonials.splice(from,1)[0];state.testimonials.splice(to,0,m);renderTestiTable();await sb.from('testimonials').upsert(state.testimonials.map((x,idx)=>({id:x.id,position:idx})));state.testimonials.forEach((x,idx)=>x.position=idx);toast('Order updated');});
+    rows.appendChild(r);
+  });
+}
+let editingTst=null,tstDraft=null;
+function openTst(id){editingTst=id;const src=id?state.testimonials.find(x=>x.id===id):null;tstDraft=src?JSON.parse(JSON.stringify(src)):{quote:'',author:'',role:'',status:'Published'};nav('tstedit');renderTstEditor();}
+function renderTstEditor(){const p=tstDraft;
+  $('#tstedit').innerHTML=`
+    <div class="fld"><label>Quote</label><textarea class="ta" id="t-q" style="min-height:150px">${p.quote||''}</textarea></div>
+    <div class="grid2"><div class="fld"><label>Author</label><input class="inp" id="t-a" value="${(p.author||'').replace(/"/g,'&quot;')}"></div>
+    <div class="fld"><label>Role / company</label><input class="inp" id="t-r" value="${(p.role||'').replace(/"/g,'&quot;')}"></div></div>
+    <div class="esec"><label class="toggle ${p.status==='Published'?'on':''}" id="t-toggle"><span class="sw"></span><span class="tl">Published on front site</span></label></div>`;
+  $('#t-toggle').onclick=()=>{p.status=p.status==='Published'?'Draft':'Published';$('#t-toggle').classList.toggle('on');};
+}
+async function saveTst(){const p=tstDraft;p.quote=$('#t-q').value.trim();p.author=$('#t-a').value.trim();p.role=$('#t-r').value.trim();
+  if(!p.quote){toast('Quote is required');return;}
+  if(editingTst){const {id,created_at,...rest}=p;const {error}=await sb.from('testimonials').update(rest).eq('id',editingTst);if(error){toast('Save failed');return;}const i=state.testimonials.findIndex(x=>x.id===editingTst);state.testimonials[i]={...state.testimonials[i],...rest};}
+  else{p.position=state.testimonials.length;const {id,created_at,...rest}=p;const {data,error}=await sb.from('testimonials').insert(rest).select().single();if(error){toast('Save failed');return;}state.testimonials.push(data);}
+  toast('Testimonial saved');nav('testimonials');}
 const authgate=$('#authgate');
 async function showApp(){authgate.style.display='none';try{await loadAll();updateInboxBadge();nav('overview');}catch(err){console.error(err);$('#kpis').innerHTML='<div class="empty">Failed to load data.</div>';}}
 function showLogin(){authgate.style.display='flex';}

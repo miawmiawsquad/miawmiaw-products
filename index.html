@@ -55,7 +55,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 .page{position:fixed;inset:calc(var(--head-h) + var(--sub-h)) 0 0 0;opacity:0;pointer-events:none;transition:opacity .5s var(--ease)}
 .page.show{opacity:1;pointer-events:auto}
-#page-about,#page-detail{inset:var(--head-h) 0 0 0}
+#page-about,#page-detail,#page-services,#page-service{inset:var(--head-h) 0 0 0}
 
 /* INDEX */
 .index-wrap{position:absolute;inset:0;display:flex}
@@ -316,6 +316,62 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .d-ov{font-size:clamp(15px,1.7vw,18px);line-height:1.65;color:#2c2c2c;max-width:58ch;white-space:pre-wrap}
 .d-meta .v a.d-link{color:var(--accent);border-bottom:1px solid transparent;transition:border-color .2s var(--ease)}
 .d-meta .v a.d-link:hover{border-color:var(--accent)}
+
+/* SERVICES */
+.svlist{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+.svlist::-webkit-scrollbar{display:none}
+.svlist-in{max-width:1100px;margin:0 auto;padding:8vh 24px 12vh}
+.svrow{display:grid;grid-template-columns:60px 1fr 40px;align-items:center;gap:20px;padding:30px 6px;border-bottom:1px solid var(--hair);cursor:pointer;transition:padding .4s var(--ease-out),background .3s var(--ease)}
+.svrow:hover{padding-left:16px}
+.svrow .svn{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted)}
+.svname{font-size:clamp(24px,3.4vw,40px);font-weight:500;letter-spacing:-.02em;line-height:1.05}
+.svtag{font-size:13.5px;color:var(--muted);margin-top:8px;max-width:60ch}
+.svgo{color:var(--muted);text-align:right;transition:color .3s var(--ease),transform .4s var(--ease-out)}
+.svrow:hover .svgo{color:var(--ink);transform:translateX(4px)}
+.svdetail{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+.svdetail::-webkit-scrollbar{display:none}
+.svul{list-style:none}
+.svul li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--hair);font-size:15px;line-height:1.5;color:#2c2c2c}
+.svul li:last-child{border-bottom:none}
+.svul li .k{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
+.svtime{font-size:18px;font-weight:500}
+.svrel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.svrelc{position:relative;display:block;cursor:pointer}
+.svrelc .ri{display:block;aspect-ratio:4/3;background-size:cover;background-position:center;background-color:var(--stage);border-radius:3px}
+.svrelc .rl{display:block;margin-top:8px;font-size:12.5px;color:var(--muted);transition:color .3s var(--ease)}
+.svrelc:hover .rl{color:var(--ink)}
+.svcta{display:inline-block;margin-top:4px}
+@media(max-width:860px){.svrel{grid-template-columns:repeat(2,1fr)}.svlist-in{padding:5vh 20px 10vh}.svrow{padding:22px 4px}}
+
+/* TESTIMONIALS + CTA (about) */
+.testi{border-top:1px solid var(--hair)}
+.testi-in{display:grid;grid-template-columns:1fr 1.25fr;gap:60px;max-width:1100px;margin:0 auto;padding:11vh 24px}
+.testi-left{position:sticky;top:12vh;align-self:start}
+.testi-eyebrow{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.testi-title{font-size:clamp(30px,4.5vw,52px);font-weight:500;letter-spacing:-.03em;line-height:1.02}
+.testi-right{display:flex;flex-direction:column}
+.tcard{padding:52px 0;border-bottom:1px solid var(--hair)}
+.tcard:first-child{padding-top:0}
+.tcard .a{margin-top:22px}
+.tcard:last-child{border-bottom:none}
+.tcard .q{font-size:clamp(15px,1.8vw,19px);line-height:1.55;color:#2c2c2c}
+.tcard .a{margin-top:16px;font-weight:600;font-size:14px}
+.tcard .r{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-top:3px}
+.cta-sec{background:var(--ink);color:var(--paper);padding:17vh 24px}
+.cta-in{max-width:1100px;margin:0 auto}
+.cta-h{font-size:clamp(40px,8.5vw,104px);font-weight:600;letter-spacing:-.03em;line-height:1}
+.cta-h .rvm{display:block;overflow:hidden}
+.cta-h .rvm>span{display:inline-block;transform:translateY(115%);transition:transform .85s var(--ease-out)}
+.cta-h .rvm:nth-child(2)>span{transition-delay:.12s}
+.cta-sec.in .cta-h .rvm>span{transform:none}
+.cta-sec .cta{margin-top:52px;border-color:var(--paper);color:var(--paper);padding:16px 30px;font-size:13px;letter-spacing:.18em;border-radius:100px;opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease-out) .35s,transform .6s var(--ease-out) .35s,background .25s var(--ease),color .25s var(--ease)}
+.cta-sec .cta:hover{background:var(--paper);color:var(--ink)}
+.cta-sec.in .cta{opacity:1;transform:none}
+@media(max-width:860px){
+  .testi-in{grid-template-columns:1fr;gap:28px;padding:7vh 20px}
+  .testi-left{position:static}
+  .cta-sec{padding:12vh 20px}
+}
 </style>
 </head>
 <body>
@@ -325,6 +381,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   <div class="head-right">
     <nav class="nav">
       <button data-go="portfolio" class="on" data-i18n="work">Work</button>
+      <button data-go="services" data-i18n="navServices">Services</button>
       <button data-go="about" data-i18n="about">About</button>
     </nav>
     <div class="langsel" id="langsel">
@@ -342,6 +399,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 <div class="mnav" id="mnav">
   <nav class="mnav-links">
     <button data-go="portfolio" data-i18n="work">Work</button>
+    <button data-go="services" data-i18n="navServices">Services</button>
     <button data-go="about" data-i18n="about">About</button>
     <button data-go="contact" class="mcta" data-i18n="getInTouch">Get in touch</button>
   </nav>
@@ -381,7 +439,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 <!-- ABOUT -->
 <section class="page" id="page-about">
   <div class="about">
-    <div class="about-in" id="about-in"></div></div></section>
+    <div class="about-in" id="about-in"></div>
+    <div id="about-extra"></div></div></section>
 
 <!-- CONTACT -->
 <section class="page" id="page-contact">
@@ -427,6 +486,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   </div>
 </section>
 
+<!-- SERVICES -->
+<section class="page" id="page-services"><div class="svlist" id="svlist"></div></section>
+<section class="page" id="page-service"><div class="svdetail" id="svdetail"></div></section>
+
 <!-- FILTER DRAWER -->
 <div class="backdrop" id="backdrop"></div>
 <aside class="drawer" id="drawer" aria-hidden="true">
@@ -459,13 +522,13 @@ const isMobile=()=>window.matchMedia('(max-width:860px)').matches;
 let activeWork=null;
 let curView='index';
 let searchQ='';
-let currentDetailN=null,aboutData=null,LANG='en';
+let currentDetailN=null,currentServiceN=null,aboutData=null,SERVICES_DATA=[],TESTI=[],LANG='en';
 const GROUP_KEY={device:'byDevice',industry:'byIndustry',type:'byCategory'};
 const SERVICES=[["Landing Page UI/UX Design HTML","svc1"],["Website Design","svc2"],["SaaS Dashboard / CRM / ERP","svc3"],["Mobile App Design","svc4"],["UX Audit","svc5"],["Clean Up Vibe-Coded Apps","svc6"],["Custom UI/UX Design","svc7"]];
 const BUDGETS=[["Under $500","bud1"],["$500–2k","bud2"],["$2k–5k","bud3"],["$5k+","bud4"]];
 const I18N={
- en:{work:"Work",about:"About",getInTouch:"Get in touch",vIndex:"Index",vGrid:"Grid",vList:"List",filter:"Filter",close:"Close ×",clearAll:"Clear all",searchPh:"Search projects",works:"works",worksView:"works — View",byDevice:"By device",byIndustry:"By industry",byCategory:"By category",noMatch:"No works match",contactTag:"Contact",back:"← Back",project:"Project",secCover:"Cover",secOverview:"Overview",secApproach:"Approach",secGallery:"Gallery",secNext:"Next",mClient:"Client",mRole:"Role",mDevice:"Device",mIndustry:"Industry",mCategory:"Category",mYear:"Year",mLink:"Link",visit:"Visit →",approach2:"Every deliverable ships as a single-file, developer-ready handoff — no ambiguity between design and build. The system is documented so it holds up as the work scales beyond this first release.",practice:"Practice",contact:"Contact",st1eyebrow:"01 — You",st2eyebrow:"02 — Services",st3eyebrow:"03 — Brief",st1h:"Let’s start with you.",st2h:"What do you need?",st3h:"Tell us about it.",lName:"Name *",lEmail:"Email *",lCompany:"Company",lPhone:"Phone / WhatsApp",lReferrer:"Referred by",lBrief:"Project brief *",optional:"optional",optionalTeam:"optional — team member",phName:"Your name",phCompany:"Company",phReferrer:"Who referred you?",phBrief:"A few lines about your project, goals, and timeline…",budget:"Budget",cBack:"← Back",next:"Next →",send:"Send inquiry",sending:"Sending…",err1:"Please enter your name and a valid email.",err2:"Please select at least one service and a budget.",err3:"Please add a short brief (at least a sentence).",errSubmit:"Something went wrong — please try again.",sent:"Sent",thanks:"Thanks — we’ll get back to you shortly.",thanksLead:"We’ve received your inquiry and will reply to your email as soon as we can.",backHome:"Back to homepage",svc1:"Landing Page UI/UX Design HTML",svc2:"Website Design",svc3:"SaaS Dashboard / CRM / ERP",svc4:"Mobile App Design",svc5:"UX Audit",svc6:"Clean Up Vibe-Coded Apps",svc7:"Custom UI/UX Design",bud1:"Under $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"},
- zh:{work:"作品",about:"關於",getInTouch:"聯絡我們",vIndex:"索引",vGrid:"網格",vList:"清單",filter:"篩選",close:"關閉 ×",clearAll:"全部清除",searchPh:"搜尋作品",works:"件作品",worksView:"件作品 — 查看",byDevice:"依裝置",byIndustry:"依產業",byCategory:"依類別",noMatch:"沒有符合的作品",contactTag:"聯絡",back:"← 返回",project:"專案",secCover:"封面",secOverview:"概覽",secApproach:"方法",secGallery:"作品集",secNext:"下一個",mClient:"客戶",mRole:"角色",mDevice:"裝置",mIndustry:"產業",mCategory:"類別",mYear:"年份",mLink:"連結",visit:"前往 →",approach2:"每個交付物都是單一檔案、可直接交給開發者的成果 — 設計與實作之間毫無歧義。系統皆有文件記錄，讓作品在首次發佈之後持續擴充時依然穩固。",practice:"服務項目",contact:"聯絡",st1eyebrow:"01 — 您",st2eyebrow:"02 — 服務",st3eyebrow:"03 — 需求",st1h:"先從您開始。",st2h:"您需要什麼？",st3h:"告訴我們細節。",lName:"姓名 *",lEmail:"電郵 *",lCompany:"公司",lPhone:"電話 / WhatsApp",lReferrer:"推薦人",lBrief:"專案需求 *",optional:"選填",optionalTeam:"選填 — 團隊成員",phName:"您的姓名",phCompany:"公司",phReferrer:"誰推薦您？",phBrief:"簡述您的專案、目標與時程…",budget:"預算",cBack:"← 返回",next:"下一步 →",send:"送出需求",sending:"送出中…",err1:"請輸入姓名與有效電郵。",err2:"請至少選擇一項服務與預算。",err3:"請簡短描述需求（至少一句）。",errSubmit:"發生錯誤 — 請再試一次。",sent:"已送出",thanks:"感謝您 — 我們會盡快回覆。",thanksLead:"我們已收到您的需求，會盡快回覆您的電郵。",backHome:"返回首頁",svc1:"到達頁 UI/UX 設計 (HTML)",svc2:"網站設計",svc3:"SaaS 儀表板 / CRM / ERP",svc4:"行動應用程式設計",svc5:"UX 稽核",svc6:"整理 Vibe-Coded 應用程式",svc7:"客製 UI/UX 設計",bud1:"低於 $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"}
+ en:{work:"Work",about:"About",getInTouch:"Get in touch",vIndex:"Index",vGrid:"Grid",vList:"List",filter:"Filter",close:"Close ×",clearAll:"Clear all",searchPh:"Search projects",works:"works",worksView:"works — View",byDevice:"By device",byIndustry:"By industry",byCategory:"By category",noMatch:"No works match",contactTag:"Contact",back:"← Back",project:"Project",secCover:"Cover",secOverview:"Overview",secApproach:"Approach",secGallery:"Gallery",secNext:"Next",mClient:"Client",mRole:"Role",mDevice:"Device",mIndustry:"Industry",mCategory:"Category",mYear:"Year",mLink:"Link",visit:"Visit →",navServices:"Services",sBestFor:"Best for",sIncluded:"What\u2019s included",sTimeline:"Timeline",sRelated:"Relevant work",testiTitle:"What they say.",ctaBuild:"Let\u2019s build",ctaGreat:"something great.",approach2:"Every deliverable ships as a single-file, developer-ready handoff — no ambiguity between design and build. The system is documented so it holds up as the work scales beyond this first release.",practice:"Practice",contact:"Contact",st1eyebrow:"01 — You",st2eyebrow:"02 — Services",st3eyebrow:"03 — Brief",st1h:"Let’s start with you.",st2h:"What do you need?",st3h:"Tell us about it.",lName:"Name *",lEmail:"Email *",lCompany:"Company",lPhone:"Phone / WhatsApp",lReferrer:"Referred by",lBrief:"Project brief *",optional:"optional",optionalTeam:"optional — team member",phName:"Your name",phCompany:"Company",phReferrer:"Who referred you?",phBrief:"A few lines about your project, goals, and timeline…",budget:"Budget",cBack:"← Back",next:"Next →",send:"Send inquiry",sending:"Sending…",err1:"Please enter your name and a valid email.",err2:"Please select at least one service and a budget.",err3:"Please add a short brief (at least a sentence).",errSubmit:"Something went wrong — please try again.",sent:"Sent",thanks:"Thanks — we’ll get back to you shortly.",thanksLead:"We’ve received your inquiry and will reply to your email as soon as we can.",backHome:"Back to homepage",svc1:"Landing Page UI/UX Design HTML",svc2:"Website Design",svc3:"SaaS Dashboard / CRM / ERP",svc4:"Mobile App Design",svc5:"UX Audit",svc6:"Clean Up Vibe-Coded Apps",svc7:"Custom UI/UX Design",bud1:"Under $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"},
+ zh:{work:"作品",about:"關於",getInTouch:"聯絡我們",vIndex:"索引",vGrid:"網格",vList:"清單",filter:"篩選",close:"關閉 ×",clearAll:"全部清除",searchPh:"搜尋作品",works:"件作品",worksView:"件作品 — 查看",byDevice:"依裝置",byIndustry:"依產業",byCategory:"依類別",noMatch:"沒有符合的作品",contactTag:"聯絡",back:"← 返回",project:"專案",secCover:"封面",secOverview:"概覽",secApproach:"方法",secGallery:"作品集",secNext:"下一個",mClient:"客戶",mRole:"角色",mDevice:"裝置",mIndustry:"產業",mCategory:"類別",mYear:"年份",mLink:"連結",visit:"前往 →",navServices:"服務",sBestFor:"適合對象",sIncluded:"包含內容",sTimeline:"時程",sRelated:"相關作品",testiTitle:"客戶怎麼說。",ctaBuild:"一起打造",ctaGreat:"很棒的作品。",approach2:"每個交付物都是單一檔案、可直接交給開發者的成果 — 設計與實作之間毫無歧義。系統皆有文件記錄，讓作品在首次發佈之後持續擴充時依然穩固。",practice:"服務項目",contact:"聯絡",st1eyebrow:"01 — 您",st2eyebrow:"02 — 服務",st3eyebrow:"03 — 需求",st1h:"先從您開始。",st2h:"您需要什麼？",st3h:"告訴我們細節。",lName:"姓名 *",lEmail:"電郵 *",lCompany:"公司",lPhone:"電話 / WhatsApp",lReferrer:"推薦人",lBrief:"專案需求 *",optional:"選填",optionalTeam:"選填 — 團隊成員",phName:"您的姓名",phCompany:"公司",phReferrer:"誰推薦您？",phBrief:"簡述您的專案、目標與時程…",budget:"預算",cBack:"← 返回",next:"下一步 →",send:"送出需求",sending:"送出中…",err1:"請輸入姓名與有效電郵。",err2:"請至少選擇一項服務與預算。",err3:"請簡短描述需求（至少一句）。",errSubmit:"發生錯誤 — 請再試一次。",sent:"已送出",thanks:"感謝您 — 我們會盡快回覆。",thanksLead:"我們已收到您的需求，會盡快回覆您的電郵。",backHome:"返回首頁",svc1:"到達頁 UI/UX 設計 (HTML)",svc2:"網站設計",svc3:"SaaS 儀表板 / CRM / ERP",svc4:"行動應用程式設計",svc5:"UX 稽核",svc6:"整理 Vibe-Coded 應用程式",svc7:"客製 UI/UX 設計",bud1:"低於 $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"}
 };
 function t(k){return (I18N[LANG]&&I18N[LANG][k])||I18N.en[k]||k;}
 function applyStatic(){document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.setAttribute('placeholder',t(el.dataset.i18nPh));});}
@@ -480,6 +543,8 @@ function setLang(l){LANG=l;try{localStorage.setItem('miaw_lang',l);}catch(e){}
   document.querySelectorAll('#q-budget .c-bud').forEach(c=>c.classList.toggle('on',c.dataset.v===cState.budget));
   const pd=document.getElementById('page-detail');if(pd&&pd.classList.contains('show')&&currentDetailN!=null)openDetail(currentDetailN);
   const pa=document.getElementById('page-about');if(pa&&pa.classList.contains('show')&&aboutData)renderAboutData(aboutData);
+  const pss=document.getElementById('page-services');if(pss&&pss.classList.contains('show'))renderServicesList();
+  const psv=document.getElementById('page-service');if(psv&&psv.classList.contains('show')&&currentServiceN!=null)openService(currentServiceN);
 }
 document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 const burger=document.getElementById('burger'),mnav=document.getElementById('mnav');
@@ -715,6 +780,38 @@ document.querySelectorAll('.views button').forEach(b=>{
   };
 });
 
+/* ---- services ---- */
+function renderServicesList(){
+  const el=document.getElementById('svlist');if(!el)return;
+  el.innerHTML='<div class="svlist-in">'+SERVICES_DATA.map(s=>`<div class="svrow" data-n="${s.n}"><div class="svn">${pad(s.n)}</div><div class="svmain"><div class="svname">${esc(s.name)}</div><div class="svtag">${esc(s.tagline)}</div></div><div class="svgo mono">→</div></div>`).join('')+'</div>';
+  el.querySelectorAll('.svrow').forEach(r=>r.onclick=()=>openService(+r.dataset.n));
+}
+function buildServiceDetail(s){
+  const rel=(s.related||[]).map(id=>WORKS.find(w=>w.id===id)).filter(Boolean);
+  const relHtml=rel.length?`<section class="d-section"><div class="d-h">${t('sRelated')}</div><div class="svrel">${rel.map(w=>`<a class="svrelc" data-n="${w.n}"><span class="ri" style="background-image:url('${w.thumb}')"></span><span class="rl">${esc(w.name)}</span></a>`).join('')}</div></section>`:'';
+  const bf=`<ul class="svul">${(s.best_for||[]).map((x,i)=>`<li><span class="k">${pad(i+1)}</span><span>${esc(x)}</span></li>`).join('')}</ul>`;
+  const dl=`<ul class="svul">${(s.deliverables||[]).map((x,i)=>`<li><span class="k">${pad(i+1)}</span><span>${esc(x)}</span></li>`).join('')}</ul>`;
+  document.getElementById('svdetail').innerHTML=`
+    <div class="d-top"><button class="d-back" id="sv-back">${t('back')}</button><span class="d-count mono">${pad(s.n)} / ${pad(SERVICES_DATA.length)}</span></div>
+    <div class="d-wrap">
+      <section class="d-section cover">
+        <span class="d-k">${t('navServices')}</span>
+        <h1 class="d-title">${esc(s.name)}</h1>
+        <p class="d-lead">${esc(s.tagline)}</p>
+      </section>
+      <section class="d-section"><div class="d-h">${t('secOverview')}</div><div class="d-ov">${esc(s.overview)}</div></section>
+      <section class="d-section"><div class="d-h">${t('sBestFor')}</div>${bf}</section>
+      <section class="d-section"><div class="d-h">${t('sIncluded')}</div>${dl}</section>
+      ${s.timeline?`<section class="d-section"><div class="d-h">${t('sTimeline')}</div><p class="svtime">${esc(s.timeline)}</p></section>`:''}
+      ${relHtml}
+      <section class="d-section" style="border-bottom:none"><button class="cta svcta" id="sv-cta">${t('getInTouch')}</button></section>
+    </div>`;
+  document.getElementById('sv-back').onclick=()=>go('services');
+  document.getElementById('sv-cta').onclick=()=>go('contact');
+  document.querySelectorAll('#svdetail .svrelc').forEach(a=>a.onclick=()=>openDetail(+a.dataset.n));
+}
+function openService(n){const s=SERVICES_DATA.find(x=>x.n===n);if(!s)return;currentServiceN=n;buildServiceDetail(s);const sc=document.querySelector('.svdetail');if(sc)sc.scrollTop=0;go('service');}
+
 /* ---- router ---- */
 /* ---- contact stepper ---- */
 const cState={step:1,services:new Set(),budget:''};
@@ -751,17 +848,20 @@ document.getElementById('c-submit').onclick=async()=>{
 };
 
 /* ---- router ---- */
-const pP=document.getElementById('page-portfolio'),pA=document.getElementById('page-about'),pD=document.getElementById('page-detail'),pC=document.getElementById('page-contact');
+const pP=document.getElementById('page-portfolio'),pA=document.getElementById('page-about'),pD=document.getElementById('page-detail'),pC=document.getElementById('page-contact'),pS=document.getElementById('page-services'),pSv=document.getElementById('page-service');
 const sub=document.getElementById('sub');
 function go(page){
   pP.classList.toggle('show',page==='portfolio');
   pA.classList.toggle('show',page==='about');
   pD.classList.toggle('show',page==='detail');
   pC.classList.toggle('show',page==='contact');
+  pS.classList.toggle('show',page==='services');
+  pSv.classList.toggle('show',page==='service');
+  if(page==='services')renderServicesList();
   const showSub=page==='portfolio';
   sub.style.opacity=showSub?'1':'0';sub.style.transform=showSub?'none':'translateY(-6px)';sub.style.pointerEvents=showSub?'auto':'none';
   const _cta=document.querySelector('.cta');if(_cta)_cta.style.display=(page==='contact')?'none':'';
-  document.querySelectorAll('.nav [data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===page||(page==='detail'&&b.dataset.go==='portfolio')));
+  document.querySelectorAll('.nav [data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===page||(page==='detail'&&b.dataset.go==='portfolio')||(page==='service'&&b.dataset.go==='services')));
   if(page==='about')document.querySelectorAll('#page-about .rv').forEach((el,i)=>setTimeout(()=>el.classList.add('in'),80+i*90));
   if(page==='contact')resetContact();
   try{toggleMenu(false);}catch(e){}
@@ -775,6 +875,22 @@ function renderAboutData(ab){
     <p class="about-lead rv">${ab.lead||''}</p>
     <div class="about-grid rv"><h3>${t('practice')}</h3><div class="svc">${(ab.practice||[]).map(r=>`<div class="svc-item"><span class="t">${r[0]}</span><span class="d">${r[1]}</span></div>`).join('')}</div></div>
     <div class="about-grid rv"><h3>${t('contact')}</h3><div class="contact-row">${(ab.contacts||[]).map(r=>`<a href="${String(r[1]).includes('@')?'mailto:'+r[1]:r[1]}">${r[0]}</a>`).join('')}</div></div>`;
+  renderAboutExtra();
+}
+function renderAboutExtra(){
+  const el=document.getElementById('about-extra');if(!el)return;
+  const testi=TESTI.length?`<section class="testi"><div class="testi-in">
+      <div class="testi-left"><div class="testi-eyebrow mono">#BuildBetterWithMiawmiaw</div><h2 class="testi-title">${t('testiTitle')}</h2></div>
+      <div class="testi-right">${TESTI.map(x=>`<div class="tcard"><div class="q">${esc(x.quote)}</div><div class="a">${esc(x.author)}</div>${x.role?`<div class="r">${esc(x.role)}</div>`:''}</div>`).join('')}</div>
+    </div></section>`:'';
+  el.innerHTML=testi+`
+    <section class="cta-sec" id="cta-sec"><div class="cta-in">
+      <h2 class="cta-h"><span class="rvm"><span>${t('ctaBuild')}</span></span><span class="rvm"><span>${t('ctaGreat')}</span></span></h2>
+      <button class="cta cta-big" id="about-cta">${t('getInTouch')}</button>
+    </div></section>`;
+  const cbtn=document.getElementById('about-cta');if(cbtn)cbtn.onclick=()=>go('contact');
+  const cta=document.getElementById('cta-sec');
+  if(cta){const io=new IntersectionObserver(ents=>{ents.forEach(e=>{if(e.isIntersecting){cta.classList.add('in');io.disconnect();}});},{threshold:.3});io.observe(cta);}
 }
 
 /* ---- init after data ---- */
@@ -787,13 +903,17 @@ function init(){
 /* ---- boot: load from Supabase ---- */
 (async function boot(){
   try{
-    const [pr,fo,ab]=await Promise.all([
+    const [pr,fo,ab,sv,te]=await Promise.all([
       sb.from('projects').select('*').eq('status','Published').order('position'),
       sb.from('filter_options').select('*').order('position'),
-      sb.from('site_about').select('*').eq('id',1).single()
+      sb.from('site_about').select('*').eq('id',1).single(),
+      sb.from('services').select('*').eq('status','Published').order('position'),
+      sb.from('testimonials').select('*').eq('status','Published').order('position')
     ]);
+    SERVICES_DATA=(sv.data||[]).map((x,i)=>({n:i+1,name:x.name,tagline:x.tagline,overview:x.overview,best_for:x.best_for||[],deliverables:x.deliverables||[],timeline:x.timeline,related:x.related||[]}));
+    TESTI=(te.data||[]).map(x=>({quote:x.quote,author:x.author,role:x.role}));
     const projs=pr.data||[];
-    WORKS=projs.map((p,i)=>({n:i+1,name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,link:p.link,cover:p.cover,thumb:(p.cover_thumb||p.cover),images:(p.images||[])}));
+    WORKS=projs.map((p,i)=>({n:i+1,id:p.id,name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,link:p.link,cover:p.cover,thumb:(p.cover_thumb||p.cover),images:(p.images||[])}));
     FILTERS={device:[],industry:[],type:[]};(fo.data||[]).forEach(o=>{if(FILTERS[o.grp])FILTERS[o.grp].push(o.value);});
     if(ab.data){aboutData=ab.data;renderAboutData(ab.data);}
     init();
