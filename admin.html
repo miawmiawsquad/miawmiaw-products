@@ -231,6 +231,17 @@ a{color:inherit;text-decoration:none}
 .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .prow.strow{grid-template-columns:30px 1.8fr 120px 90px 100px}
 .prow.tstrow{grid-template-columns:30px 1.8fr 1fr 90px 100px}
+.prow.clirow{grid-template-columns:30px 90px 1.6fr 90px 100px}
+.ovbar{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.ovranges{display:flex;gap:2px;flex-wrap:wrap}
+.ovranges button{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--muted);padding:7px 12px;border:1px solid transparent;border-radius:7px;transition:.2s var(--ease)}
+.ovranges button:hover{color:var(--ink)}
+.ovranges button.on{color:var(--ink);border-color:var(--line);background:var(--soft)}
+.ovcustom{display:flex;align-items:center;gap:8px}
+.ovcustom input{border:1px solid var(--line);border-radius:7px;padding:7px 10px;font-size:12.5px;font-family:inherit}
+.ovcustom span{color:var(--muted)}
+.clilogo{width:72px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--soft);border-radius:5px;overflow:hidden}
+.clilogo img{max-width:82%;max-height:26px;object-fit:contain}
 </style>
 </head>
 <body>
@@ -254,6 +265,7 @@ a{color:inherit;text-decoration:none}
       <button data-view="projects"><span class="ic">▦</span> Projects</button>
       <button data-view="services"><span class="ic">▤</span> Services</button>
       <button data-view="testimonials"><span class="ic">❝</span> Testimonials</button>
+      <button data-view="clients"><span class="ic">◈</span> Clients</button>
       <button data-view="inbox"><span class="ic">✉</span> Inbox <span class="ibadge" id="ibadge" hidden>0</span></button>
       <button data-view="about"><span class="ic">✎</span> About</button>
       <button data-view="filters"><span class="ic">⚑</span> Filters</button>
@@ -275,20 +287,33 @@ a{color:inherit;text-decoration:none}
 
       <!-- OVERVIEW -->
       <section class="view on" id="v-overview">
+        <div class="ovbar">
+          <div class="ovranges" id="ov-ranges">
+            <button data-r="7">7d</button>
+            <button data-r="30" class="on">30d</button>
+            <button data-r="90">90d</button>
+            <button data-r="year">This year</button>
+            <button data-r="all">All</button>
+            <button data-r="custom">Custom</button>
+          </div>
+          <div class="ovcustom" id="ov-custom" style="display:none"><input type="date" id="ov-from"><span>–</span><input type="date" id="ov-to"><button class="btn" id="ov-apply">Apply</button></div>
+          <button class="btn pri" id="ov-export" style="margin-left:auto">↓ Export</button>
+        </div>
         <div class="kpis" id="kpis"></div>
         <div class="panels">
           <div class="card">
-            <div class="ch"><span class="t">Views</span><span class="m mono">30d</span></div>
+            <div class="ch"><span class="t">Inquiries</span><span class="m mono" id="ov-chart-sub">last 30 days</span></div>
             <div class="chartwrap" id="chart"></div>
-            <div class="legend"><span>Total <b id="lg-total">—</b></span><span>Peak <b id="lg-peak">—</b></span></div>
+            <div class="legend"><span>Total <b id="lg-total">—</b></span><span>Peak/day <b id="lg-peak">—</b></span></div>
           </div>
           <div class="card">
-            <div class="ch"><span class="t">Top projects</span><span class="m mono">by views</span></div>
+            <div class="ch"><span class="t">Top requested services</span><span class="m mono">all time</span></div>
             <div class="toplist" id="toplist"></div>
-            <div class="ch" style="margin-top:26px"><span class="t">Sources</span><span class="m mono">traffic</span></div>
+            <div class="ch" style="margin-top:26px"><span class="t">Budget</span><span class="m mono">requests</span></div>
             <div class="sources" id="sources"></div>
           </div>
         </div>
+        <div class="card" style="margin-top:14px"><div class="ch"><span class="t">Recent inquiries</span><span class="m mono">latest 5</span></div><div class="toplist" id="recentlist"></div></div>
       </section>
 
       <!-- PROJECTS -->
@@ -326,6 +351,10 @@ a{color:inherit;text-decoration:none}
       <section class="view" id="v-testimonials"><div class="ptable"><div class="phead" style="grid-template-columns:30px 1.8fr 1fr 90px 100px"><span></span><span>Quote</span><span>Author</span><span>Status</span><span></span></div><div id="tstrows"></div></div></section>
       <section class="view" id="v-tstedit"><div class="editor" id="tstedit"></div></section>
 
+      <!-- CLIENTS -->
+      <section class="view" id="v-clients"><div class="ptable"><div class="phead" style="grid-template-columns:30px 90px 1.6fr 90px 100px"><span></span><span>Logo</span><span>Name</span><span>Status</span><span></span></div><div id="clirows"></div></div></section>
+      <section class="view" id="v-cliedit"><div class="editor" id="cliedit"></div></section>
+
     </div>
   </main>
 </div>
@@ -334,6 +363,9 @@ a{color:inherit;text-decoration:none}
 <div class="picker" id="picker"><div class="pk"><div class="pkh"><span>Select image</span><button id="pk-close">Close ×</button></div><div class="pkg" id="pk-grid"></div></div></div>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SB_URL='https://unhrdsxnyaiyrnngqasp.supabase.co';
@@ -353,7 +385,7 @@ const IMG=[
  "https://pikaso.cdnpk.net/private/production/5287922358/render.jpg?token=exp=1788220800~hmac=bc9f9e38e536f2e5431f9040e0ed4a1fcd3ef067ee9147d3b4e6dc3fdcc40480"
 ];
 
-const state={projects:[],about:{headline:'',lead:'',practice:[],contacts:[]},filterRows:[],filters:{device:[],industry:[],type:[]},inquiries:[],services:[],testimonials:[]};
+const state={projects:[],about:{headline:'',lead:'',practice:[],contacts:[]},filterRows:[],filters:{device:[],industry:[],type:[]},inquiries:[],services:[],testimonials:[],clients:[]};
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const fmt=n=>Number(n||0).toLocaleString('en-US');
@@ -361,13 +393,14 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 function rebuildFilterStrings(){state.filters={device:[],industry:[],type:[]};[...state.filterRows].sort((a,b)=>a.position-b.position).forEach(r=>{if(state.filters[r.grp])state.filters[r.grp].push(r.value);});}
 
 async function loadAll(){
-  const [pr,ab,fo,iq,svc,tst]=await Promise.all([
+  const [pr,ab,fo,iq,svc,tst,cli]=await Promise.all([
     sb.from('projects').select('*').order('position'),
     sb.from('site_about').select('*').eq('id',1).single(),
     sb.from('filter_options').select('*').order('position'),
     sb.from('inquiries').select('*').order('created_at',{ascending:false}),
     sb.from('services').select('*').order('position'),
-    sb.from('testimonials').select('*').order('position')
+    sb.from('testimonials').select('*').order('position'),
+    sb.from('clients').select('*').order('position')
   ]);
   state.projects=pr.data||[];
   if(ab.data)state.about=ab.data;
@@ -375,11 +408,12 @@ async function loadAll(){
   state.inquiries=iq.data||[];
   state.services=svc.data||[];
   state.testimonials=tst.data||[];
+  state.clients=cli.data||[];
   rebuildFilterStrings();
 }
 async function persistOrder(){await sb.from('projects').upsert(state.projects.map((p,i)=>({id:p.id,position:i})));state.projects.forEach((p,i)=>p.position=i);}
 
-const TITLES={overview:["Overview","Last 30 days"],projects:["Projects","Manage front-site content"],editor:["Edit project","Front-site content"],about:["About page","Edit front-site about"],filters:["Filters","Manage filter options"],inbox:["Inbox","Incoming inquiries"],inquiry:["Inquiry","Inbox"],services:["Services","Manage service offerings"],svcedit:["Edit service","Service offering"],testimonials:["Testimonials","Manage client testimonials"],tstedit:["Edit testimonial","Testimonial"]};
+const TITLES={overview:["Overview","Last 30 days"],projects:["Projects","Manage front-site content"],editor:["Edit project","Front-site content"],about:["About page","Edit front-site about"],filters:["Filters","Manage filter options"],inbox:["Inbox","Incoming inquiries"],inquiry:["Inquiry","Inbox"],services:["Services","Manage service offerings"],svcedit:["Edit service","Service offering"],testimonials:["Testimonials","Manage client testimonials"],tstedit:["Edit testimonial","Testimonial"],clients:["Clients","Manage client logos"],cliedit:["Edit client","Client logo"]};
 function acts(view){
   const el=$('#pg-acts');el.innerHTML='';
   if(view==='projects'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add project';b.onclick=()=>openEditor(null);el.appendChild(b);}
@@ -389,9 +423,11 @@ function acts(view){
   if(view==='svcedit'){el.innerHTML='<button class="btn ghost" id="sv-cancel">Cancel</button><button class="btn pri" id="sv-save">Save service</button>';$('#sv-cancel').onclick=()=>nav('services');$('#sv-save').onclick=saveSvc;}
   if(view==='testimonials'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add testimonial';b.onclick=()=>openTst(null);el.appendChild(b);}
   if(view==='tstedit'){el.innerHTML='<button class="btn ghost" id="t-cancel">Cancel</button><button class="btn pri" id="t-save">Save testimonial</button>';$('#t-cancel').onclick=()=>nav('testimonials');$('#t-save').onclick=saveTst;}
+  if(view==='clients'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add client';b.onclick=()=>openCli(null);el.appendChild(b);}
+  if(view==='cliedit'){el.innerHTML='<button class="btn ghost" id="cl-cancel">Cancel</button><button class="btn pri" id="cl-save">Save client</button>';$('#cl-cancel').onclick=()=>nav('clients');$('#cl-save').onclick=saveCli;}
 }
 function nav(view){
-  document.querySelectorAll('.snav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view||(view==='editor'&&b.dataset.view==='projects')||(view==='inquiry'&&b.dataset.view==='inbox')||(view==='svcedit'&&b.dataset.view==='services')||(view==='tstedit'&&b.dataset.view==='testimonials')));
+  document.querySelectorAll('.snav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view||(view==='editor'&&b.dataset.view==='projects')||(view==='inquiry'&&b.dataset.view==='inbox')||(view==='svcedit'&&b.dataset.view==='services')||(view==='tstedit'&&b.dataset.view==='testimonials')||(view==='cliedit'&&b.dataset.view==='clients')));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   $('#v-'+view).classList.add('on');
   $('#pg-title').textContent=TITLES[view][0];$('#pg-sub').textContent=TITLES[view][1];
@@ -403,23 +439,89 @@ function nav(view){
   if(view==='inbox')renderInbox();
   if(view==='services')renderServicesTable();
   if(view==='testimonials')renderTestiTable();
+  if(view==='clients')renderClientsTable();
 }
 document.querySelectorAll('.snav button').forEach(b=>b.onclick=()=>nav(b.dataset.view));
 
+let ovState={mode:'30',from:'',to:'',applied:false};
+function ovRange(){
+  const now=Date.now(),D=86400000;let start,end=now;const m=ovState.mode;
+  if(m==='7')start=now-7*D;else if(m==='30')start=now-30*D;else if(m==='90')start=now-90*D;
+  else if(m==='year')start=new Date(new Date().getFullYear(),0,1).getTime();
+  else if(m==='all')start=0;
+  else if(m==='custom'){start=ovState.from?new Date(ovState.from).getTime():0;end=ovState.to?new Date(ovState.to).getTime()+D:now;}
+  const len=Math.max(D,end-start);const days=Math.max(1,Math.round(len/D));
+  const label=m==='7'?'last 7 days':m==='30'?'last 30 days':m==='90'?'last 90 days':m==='year'?'this year':m==='all'?'all time':'custom range';
+  return {start,end,prevStart:start-len,prevEnd:start,days,label};
+}
 function renderOverview(){
-  const totalViews=state.projects.reduce((a,p)=>a+(p.views||0),0);
+  const inqAll=state.inquiries||[];const R=ovRange();
+  const inRange=inqAll.filter(q=>{const t=new Date(q.created_at).getTime();return t>=R.start&&t<R.end;});
+  const inPrev=inqAll.filter(q=>{const t=new Date(q.created_at).getTime();return t>=R.prevStart&&t<R.prevEnd;});
+  const newCount=inqAll.filter(q=>q.status==='New').length;
+  const cur=inRange.length,prev=inPrev.length;
+  const delta=prev>0?Math.round((cur-prev)/prev*100):(cur>0?100:0);
   const pubs=state.projects.filter(p=>p.status==='Published').length;
-  const kpis=[["Total views",fmt(totalViews),'<b>+12.4%</b> vs prev'],["Unique visitors","11,240",'<b>+8.1%</b> vs prev'],["Avg. time","1m 48s",'<b class="dn">-3.2%</b> vs prev'],["Published",pubs+" / "+state.projects.length,'projects live']];
+  const kpis=[
+    ["New inquiries",String(newCount),newCount?('<b>'+newCount+'</b> unread — review in Inbox'):'All caught up'],
+    ["Inquiries",String(cur),(prev>0?('<b'+(delta<0?' class="dn"':'')+'>'+(delta>=0?'+':'')+delta+'%</b> vs prev period'):R.label)],
+    ["Published projects",pubs+" / "+state.projects.length,'live on site'],
+    ["Visitors","—",'<span style="color:var(--muted)">Connect analytics</span>']
+  ];
   $('#kpis').innerHTML=kpis.map(k=>`<div class="kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="d">${k[2]}</div></div>`).join('');
-  const N=30;let v=520,pts=[];for(let i=0;i<N;i++){v+=Math.sin(i/3)*22+(i*6)+(Math.random()*40-20);pts.push(Math.max(380,Math.round(v)));}
-  const w=560,h=200,max=Math.max(...pts),min=Math.min(...pts);const x=i=>i/(N-1)*w,y=val=>h-((val-min)/(max-min))*(h-24)-12;
-  let d='',a=`M0 ${h} `;pts.forEach((p,i)=>{const cx=x(i),cy=y(p);d+=(i?'L':'M')+cx.toFixed(1)+' '+cy.toFixed(1)+' ';a+='L'+cx.toFixed(1)+' '+cy.toFixed(1)+' ';});a+=`L${w} ${h} Z`;
-  $('#chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E4A63" stop-opacity=".16"/><stop offset="1" stop-color="#2E4A63" stop-opacity="0"/></linearGradient></defs><path d="${a}" fill="url(#g)"/><path d="${d}" fill="none" stroke="#2E4A63" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${x(N-1)}" cy="${y(pts[N-1])}" r="3.5" fill="#2E4A63"/></svg>`;
-  $('#lg-total').textContent=fmt(pts.reduce((a,b)=>a+b,0));$('#lg-peak').textContent=fmt(max);
-  const top=[...state.projects].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,5);const mx=(top[0]&&top[0].views)||1;
-  $('#toplist').innerHTML=top.map((p,i)=>`<div class="topitem"><span class="rk mono">${pad(i+1)}</span><span class="nm">${p.name}</span><span class="vw mono">${fmt(p.views)}</span><div class="bar"><i style="width:${(p.views||0)/mx*100}%"></i></div></div>`).join('');
-  const src=[["Direct",42],["Search",31],["Social",18],["Referral",9]];
-  $('#sources').innerHTML=src.map(s=>`<div class="src"><div class="sr"><span>${s[0]}</span><span class="p mono">${s[1]}%</span></div><div class="tr"><i style="width:${s[1]}%"></i></div></div>`).join('');
+  const sub=$('#ov-chart-sub');if(sub)sub.textContent=R.label;
+  // buckets (daily if <=92 days, else weekly)
+  const D=86400000;const bDays=R.days<=92?1:7;const nB=Math.max(1,Math.ceil(R.days/bDays));const counts=new Array(nB).fill(0);
+  inRange.forEach(q=>{const off=Math.floor((new Date(q.created_at).getTime()-R.start)/(bDays*D));if(off>=0&&off<nB)counts[off]++;});
+  const total=counts.reduce((a,b)=>a+b,0),peak=Math.max(0,...counts),max=Math.max(1,...counts);
+  const w=560,h=200,x=i=>nB<=1?w:i/(nB-1)*w,y=v=>h-(v/max)*(h-24)-12;
+  let d='',a2=`M0 ${h} `;counts.forEach((c,i)=>{const cx=x(i),cy=y(c);d+=(i?'L':'M')+cx.toFixed(1)+' '+cy.toFixed(1)+' ';a2+='L'+cx.toFixed(1)+' '+cy.toFixed(1)+' ';});a2+=`L${w} ${h} Z`;
+  $('#chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E4A63" stop-opacity=".16"/><stop offset="1" stop-color="#2E4A63" stop-opacity="0"/></linearGradient></defs><path d="${a2}" fill="url(#g)"/><path d="${d}" fill="none" stroke="#2E4A63" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${x(nB-1)}" cy="${y(counts[nB-1])}" r="3.5" fill="#2E4A63"/></svg>`;
+  $('#lg-total').textContent=total;$('#lg-peak').textContent=peak;
+  const svcTally={};inRange.forEach(q=>(q.services||[]).forEach(sv=>svcTally[sv]=(svcTally[sv]||0)+1));
+  const svcArr=Object.entries(svcTally).sort((a,b)=>b[1]-a[1]).slice(0,5);const svcMax=svcArr.length?svcArr[0][1]:1;
+  $('#toplist').innerHTML=svcArr.length?svcArr.map((sx,i)=>`<div class="topitem"><span class="rk mono">${pad(i+1)}</span><span class="nm">${sx[0]}</span><span class="vw mono">${sx[1]}</span><div class="bar"><i style="width:${sx[1]/svcMax*100}%"></i></div></div>`).join(''):'<div class="empty" style="padding:22px 0">No inquiries in range</div>';
+  const budOrder=["Under $500","$500–2k","$2k–5k","$5k+"];const budTally={};inRange.forEach(q=>{if(q.budget)budTally[q.budget]=(budTally[q.budget]||0)+1;});
+  const budTotal=Object.values(budTally).reduce((a,b)=>a+b,0);
+  $('#sources').innerHTML=budOrder.map(b=>{const c=budTally[b]||0;const pct=budTotal?Math.round(c/budTotal*100):0;return `<div class="src"><div class="sr"><span>${b}</span><span class="p mono">${c} · ${pct}%</span></div><div class="tr"><i style="width:${pct}%"></i></div></div>`;}).join('');
+  const recent=[...inRange].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,5);
+  $('#recentlist').innerHTML=recent.length?recent.map(q=>`<div class="topitem recent" data-id="${q.id}" style="cursor:pointer;grid-template-columns:1fr auto auto;gap:14px"><span class="nm">${q.name}<span style="color:var(--muted);font-weight:400"> — ${(q.services||[])[0]||''}</span></span><span class="vw mono">${q.budget||''}</span><span class="vw mono">${new Date(q.created_at).toLocaleDateString()}</span></div>`).join(''):'<div class="empty" style="padding:22px 0">No inquiries in range</div>';
+  $('#recentlist').querySelectorAll('.recent').forEach(r=>r.onclick=()=>openInquiry(r.dataset.id));
+  // bind controls
+  document.querySelectorAll('#ov-ranges button').forEach(bt=>bt.onclick=()=>{ovState.mode=bt.dataset.r;ovState.applied=false;document.querySelectorAll('#ov-ranges button').forEach(x=>x.classList.toggle('on',x===bt));const cu=$('#ov-custom');if(cu)cu.style.display=(bt.dataset.r==='custom')?'flex':'none';if(bt.dataset.r!=='custom')renderOverview();});
+  const ap=$('#ov-apply');
+  if(ap){ap.textContent=ovState.applied?'Clear':'Apply';ap.onclick=()=>{
+    if(ovState.applied){ovState.applied=false;ovState.from='';ovState.to='';const ff=$('#ov-from'),tt=$('#ov-to');if(ff)ff.value='';if(tt)tt.value='';ovState.mode='30';document.querySelectorAll('#ov-ranges button').forEach(x=>x.classList.toggle('on',x.dataset.r==='30'));const cu=$('#ov-custom');if(cu)cu.style.display='none';renderOverview();}
+    else{ovState.from=$('#ov-from').value;ovState.to=$('#ov-to').value;if(!ovState.from&&!ovState.to){toast('Pick a date range');return;}ovState.applied=true;renderOverview();}
+  };}
+  const ex=$('#ov-export');if(ex)ex.onclick=exportAll;
+}
+function exportAll(){
+  const R=ovRange();const inq=(state.inquiries||[]).filter(q=>{const t=new Date(q.created_at).getTime();return t>=R.start&&t<R.end;});
+  try{
+    const rows=inq.map(q=>({Date:new Date(q.created_at).toLocaleString(),Name:q.name,Email:q.email,Company:q.company||'',Phone:q.phone||'',Referrer:q.referrer||'',Services:(q.services||[]).join(', '),Budget:q.budget||'',Status:q.status,Brief:q.brief||''}));
+    const ws=XLSX.utils.json_to_sheet(rows.length?rows:[{Date:'',Name:'No inquiries in range'}]);
+    ws['!cols']=[{wch:20},{wch:18},{wch:24},{wch:16},{wch:16},{wch:16},{wch:30},{wch:12},{wch:10},{wch:50}];
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Inquiries');
+    XLSX.writeFile(wb,'miawstudio-inquiries.xlsx');
+  }catch(e){console.error(e);toast('Excel export failed');}
+  try{
+    const {jsPDF}=window.jspdf;const doc=new jsPDF();
+    const svcTally={};inq.forEach(q=>(q.services||[]).forEach(sv=>svcTally[sv]=(svcTally[sv]||0)+1));
+    const svcArr=Object.entries(svcTally).sort((a,b)=>b[1]-a[1]);
+    const budOrder=["Under $500","$500–2k","$2k–5k","$5k+"];const budTally={};inq.forEach(q=>{if(q.budget)budTally[q.budget]=(budTally[q.budget]||0)+1;});
+    const newCount=(state.inquiries||[]).filter(q=>q.status==='New').length;
+    doc.setFontSize(18);doc.text('miawstudio — Report',14,20);
+    doc.setFontSize(10);doc.setTextColor(120);doc.text('Period: '+R.label+'  ('+new Date(R.start).toLocaleDateString()+' – '+new Date(R.end).toLocaleDateString()+')',14,28);
+    doc.setTextColor(20);doc.setFontSize(12);doc.text('Summary',14,42);
+    doc.autoTable({startY:46,head:[['Metric','Value']],body:[['Inquiries (period)',String(inq.length)],['New / unread',String(newCount)],['Published projects',state.projects.filter(p=>p.status==='Published').length+' / '+state.projects.length]],theme:'grid',styles:{fontSize:9},headStyles:{fillColor:[20,20,20]}});
+    let yy=doc.lastAutoTable.finalY+10;doc.text('Top requested services',14,yy);
+    doc.autoTable({startY:yy+4,head:[['Service','Requests']],body:(svcArr.length?svcArr:[['—','0']]).map(sx=>[sx[0],String(sx[1])]),theme:'grid',styles:{fontSize:9},headStyles:{fillColor:[20,20,20]}});
+    yy=doc.lastAutoTable.finalY+10;doc.text('Budget distribution',14,yy);
+    doc.autoTable({startY:yy+4,head:[['Budget','Requests']],body:budOrder.map(b=>[b,String(budTally[b]||0)]),theme:'grid',styles:{fontSize:9},headStyles:{fillColor:[20,20,20]}});
+    doc.save('miawstudio-report.pdf');
+  }catch(e){console.error(e);toast('PDF export failed');}
+  toast('Exported PDF + Excel');
 }
 
 let dragIdx=null;
@@ -684,6 +786,45 @@ async function saveTst(){const p=tstDraft;p.quote=$('#t-q').value.trim();p.autho
   if(editingTst){const {id,created_at,...rest}=p;const {error}=await sb.from('testimonials').update(rest).eq('id',editingTst);if(error){toast('Save failed');return;}const i=state.testimonials.findIndex(x=>x.id===editingTst);state.testimonials[i]={...state.testimonials[i],...rest};}
   else{p.position=state.testimonials.length;const {id,created_at,...rest}=p;const {data,error}=await sb.from('testimonials').insert(rest).select().single();if(error){toast('Save failed');return;}state.testimonials.push(data);}
   toast('Testimonial saved');nav('testimonials');}
+let cdragIdx=null;
+function renderClientsTable(){
+  const rows=$('#clirows');rows.innerHTML='';
+  state.clients.forEach((cv,i)=>{
+    const r=document.createElement('div');r.className='prow clirow';r.draggable=true;
+    r.innerHTML=`<span class="grip">⠿</span>
+      <div class="clilogo">${cv.logo?`<img src="${cv.logo}" alt="">`:''}</div>
+      <div class="pname">${cv.name||'—'}</div>
+      <div><span class="pstat ${cv.status==='Published'?'pub':'draft'}"><span class="dot"></span>${cv.status}</span></div>
+      <div class="pacts"><button class="iaction" data-a="edit">✎</button><button class="iaction" data-a="pub">${cv.status==='Published'?'◐':'○'}</button><button class="iaction" data-a="del">✕</button></div>`;
+    r.querySelector('[data-a=edit]').onclick=()=>openCli(cv.id);
+    r.querySelector('[data-a=pub]').onclick=async()=>{const ns=cv.status==='Published'?'Draft':'Published';await sb.from('clients').update({status:ns}).eq('id',cv.id);cv.status=ns;renderClientsTable();toast(ns);};
+    r.querySelector('[data-a=del]').onclick=async()=>{if(confirm('Delete "'+cv.name+'"?')){await sb.from('clients').delete().eq('id',cv.id);state.clients.splice(i,1);renderClientsTable();toast('Deleted');}};
+    r.addEventListener('dragstart',()=>{cdragIdx=i;r.classList.add('dragging');});
+    r.addEventListener('dragend',()=>{cdragIdx=null;r.classList.remove('dragging');document.querySelectorAll('#clirows .prow').forEach(x=>x.classList.remove('dragover'));});
+    r.addEventListener('dragover',e=>{e.preventDefault();r.classList.add('dragover');});
+    r.addEventListener('dragleave',()=>r.classList.remove('dragover'));
+    r.addEventListener('drop',async e=>{e.preventDefault();const from=cdragIdx,to=i;if(from===null||from===to)return;const m=state.clients.splice(from,1)[0];state.clients.splice(to,0,m);renderClientsTable();await sb.from('clients').upsert(state.clients.map((x,idx)=>({id:x.id,position:idx})));state.clients.forEach((x,idx)=>x.position=idx);toast('Order updated');});
+    rows.appendChild(r);
+  });
+}
+let editingCli=null,cliDraft=null;
+function openCli(id){editingCli=id;const src=id?state.clients.find(x=>x.id===id):null;cliDraft=src?JSON.parse(JSON.stringify(src)):{name:'',logo:'',status:'Published'};nav('cliedit');renderCliEditor();}
+function renderCliEditor(){const p=cliDraft;
+  $('#cliedit').innerHTML=`
+    <div class="fld"><label>Logo</label>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="width:160px;height:76px;background:var(--soft);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden">${p.logo?`<img src="${p.logo}" style="max-width:80%;max-height:52px;object-fit:contain">`:'<span style="color:var(--muted);font-size:12px">No logo</span>'}</div>
+        <button class="btn" id="cl-up">Upload logo</button>
+      </div></div>
+    <div class="fld"><label>Name</label><input class="inp" id="cl-name" value="${(p.name||'').replace(/"/g,'&quot;')}"></div>
+    <div class="esec"><label class="toggle ${p.status==='Published'?'on':''}" id="cl-toggle"><span class="sw"></span><span class="tl">Published on front site</span></label></div>`;
+  $('#cl-up').onclick=()=>{const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=async()=>{const fl=inp.files[0];if(!fl)return;toast('Uploading…');const blob=await resizeWebp(fl,400,0.9);const url=await uploadBlob(blob);if(url){cliDraft.logo=url;renderCliEditor();toast('Logo uploaded');}else toast('Upload failed');};inp.click();};
+  $('#cl-toggle').onclick=()=>{p.status=p.status==='Published'?'Draft':'Published';$('#cl-toggle').classList.toggle('on');};
+}
+async function saveCli(){const p=cliDraft;p.name=$('#cl-name').value.trim();
+  if(editingCli){const {id,created_at,...rest}=p;const {error}=await sb.from('clients').update(rest).eq('id',editingCli);if(error){toast('Save failed');return;}const i=state.clients.findIndex(x=>x.id===editingCli);state.clients[i]={...state.clients[i],...rest};}
+  else{p.position=state.clients.length;const {id,created_at,...rest}=p;const {data,error}=await sb.from('clients').insert(rest).select().single();if(error){toast('Save failed');return;}state.clients.push(data);}
+  toast('Client saved');nav('clients');}
 const authgate=$('#authgate');
 async function showApp(){authgate.style.display='none';try{await loadAll();updateInboxBadge();nav('overview');}catch(err){console.error(err);$('#kpis').innerHTML='<div class="empty">Failed to load data.</div>';}}
 function showLogin(){authgate.style.display='flex';}
