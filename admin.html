@@ -242,6 +242,21 @@ a{color:inherit;text-decoration:none}
 .ovcustom span{color:var(--muted)}
 .clilogo{width:72px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--soft);border-radius:5px;overflow:hidden}
 .clilogo img{max-width:82%;max-height:26px;object-fit:contain}
+
+.prow.artrow{grid-template-columns:30px 56px 1.7fr 1fr 90px 100px}
+.rt-toolbar{display:flex;gap:4px;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;padding:6px;background:var(--soft)}
+.rt-toolbar button{padding:6px 11px;border-radius:6px;font-size:13px;color:var(--ink)}
+.rt-toolbar button:hover{background:var(--paper)}
+.rt-area{border:1px solid var(--line);border-radius:0 0 8px 8px;padding:16px 18px;min-height:280px;font-size:15px;line-height:1.65;outline:none;color:#2c2c2c}
+.rt-area:focus{border-color:var(--accent)}
+.rt-area h2{font-size:20px;font-weight:600;margin:18px 0 8px;color:var(--ink)}
+.rt-area p{margin:0 0 12px}
+.rt-area ul{margin:0 0 12px 22px;list-style:disc}
+.rt-area a{color:var(--accent);text-decoration:underline}
+.taginput{display:flex;flex-wrap:wrap;gap:6px;border:1px solid var(--line);border-radius:8px;padding:8px}
+.taginput .tg{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border-radius:6px;padding:5px 9px;font-size:12.5px}
+.taginput .tg b{cursor:pointer;color:var(--muted);font-weight:400}
+.taginput input{border:none;outline:none;flex:1;min-width:120px;font-size:13px;padding:5px}
 </style>
 </head>
 <body>
@@ -266,6 +281,7 @@ a{color:inherit;text-decoration:none}
       <button data-view="services"><span class="ic">▤</span> Services</button>
       <button data-view="testimonials"><span class="ic">❝</span> Testimonials</button>
       <button data-view="clients"><span class="ic">◈</span> Clients</button>
+      <button data-view="articles"><span class="ic">≡</span> Articles</button>
       <button data-view="inbox"><span class="ic">✉</span> Inbox <span class="ibadge" id="ibadge" hidden>0</span></button>
       <button data-view="about"><span class="ic">✎</span> About</button>
       <button data-view="filters"><span class="ic">⚑</span> Filters</button>
@@ -355,6 +371,10 @@ a{color:inherit;text-decoration:none}
       <section class="view" id="v-clients"><div class="ptable"><div class="phead" style="grid-template-columns:30px 90px 1.6fr 90px 100px"><span></span><span>Logo</span><span>Name</span><span>Status</span><span></span></div><div id="clirows"></div></div></section>
       <section class="view" id="v-cliedit"><div class="editor" id="cliedit"></div></section>
 
+      <!-- ARTICLES -->
+      <section class="view" id="v-articles"><div class="ptable"><div class="phead" style="grid-template-columns:30px 56px 1.7fr 1fr 90px 100px"><span></span><span></span><span>Article</span><span>Category</span><span>Status</span><span></span></div><div id="artrows"></div></div></section>
+      <section class="view" id="v-artedit"><div class="editor" id="artedit"></div></section>
+
     </div>
   </main>
 </div>
@@ -385,7 +405,7 @@ const IMG=[
  "https://pikaso.cdnpk.net/private/production/5287922358/render.jpg?token=exp=1788220800~hmac=bc9f9e38e536f2e5431f9040e0ed4a1fcd3ef067ee9147d3b4e6dc3fdcc40480"
 ];
 
-const state={projects:[],about:{headline:'',lead:'',practice:[],contacts:[]},filterRows:[],filters:{device:[],industry:[],type:[]},inquiries:[],services:[],testimonials:[],clients:[]};
+const state={projects:[],about:{headline:'',lead:'',practice:[],contacts:[]},filterRows:[],filters:{device:[],industry:[],type:[]},inquiries:[],services:[],testimonials:[],clients:[],articles:[]};
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
 const fmt=n=>Number(n||0).toLocaleString('en-US');
@@ -393,14 +413,15 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 function rebuildFilterStrings(){state.filters={device:[],industry:[],type:[]};[...state.filterRows].sort((a,b)=>a.position-b.position).forEach(r=>{if(state.filters[r.grp])state.filters[r.grp].push(r.value);});}
 
 async function loadAll(){
-  const [pr,ab,fo,iq,svc,tst,cli]=await Promise.all([
+  const [pr,ab,fo,iq,svc,tst,cli,art]=await Promise.all([
     sb.from('projects').select('*').order('position'),
     sb.from('site_about').select('*').eq('id',1).single(),
     sb.from('filter_options').select('*').order('position'),
     sb.from('inquiries').select('*').order('created_at',{ascending:false}),
     sb.from('services').select('*').order('position'),
     sb.from('testimonials').select('*').order('position'),
-    sb.from('clients').select('*').order('position')
+    sb.from('clients').select('*').order('position'),
+    sb.from('articles').select('*').order('position')
   ]);
   state.projects=pr.data||[];
   if(ab.data)state.about=ab.data;
@@ -409,11 +430,12 @@ async function loadAll(){
   state.services=svc.data||[];
   state.testimonials=tst.data||[];
   state.clients=cli.data||[];
+  state.articles=art.data||[];
   rebuildFilterStrings();
 }
 async function persistOrder(){await sb.from('projects').upsert(state.projects.map((p,i)=>({id:p.id,position:i})));state.projects.forEach((p,i)=>p.position=i);}
 
-const TITLES={overview:["Overview","Last 30 days"],projects:["Projects","Manage front-site content"],editor:["Edit project","Front-site content"],about:["About page","Edit front-site about"],filters:["Filters","Manage filter options"],inbox:["Inbox","Incoming inquiries"],inquiry:["Inquiry","Inbox"],services:["Services","Manage service offerings"],svcedit:["Edit service","Service offering"],testimonials:["Testimonials","Manage client testimonials"],tstedit:["Edit testimonial","Testimonial"],clients:["Clients","Manage client logos"],cliedit:["Edit client","Client logo"]};
+const TITLES={overview:["Overview","Last 30 days"],projects:["Projects","Manage front-site content"],editor:["Edit project","Front-site content"],about:["About page","Edit front-site about"],filters:["Filters","Manage filter options"],inbox:["Inbox","Incoming inquiries"],inquiry:["Inquiry","Inbox"],services:["Services","Manage service offerings"],svcedit:["Edit service","Service offering"],testimonials:["Testimonials","Manage client testimonials"],tstedit:["Edit testimonial","Testimonial"],clients:["Clients","Manage client logos"],cliedit:["Edit client","Client logo"],articles:["Articles","Blog & SEO content"],artedit:["Edit article","Article"]};
 function acts(view){
   const el=$('#pg-acts');el.innerHTML='';
   if(view==='projects'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add project';b.onclick=()=>openEditor(null);el.appendChild(b);}
@@ -425,9 +447,11 @@ function acts(view){
   if(view==='tstedit'){el.innerHTML='<button class="btn ghost" id="t-cancel">Cancel</button><button class="btn pri" id="t-save">Save testimonial</button>';$('#t-cancel').onclick=()=>nav('testimonials');$('#t-save').onclick=saveTst;}
   if(view==='clients'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add client';b.onclick=()=>openCli(null);el.appendChild(b);}
   if(view==='cliedit'){el.innerHTML='<button class="btn ghost" id="cl-cancel">Cancel</button><button class="btn pri" id="cl-save">Save client</button>';$('#cl-cancel').onclick=()=>nav('clients');$('#cl-save').onclick=saveCli;}
+  if(view==='articles'){const b=document.createElement('button');b.className='btn pri';b.innerHTML='+ Add article';b.onclick=()=>openArt(null);el.appendChild(b);}
+  if(view==='artedit'){el.innerHTML='<button class="btn ghost" id="a-cancel">Cancel</button><button class="btn pri" id="a-save">Save article</button>';$('#a-cancel').onclick=()=>nav('articles');$('#a-save').onclick=saveArt;}
 }
 function nav(view){
-  document.querySelectorAll('.snav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view||(view==='editor'&&b.dataset.view==='projects')||(view==='inquiry'&&b.dataset.view==='inbox')||(view==='svcedit'&&b.dataset.view==='services')||(view==='tstedit'&&b.dataset.view==='testimonials')||(view==='cliedit'&&b.dataset.view==='clients')));
+  document.querySelectorAll('.snav button').forEach(b=>b.classList.toggle('on',b.dataset.view===view||(view==='editor'&&b.dataset.view==='projects')||(view==='inquiry'&&b.dataset.view==='inbox')||(view==='svcedit'&&b.dataset.view==='services')||(view==='tstedit'&&b.dataset.view==='testimonials')||(view==='cliedit'&&b.dataset.view==='clients')||(view==='artedit'&&b.dataset.view==='articles')));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   $('#v-'+view).classList.add('on');
   $('#pg-title').textContent=TITLES[view][0];$('#pg-sub').textContent=TITLES[view][1];
@@ -440,6 +464,7 @@ function nav(view){
   if(view==='services')renderServicesTable();
   if(view==='testimonials')renderTestiTable();
   if(view==='clients')renderClientsTable();
+  if(view==='articles')renderArticlesTable();
 }
 document.querySelectorAll('.snav button').forEach(b=>b.onclick=()=>nav(b.dataset.view));
 
@@ -559,7 +584,7 @@ function opts(list,val){return (list||[]).map(o=>`<option ${o===val?'selected':'
 function openEditor(id){
   editingId=id;
   const src=id?state.projects.find(x=>x.id===id):null;
-  editDraft=src?JSON.parse(JSON.stringify(src)):{name:"",device:state.filters.device[0]||"Desktop",industry:state.filters.industry[0]||"Fintech",type:state.filters.type[0]||"Landing Page",year:new Date().getFullYear()+"",client:"",role:"Product designer",caption:"",overview:"",approach:"",link:"",cover:"",cover_thumb:"",images:[],views:0,status:'Draft'};
+  editDraft=src?JSON.parse(JSON.stringify(src)):{name:"",device:state.filters.device[0]||"Desktop",industry:state.filters.industry[0]||"Fintech",type:state.filters.type[0]||"Landing Page",year:new Date().getFullYear()+"",client:"",role:"Product designer",caption:"",overview:"",approach:"",link:"",cover:"",cover_thumb:"",images:[],tags:[],views:0,status:'Draft'};
   nav('editor');renderEditor();
 }
 function renderEditor(){
@@ -581,6 +606,7 @@ function renderEditor(){
       <div class="fld"><label>Role</label><input class="inp" id="f-rol" value="${(p.role||'').replace(/"/g,'&quot;')}"></div>
     </div>
     <div class="fld"><label>Link <span style="text-transform:none;letter-spacing:0;color:var(--muted)">optional</span></label><input class="inp" id="f-link" value="${(p.link||'').replace(/"/g,'&quot;')}" placeholder="https://…"></div>
+    <div class="fld"><label>Tags <span style="text-transform:none;letter-spacing:0;color:var(--muted)">search only — not shown on site</span></label><div class="taginput" id="p-tags"></div></div>
     <div class="esec"><div class="st">Detail content</div>
       <div class="fld"><label>Overview</label><textarea class="ta" id="f-ov" placeholder="Use a blank line to separate paragraphs" style="min-height:180px">${p.overview||''}</textarea></div>
     </div>
@@ -589,6 +615,7 @@ function renderEditor(){
   $('#ed-cover').onclick=()=>chooseCover();
   $('#ed-toggle').onclick=()=>{editDraft.status=editDraft.status==='Published'?'Draft':'Published';$('#ed-toggle').classList.toggle('on');};
   renderGimgs();
+  editDraft.tags=editDraft.tags||[];mountTags('p-tags',editDraft.tags);
 }
 function renderGimgs(){
   const g=$('#ed-gimgs');
@@ -637,11 +664,11 @@ async function saveAbout(){
 }
 
 function renderFilters(){
-  const groups=[["device","By device"],["industry","By industry"],["type","By category"]];
+  const groups=[["device","By device"],["industry","By industry"],["type","By category"],["acat","Article category"]];
   $('#fmgr').innerHTML=groups.map(([k,l])=>`<div class="fcol"><div class="ct">${l}</div><div id="fc-${k}"></div><div class="fadd"><input class="inp" id="fa-${k}" placeholder="Add option"><button class="btn" data-add="${k}">Add</button></div></div>`).join('');
   groups.forEach(([k])=>{
     const draw=()=>{const rows=state.filterRows.filter(r=>r.grp===k).sort((a,b)=>a.position-b.position);
-      $('#fc-'+k).innerHTML=rows.map(r=>{const cnt=state.projects.filter(p=>p[k]===r.value).length;return `<div class="fopt"><span class="nm">${r.value}</span><span class="cnt mono">${pad(cnt)}</span><button class="x" data-id="${r.id}">×</button></div>`;}).join('');
+      $('#fc-'+k).innerHTML=rows.map(r=>{const cnt=(k==='acat'?state.articles.filter(a=>a.category===r.value):state.projects.filter(p=>p[k]===r.value)).length;return `<div class="fopt"><span class="nm">${r.value}</span><span class="cnt mono">${pad(cnt)}</span><button class="x" data-id="${r.id}">×</button></div>`;}).join('');
       $('#fc-'+k).querySelectorAll('.x').forEach(b=>b.onclick=async()=>{await sb.from('filter_options').delete().eq('id',b.dataset.id);state.filterRows=state.filterRows.filter(x=>x.id!==b.dataset.id);rebuildFilterStrings();draw();toast('Removed');});};
     draw();
     $('#fmgr').querySelector(`[data-add="${k}"]`).onclick=async()=>{const inp=$('#fa-'+k);const v=inp.value.trim();if(!v)return;const pos=state.filterRows.filter(r=>r.grp===k).length;const {data,error}=await sb.from('filter_options').insert({grp:k,value:v,position:pos}).select().single();if(error){toast('Error');return;}state.filterRows.push(data);rebuildFilterStrings();inp.value='';draw();toast('Option added');};
@@ -825,6 +852,79 @@ async function saveCli(){const p=cliDraft;p.name=$('#cl-name').value.trim();
   if(editingCli){const {id,created_at,...rest}=p;const {error}=await sb.from('clients').update(rest).eq('id',editingCli);if(error){toast('Save failed');return;}const i=state.clients.findIndex(x=>x.id===editingCli);state.clients[i]={...state.clients[i],...rest};}
   else{p.position=state.clients.length;const {id,created_at,...rest}=p;const {data,error}=await sb.from('clients').insert(rest).select().single();if(error){toast('Save failed');return;}state.clients.push(data);}
   toast('Client saved');nav('clients');}
+function slugify(s){return String(s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');}
+function mountTags(cid,arr){const box=$('#'+cid);if(!box)return;const draw=()=>{box.innerHTML=arr.map((t,i)=>`<span class="tg">#${t}<b data-i="${i}">×</b></span>`).join('')+'<input type="text" placeholder="Add tag + Enter">';box.querySelectorAll('.tg b').forEach(b=>b.onclick=()=>{arr.splice(+b.dataset.i,1);draw();});const inp=box.querySelector('input');inp.onkeydown=(e)=>{if(e.key==='Enter'||e.key===','){e.preventDefault();const v=inp.value.trim().replace(/^#/,'').toLowerCase();if(v&&!arr.includes(v)){arr.push(v);draw();box.querySelector('input').focus();}else inp.value='';}};};draw();}
+function pickUpload(cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;toast('Uploading…');const b=await resizeWebp(f,2000,0.85);const u=await uploadBlob(b);if(u)cb(u);else toast('Upload failed');};inp.click();}
+function richCmd(cmd){const ed=document.getElementById('a-body');if(!ed)return;ed.focus();
+  if(cmd==='bold')document.execCommand('bold');
+  else if(cmd==='italic')document.execCommand('italic');
+  else if(cmd==='h2')document.execCommand('formatBlock',false,'h2');
+  else if(cmd==='ul')document.execCommand('insertUnorderedList');
+  else if(cmd==='link'){const u=prompt('Link URL:','https://');if(u)document.execCommand('createLink',false,u);}}
+let adragIdx=null;
+function renderArticlesTable(){
+  const rows=$('#artrows');rows.innerHTML='';
+  state.articles.forEach((av,i)=>{
+    const r=document.createElement('div');r.className='prow artrow';r.draggable=true;
+    r.innerHTML=`<span class="grip">⠿</span>
+      <div class="pthumb" style="background-image:url('${av.cover||''}')"></div>
+      <div class="pname">${av.title}<div class="cap">/${av.slug}</div></div>
+      <div><span class="pchip">${av.category||'—'}</span></div>
+      <div><span class="pstat ${av.status==='Published'?'pub':'draft'}"><span class="dot"></span>${av.status}</span></div>
+      <div class="pacts"><button class="iaction" data-a="edit">✎</button><button class="iaction" data-a="pub">${av.status==='Published'?'◐':'○'}</button><button class="iaction" data-a="del">✕</button></div>`;
+    r.querySelector('[data-a=edit]').onclick=()=>openArt(av.id);
+    r.querySelector('[data-a=pub]').onclick=async()=>{const ns=av.status==='Published'?'Draft':'Published';await sb.from('articles').update({status:ns}).eq('id',av.id);av.status=ns;renderArticlesTable();toast(ns);};
+    r.querySelector('[data-a=del]').onclick=async()=>{if(confirm('Delete "'+av.title+'"?')){await sb.from('articles').delete().eq('id',av.id);state.articles.splice(i,1);renderArticlesTable();toast('Deleted');}};
+    r.addEventListener('dragstart',()=>{adragIdx=i;r.classList.add('dragging');});
+    r.addEventListener('dragend',()=>{adragIdx=null;r.classList.remove('dragging');document.querySelectorAll('#artrows .prow').forEach(x=>x.classList.remove('dragover'));});
+    r.addEventListener('dragover',e=>{e.preventDefault();r.classList.add('dragover');});
+    r.addEventListener('dragleave',()=>r.classList.remove('dragover'));
+    r.addEventListener('drop',async e=>{e.preventDefault();const from=adragIdx,to=i;if(from===null||from===to)return;const m=state.articles.splice(from,1)[0];state.articles.splice(to,0,m);renderArticlesTable();await sb.from('articles').upsert(state.articles.map((x,idx)=>({id:x.id,position:idx})));state.articles.forEach((x,idx)=>x.position=idx);toast('Order updated');});
+    rows.appendChild(r);
+  });
+}
+let editingArt=null,artDraft=null;
+function openArt(id){editingArt=id;const src=id?state.articles.find(x=>x.id===id):null;
+  const cats=state.filterRows.filter(r=>r.grp==='acat');
+  artDraft=src?{...JSON.parse(JSON.stringify(src)),images:(src.gallery||[])}:{position:0,slug:'',title:'',category:(cats[0]||{}).value||'UX',cover:'',excerpt:'',body:'',images:[],tags:[],author:'miawmiaw team',cta_text:'',cta_url:'',status:'Draft'};
+  artDraft.tags=artDraft.tags||[];artDraft.images=artDraft.images||[];
+  nav('artedit');renderArtEditor();}
+function renderArtGimgs(){const g=$('#a-gimgs');if(!g)return;g.innerHTML=(artDraft.images||[]).map((src,i)=>`<div class="gimg" style="background-image:url('${src}')"><button class="rm" data-i="${i}">×</button></div>`).join('')+`<button class="gadd" id="a-gadd">+</button>`;g.querySelectorAll('.rm').forEach(b=>b.onclick=()=>{artDraft.images.splice(+b.dataset.i,1);renderArtGimgs();});$('#a-gadd').onclick=()=>pickUpload(u=>{artDraft.images.push(u);renderArtGimgs();});}
+function renderArtEditor(){
+  const p=artDraft;const cats=state.filterRows.filter(r=>r.grp==='acat').sort((a,b)=>a.position-b.position).map(r=>r.value);
+  $('#artedit').innerHTML=`
+    <div class="fld"><label>Cover image <span style="text-transform:none;letter-spacing:0;color:var(--muted)">4:3 recommended</span></label>
+      <div class="cover" style="aspect-ratio:4/3;background-image:url('${p.cover||''}')"><button class="change" id="a-cover">Upload cover</button></div></div>
+    <div class="grid2">
+      <div class="fld"><label>Title</label><input class="inp" id="a-title" value="${(p.title||'').replace(/"/g,'&quot;')}"></div>
+      <div class="fld"><label>Slug</label><input class="inp" id="a-slug" value="${(p.slug||'').replace(/"/g,'&quot;')}" placeholder="auto-from-title"></div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><label>Category</label><select class="sel" id="a-cat">${cats.map(c=>`<option ${c===p.category?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="fld"><label>Author</label><input class="inp" id="a-author" value="${(p.author||'miawmiaw team').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div class="fld"><label>Excerpt <span style="text-transform:none;letter-spacing:0;color:var(--muted)">short summary for previews & SEO</span></label><textarea class="ta" id="a-excerpt" style="min-height:70px">${p.excerpt||''}</textarea></div>
+    <div class="fld"><label>Body</label>
+      <div class="rt-toolbar"><button type="button" data-cmd="bold"><b>B</b></button><button type="button" data-cmd="italic"><i>I</i></button><button type="button" data-cmd="h2">H2</button><button type="button" data-cmd="ul">List</button><button type="button" data-cmd="link">Link</button></div>
+      <div class="rt-area" id="a-body" contenteditable="true">${p.body||''}</div></div>
+    <div class="fld"><label>Tags <span style="text-transform:none;letter-spacing:0;color:var(--muted)">search only — not shown on site</span></label><div class="taginput" id="a-tags"></div></div>
+    <div class="esec"><div class="st">Gallery images</div><div class="gimgs" id="a-gimgs"></div></div>
+    <div class="esec"><div class="st">Call to action</div>
+      <div class="fld"><label>CTA text</label><input class="inp" id="a-cta" value="${(p.cta_text||'').replace(/"/g,'&quot;')}" placeholder="Let’s build something great."></div>
+      <div class="fld"><label>CTA link <span style="text-transform:none;letter-spacing:0;color:var(--muted)">blank = Get in touch page</span></label><input class="inp" id="a-ctaurl" value="${(p.cta_url||'').replace(/"/g,'&quot;')}" placeholder="(default contact page)"></div></div>
+    <div class="esec"><label class="toggle ${p.status==='Published'?'on':''}" id="a-toggle"><span class="sw"></span><span class="tl">Published on front site</span></label></div>`;
+  $('#artedit').querySelectorAll('.rt-toolbar button').forEach(b=>{b.onmousedown=e=>e.preventDefault();b.onclick=()=>richCmd(b.dataset.cmd);});
+  $('#a-cover').onclick=()=>pickUpload(u=>{artDraft.cover=u;const cv=$('#artedit .cover');if(cv)cv.style.backgroundImage=`url('${u}')`;});
+  $('#a-title').oninput=()=>{const sl=$('#a-slug');if(sl&&!sl.value.trim())sl.value=slugify($('#a-title').value);};
+  $('#a-toggle').onclick=()=>{artDraft.status=artDraft.status==='Published'?'Draft':'Published';$('#a-toggle').classList.toggle('on');};
+  renderArtGimgs();mountTags('a-tags',artDraft.tags);
+}
+function collectArt(){const p=artDraft;p.title=$('#a-title').value.trim();p.slug=($('#a-slug').value.trim()||slugify(p.title));p.category=$('#a-cat').value;p.author=$('#a-author').value.trim()||'miawmiaw team';p.excerpt=$('#a-excerpt').value.trim();p.body=$('#a-body').innerHTML;p.cta_text=$('#a-cta').value.trim();p.cta_url=$('#a-ctaurl').value.trim();}
+async function saveArt(){collectArt();const p=artDraft;if(!p.title){toast('Title is required');return;}if(!p.slug){toast('Slug is required');return;}
+  const row={position:p.position||0,slug:p.slug,title:p.title,category:p.category,cover:p.cover,excerpt:p.excerpt,body:p.body,gallery:p.images||[],tags:p.tags||[],author:p.author,cta_text:p.cta_text,cta_url:p.cta_url,status:p.status};
+  if(editingArt){const {error}=await sb.from('articles').update(row).eq('id',editingArt);if(error){toast(error.message||'Save failed');return;}const i=state.articles.findIndex(x=>x.id===editingArt);state.articles[i]={...state.articles[i],...row};}
+  else{row.position=state.articles.length;const {data,error}=await sb.from('articles').insert(row).select().single();if(error){toast(error.message||'Save failed');return;}state.articles.push(data);}
+  toast('Article saved');nav('articles');}
 const authgate=$('#authgate');
 async function showApp(){authgate.style.display='none';try{await loadAll();updateInboxBadge();nav('overview');}catch(err){console.error(err);$('#kpis').innerHTML='<div class="empty">Failed to load data.</div>';}}
 function showLogin(){authgate.style.display='flex';}

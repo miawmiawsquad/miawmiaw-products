@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" id="m-desc" content="miawmiaw studio — a product & brand design studio designing interfaces, systems and flows.">
+<meta property="og:type" content="website">
+<meta property="og:title" id="m-ogt" content="miawmiaw studio">
+<meta property="og:description" id="m-ogd" content="Designing digital experiences that matter.">
+<meta property="og:image" id="m-ogi" content="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/logo_256.png?v=3">
 <title>miawmiaw studio — portfolio</title>
 <link rel="icon" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon.ico?v=3" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/favicon-32.png?v=3">
@@ -55,7 +60,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 .page{position:fixed;inset:calc(var(--head-h) + var(--sub-h)) 0 0 0;opacity:0;pointer-events:none;transition:opacity .5s var(--ease)}
 .page.show{opacity:1;pointer-events:auto}
-#page-about,#page-detail,#page-services,#page-service{inset:var(--head-h) 0 0 0}
+#page-about,#page-detail,#page-services,#page-service,#page-blog,#page-article{inset:var(--head-h) 0 0 0}
 
 /* INDEX */
 .index-wrap{position:absolute;inset:0;display:flex}
@@ -411,6 +416,44 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .tlogo img{max-width:72%;max-height:46px;object-fit:contain;filter:grayscale(1);opacity:.5;transition:opacity .3s var(--ease)}
 .tlogo:hover img{opacity:.95}
 @media(max-width:860px){.trust-grid{grid-template-columns:repeat(2,1fr)}.trust-in{padding:8vh 20px}.trust-head{align-items:flex-start}.tlogo{padding:20px}}
+
+/* BLOG + ARTICLE */
+.blog,.article{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+.blog::-webkit-scrollbar,.article::-webkit-scrollbar{display:none}
+.blog-in{max-width:1100px;margin:0 auto;padding:9vh 24px 12vh}
+.blog-eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.blog-title{font-size:clamp(36px,6vw,72px);font-weight:500;letter-spacing:-.03em;line-height:1;margin-bottom:40px}
+.blog-cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px}
+.bchip{border:1px solid var(--hair);border-radius:100px;padding:8px 14px;font-size:12.5px;color:var(--ink);transition:.2s var(--ease)}
+.bchip:hover{border-color:var(--muted)}
+.bchip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 24px}
+.bcard{display:block;cursor:pointer}
+.bc-cover{display:block;aspect-ratio:4/3;background-size:cover;background-position:center;background-color:var(--stage);border-radius:3px;transition:opacity .3s var(--ease)}
+.bcard:hover .bc-cover{opacity:.9}
+.bc-meta{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:14px}
+.bc-title{display:block;font-size:18px;font-weight:500;letter-spacing:-.01em;line-height:1.25;margin-top:8px}
+.art-in{max-width:760px;margin:0 auto;padding:5vh 24px 12vh}
+.art-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.art-title{font-size:clamp(32px,5vw,56px);font-weight:500;letter-spacing:-.03em;line-height:1.04;margin-top:14px}
+.art-meta{font-size:11px;letter-spacing:.06em;color:var(--muted);margin-top:16px}
+.art-cover{width:100%;aspect-ratio:4/3;background-size:cover;background-position:center;background-color:var(--stage);border-radius:3px;margin:34px 0}
+.art-body{font-size:clamp(16px,1.9vw,18px);line-height:1.7;color:#2c2c2c}
+.art-body h2{font-size:clamp(22px,2.6vw,28px);font-weight:600;letter-spacing:-.01em;color:var(--ink);margin:36px 0 12px;line-height:1.2}
+.art-body p{margin:0 0 20px}
+.art-body ul{margin:0 0 20px 22px;list-style:disc}
+.art-body li{margin-bottom:8px}
+.art-body a{color:var(--accent);border-bottom:1px solid var(--accent)}
+.art-body strong{font-weight:600;color:var(--ink)}
+.art-gallery{margin-top:20px;display:grid;gap:14px}
+.art-gimg{width:100%;height:auto;display:block;border-radius:3px}
+.art-cta{margin:8vh 0 0;text-align:center;border-top:1px solid var(--hair);padding-top:8vh}
+.art-cta-h{font-size:clamp(26px,4vw,40px);font-weight:500;letter-spacing:-.02em;line-height:1.1;max-width:20ch;margin:0 auto 30px}
+.art-cta .cta{display:inline-block}
+.art-related{margin-top:8vh;border-top:1px solid var(--hair);padding-top:6vh}
+.art-related .d-h{margin-bottom:22px}
+.art-rel{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:860px){.blog-grid{grid-template-columns:repeat(2,1fr)}.art-rel{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -539,6 +582,15 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 <section class="page" id="page-services"><div class="svlist" id="svlist"></div></section>
 <section class="page" id="page-service"><div class="svdetail" id="svdetail"></div></section>
 
+<!-- BLOG -->
+<section class="page" id="page-blog"><div class="blog"><div class="blog-in">
+  <div class="blog-eyebrow mono" data-i18n="blogEyebrow">Journal</div>
+  <h1 class="blog-title" data-i18n="blogTitle">Ideas & insights.</h1>
+  <div class="blog-cats" id="blog-cats"></div>
+  <div class="blog-grid" id="blog-grid"></div>
+</div></div></section>
+<section class="page" id="page-article"><div class="article"><div id="article-inner"></div></div></section>
+
 <!-- FILTER DRAWER -->
 <div class="backdrop" id="backdrop"></div>
 <aside class="drawer" id="drawer" aria-hidden="true">
@@ -571,13 +623,13 @@ const isMobile=()=>window.matchMedia('(max-width:860px)').matches;
 let activeWork=null;
 let curView='index';
 let searchQ='';
-let currentDetailN=null,currentServiceN=null,aboutData=null,SERVICES_DATA=[],TESTI=[],CLIENTS=[],LANG='en';
+let currentDetailN=null,currentServiceN=null,aboutData=null,SERVICES_DATA=[],TESTI=[],CLIENTS=[],ARTICLES=[],LANG='en';
 const GROUP_KEY={device:'byDevice',industry:'byIndustry',type:'byCategory'};
 const SERVICES=[["Landing Page UI/UX Design HTML","svc1"],["Website Design","svc2"],["SaaS Dashboard / CRM / ERP","svc3"],["Mobile App Design","svc4"],["UX Audit","svc5"],["Clean Up Vibe-Coded Apps","svc6"],["Custom UI/UX Design","svc7"]];
 const BUDGETS=[["Under $500","bud1"],["$500–2k","bud2"],["$2k–5k","bud3"],["$5k+","bud4"]];
 const I18N={
- en:{work:"Work",about:"About",getInTouch:"Get in touch",vIndex:"Index",vGrid:"Grid",vList:"List",filter:"Filter",close:"Close ×",clearAll:"Clear all",searchPh:"Search projects",works:"works",worksView:"works — View",byDevice:"By device",byIndustry:"By industry",byCategory:"By category",noMatch:"No works match",contactTag:"Contact",back:"← Back",project:"Project",secCover:"Cover",secOverview:"Overview",secApproach:"Approach",secGallery:"Gallery",secNext:"Next",mClient:"Client",mRole:"Role",mDevice:"Device",mIndustry:"Industry",mCategory:"Category",mYear:"Year",mLink:"Link",visit:"Visit →",navServices:"Services",sBestFor:"Best for",sIncluded:"What\u2019s included",sTimeline:"Timeline",sRelated:"Relevant work",testiTitle:"What they say.",ctaBuild:"Let\u2019s build",ctaGreat:"something great.",trustEyebrow:"Trusted by",trustTitle:"Trusted by innovators.",trustSub:"We collaborate with forward-thinking brands to build digital experiences that matter. <b>30+ companies.</b>",approach2:"Every deliverable ships as a single-file, developer-ready handoff — no ambiguity between design and build. The system is documented so it holds up as the work scales beyond this first release.",practice:"Practice",contact:"Contact",st1eyebrow:"01 — You",st2eyebrow:"02 — Services",st3eyebrow:"03 — Brief",st1h:"Let’s start with you.",st2h:"What do you need?",st3h:"Tell us about it.",lName:"Name *",lEmail:"Email *",lCompany:"Company",lPhone:"Phone / WhatsApp",lReferrer:"Referred by",lBrief:"Project brief *",optional:"optional",optionalTeam:"optional — team member",phName:"Your name",phCompany:"Company",phReferrer:"Who referred you?",phBrief:"A few lines about your project, goals, and timeline…",budget:"Budget",cBack:"← Back",next:"Next →",send:"Send inquiry",sending:"Sending…",err1:"Please enter your name and a valid email.",err2:"Please select at least one service and a budget.",err3:"Please add a short brief (at least a sentence).",errSubmit:"Something went wrong — please try again.",sent:"Sent",thanks:"Thanks — we’ll get back to you shortly.",thanksLead:"We’ve received your inquiry and will reply to your email as soon as we can.",backHome:"Back to homepage",svc1:"Landing Page UI/UX Design HTML",svc2:"Website Design",svc3:"SaaS Dashboard / CRM / ERP",svc4:"Mobile App Design",svc5:"UX Audit",svc6:"Clean Up Vibe-Coded Apps",svc7:"Custom UI/UX Design",bud1:"Under $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"},
- zh:{work:"作品",about:"關於",getInTouch:"聯絡我們",vIndex:"索引",vGrid:"網格",vList:"清單",filter:"篩選",close:"關閉 ×",clearAll:"全部清除",searchPh:"搜尋作品",works:"件作品",worksView:"件作品 — 查看",byDevice:"依裝置",byIndustry:"依產業",byCategory:"依類別",noMatch:"沒有符合的作品",contactTag:"聯絡",back:"← 返回",project:"專案",secCover:"封面",secOverview:"概覽",secApproach:"方法",secGallery:"作品集",secNext:"下一個",mClient:"客戶",mRole:"角色",mDevice:"裝置",mIndustry:"產業",mCategory:"類別",mYear:"年份",mLink:"連結",visit:"前往 →",navServices:"服務",sBestFor:"適合對象",sIncluded:"包含內容",sTimeline:"時程",sRelated:"相關作品",testiTitle:"客戶怎麼說。",ctaBuild:"一起打造",ctaGreat:"很棒的作品。",trustEyebrow:"合作夥伴",trustTitle:"值得信賴的創新夥伴。",trustSub:"我們與具前瞻性的品牌合作，打造真正重要的數位體驗。<b>30+ 家企業。</b>",approach2:"每個交付物都是單一檔案、可直接交給開發者的成果 — 設計與實作之間毫無歧義。系統皆有文件記錄，讓作品在首次發佈之後持續擴充時依然穩固。",practice:"服務項目",contact:"聯絡",st1eyebrow:"01 — 您",st2eyebrow:"02 — 服務",st3eyebrow:"03 — 需求",st1h:"先從您開始。",st2h:"您需要什麼？",st3h:"告訴我們細節。",lName:"姓名 *",lEmail:"電郵 *",lCompany:"公司",lPhone:"電話 / WhatsApp",lReferrer:"推薦人",lBrief:"專案需求 *",optional:"選填",optionalTeam:"選填 — 團隊成員",phName:"您的姓名",phCompany:"公司",phReferrer:"誰推薦您？",phBrief:"簡述您的專案、目標與時程…",budget:"預算",cBack:"← 返回",next:"下一步 →",send:"送出需求",sending:"送出中…",err1:"請輸入姓名與有效電郵。",err2:"請至少選擇一項服務與預算。",err3:"請簡短描述需求（至少一句）。",errSubmit:"發生錯誤 — 請再試一次。",sent:"已送出",thanks:"感謝您 — 我們會盡快回覆。",thanksLead:"我們已收到您的需求，會盡快回覆您的電郵。",backHome:"返回首頁",svc1:"到達頁 UI/UX 設計 (HTML)",svc2:"網站設計",svc3:"SaaS 儀表板 / CRM / ERP",svc4:"行動應用程式設計",svc5:"UX 稽核",svc6:"整理 Vibe-Coded 應用程式",svc7:"客製 UI/UX 設計",bud1:"低於 $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"}
+ en:{work:"Work",about:"About",getInTouch:"Get in touch",vIndex:"Index",vGrid:"Grid",vList:"List",filter:"Filter",close:"Close ×",clearAll:"Clear all",searchPh:"Search projects",works:"works",worksView:"works — View",byDevice:"By device",byIndustry:"By industry",byCategory:"By category",noMatch:"No works match",contactTag:"Contact",back:"← Back",project:"Project",secCover:"Cover",secOverview:"Overview",secApproach:"Approach",secGallery:"Gallery",secNext:"Next",mClient:"Client",mRole:"Role",mDevice:"Device",mIndustry:"Industry",mCategory:"Category",mYear:"Year",mLink:"Link",visit:"Visit →",navServices:"Services",sBestFor:"Best for",sIncluded:"What\u2019s included",sTimeline:"Timeline",sRelated:"Relevant work",testiTitle:"What they say.",ctaBuild:"Let\u2019s build",ctaGreat:"something great.",trustEyebrow:"Trusted by",trustTitle:"Trusted by innovators.",trustSub:"We collaborate with forward-thinking brands to build digital experiences that matter. <b>30+ companies.</b>",blogEyebrow:"Journal",blogTitle:"Ideas & insights.",related:"Related reading",byLabel:"By",blogBack:"\u2190 All articles",approach2:"Every deliverable ships as a single-file, developer-ready handoff — no ambiguity between design and build. The system is documented so it holds up as the work scales beyond this first release.",practice:"Practice",contact:"Contact",st1eyebrow:"01 — You",st2eyebrow:"02 — Services",st3eyebrow:"03 — Brief",st1h:"Let’s start with you.",st2h:"What do you need?",st3h:"Tell us about it.",lName:"Name *",lEmail:"Email *",lCompany:"Company",lPhone:"Phone / WhatsApp",lReferrer:"Referred by",lBrief:"Project brief *",optional:"optional",optionalTeam:"optional — team member",phName:"Your name",phCompany:"Company",phReferrer:"Who referred you?",phBrief:"A few lines about your project, goals, and timeline…",budget:"Budget",cBack:"← Back",next:"Next →",send:"Send inquiry",sending:"Sending…",err1:"Please enter your name and a valid email.",err2:"Please select at least one service and a budget.",err3:"Please add a short brief (at least a sentence).",errSubmit:"Something went wrong — please try again.",sent:"Sent",thanks:"Thanks — we’ll get back to you shortly.",thanksLead:"We’ve received your inquiry and will reply to your email as soon as we can.",backHome:"Back to homepage",svc1:"Landing Page UI/UX Design HTML",svc2:"Website Design",svc3:"SaaS Dashboard / CRM / ERP",svc4:"Mobile App Design",svc5:"UX Audit",svc6:"Clean Up Vibe-Coded Apps",svc7:"Custom UI/UX Design",bud1:"Under $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"},
+ zh:{work:"作品",about:"關於",getInTouch:"聯絡我們",vIndex:"索引",vGrid:"網格",vList:"清單",filter:"篩選",close:"關閉 ×",clearAll:"全部清除",searchPh:"搜尋作品",works:"件作品",worksView:"件作品 — 查看",byDevice:"依裝置",byIndustry:"依產業",byCategory:"依類別",noMatch:"沒有符合的作品",contactTag:"聯絡",back:"← 返回",project:"專案",secCover:"封面",secOverview:"概覽",secApproach:"方法",secGallery:"作品集",secNext:"下一個",mClient:"客戶",mRole:"角色",mDevice:"裝置",mIndustry:"產業",mCategory:"類別",mYear:"年份",mLink:"連結",visit:"前往 →",navServices:"服務",sBestFor:"適合對象",sIncluded:"包含內容",sTimeline:"時程",sRelated:"相關作品",testiTitle:"客戶怎麼說。",ctaBuild:"一起打造",ctaGreat:"很棒的作品。",trustEyebrow:"合作夥伴",trustTitle:"值得信賴的創新夥伴。",trustSub:"我們與具前瞻性的品牌合作，打造真正重要的數位體驗。<b>30+ 家企業。</b>",blogEyebrow:"文章",blogTitle:"觀點與洞察。",related:"相關文章",byLabel:"作者",blogBack:"\u2190 全部文章",approach2:"每個交付物都是單一檔案、可直接交給開發者的成果 — 設計與實作之間毫無歧義。系統皆有文件記錄，讓作品在首次發佈之後持續擴充時依然穩固。",practice:"服務項目",contact:"聯絡",st1eyebrow:"01 — 您",st2eyebrow:"02 — 服務",st3eyebrow:"03 — 需求",st1h:"先從您開始。",st2h:"您需要什麼？",st3h:"告訴我們細節。",lName:"姓名 *",lEmail:"電郵 *",lCompany:"公司",lPhone:"電話 / WhatsApp",lReferrer:"推薦人",lBrief:"專案需求 *",optional:"選填",optionalTeam:"選填 — 團隊成員",phName:"您的姓名",phCompany:"公司",phReferrer:"誰推薦您？",phBrief:"簡述您的專案、目標與時程…",budget:"預算",cBack:"← 返回",next:"下一步 →",send:"送出需求",sending:"送出中…",err1:"請輸入姓名與有效電郵。",err2:"請至少選擇一項服務與預算。",err3:"請簡短描述需求（至少一句）。",errSubmit:"發生錯誤 — 請再試一次。",sent:"已送出",thanks:"感謝您 — 我們會盡快回覆。",thanksLead:"我們已收到您的需求，會盡快回覆您的電郵。",backHome:"返回首頁",svc1:"到達頁 UI/UX 設計 (HTML)",svc2:"網站設計",svc3:"SaaS 儀表板 / CRM / ERP",svc4:"行動應用程式設計",svc5:"UX 稽核",svc6:"整理 Vibe-Coded 應用程式",svc7:"客製 UI/UX 設計",bud1:"低於 $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"}
 };
 function t(k){return (I18N[LANG]&&I18N[LANG][k])||I18N.en[k]||k;}
 function applyStatic(){document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.setAttribute('placeholder',t(el.dataset.i18nPh));});}
@@ -594,6 +646,8 @@ function setLang(l){LANG=l;try{localStorage.setItem('miaw_lang',l);}catch(e){}
   const pa=document.getElementById('page-about');if(pa&&pa.classList.contains('show')&&aboutData)renderAboutData(aboutData);
   const pss=document.getElementById('page-services');if(pss&&pss.classList.contains('show'))renderServicesList();
   const psv=document.getElementById('page-service');if(psv&&psv.classList.contains('show')&&currentServiceN!=null)openService(currentServiceN);
+  const pbl=document.getElementById('page-blog');if(pbl&&pbl.classList.contains('show'))renderBlog();
+  const pab=document.getElementById('page-article');if(pab&&pab.classList.contains('show')&&currentArticle)buildArticle(currentArticle);
 }
 document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 const burger=document.getElementById('burger'),mnav=document.getElementById('mnav');
@@ -606,7 +660,7 @@ window.addEventListener('resize',()=>{if(!isMobile())toggleMenu(false);});
 
 function match(w){
   if(!Object.keys(selected).every(g=>selected[g].size===0||selected[g].has(w[g])))return false;
-  if(searchQ){const hay=(w.name+' '+w.type+' '+w.industry+' '+w.device+' '+(w.desc||'')).toLowerCase();if(!hay.includes(searchQ))return false;}
+  if(searchQ){const hay=(w.name+' '+w.type+' '+w.industry+' '+w.device+' '+(w.desc||'')+' '+(w.tags||[]).join(' ')).toLowerCase();if(!hay.includes(searchQ))return false;}
   return true;
 }
 function filtered(){return WORKS.filter(match);}
@@ -861,6 +915,47 @@ function buildServiceDetail(s){
 }
 function openService(n){const s=SERVICES_DATA.find(x=>x.n===n);if(!s)return;currentServiceN=n;buildServiceDetail(s);const sc=document.querySelector('.svdetail');if(sc)sc.scrollTop=0;go('service');}
 
+/* ---- blog / articles ---- */
+const META_DEF={title:'miawmiaw studio',desc:'miawmiaw studio — a product & brand design studio designing interfaces, systems and flows.',img:'https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/logo_256.png?v=3'};
+function setMeta(title,desc,img){document.title=title||META_DEF.title;const set=(id,v)=>{const e=document.getElementById(id);if(e)e.setAttribute('content',v);};set('m-desc',desc||META_DEF.desc);set('m-ogt',title||META_DEF.title);set('m-ogd',desc||META_DEF.desc);set('m-ogi',img||META_DEF.img);}
+function resetMeta(){setMeta(META_DEF.title,META_DEF.desc,META_DEF.img);}
+function fmtDate(d){try{return new Date(d).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});}catch(e){return '';}}
+let blogCat='All',currentArticle=null;
+function renderBlog(){
+  const el=document.getElementById('blog-grid');if(!el)return;
+  const cats=['All',...Array.from(new Set(ARTICLES.map(a=>a.category).filter(Boolean)))];
+  const cc=document.getElementById('blog-cats');
+  cc.innerHTML=cats.map(c=>`<button class="bchip ${c===blogCat?'on':''}" data-c="${c}">${esc(c)}</button>`).join('');
+  cc.querySelectorAll('.bchip').forEach(b=>b.onclick=()=>{blogCat=b.dataset.c;renderBlog();});
+  const list=ARTICLES.filter(a=>blogCat==='All'||a.category===blogCat);
+  el.innerHTML=list.length?list.map(a=>`<a class="bcard" data-slug="${a.slug}"><span class="bc-cover" style="background-image:url('${a.cover}')"></span><span class="bc-meta mono">${esc(a.category)} · ${fmtDate(a.published_at||a.created_at)}</span><span class="bc-title">${esc(a.title)}</span></a>`).join(''):'<div style="color:var(--muted);font-family:Space Mono,monospace;font-size:12px;padding:20px 0">No articles yet</div>';
+  el.querySelectorAll('.bcard').forEach(c=>c.onclick=()=>openArticleBySlug(c.dataset.slug));
+}
+function buildArticle(a){
+  const rel=ARTICLES.filter(x=>x.slug!==a.slug&&((x.tags||[]).some(tg=>(a.tags||[]).includes(tg))||x.category===a.category)).slice(0,3);
+  const gallery=(a.gallery||[]).map(src=>`<img class="art-gimg" src="${src}" alt="" loading="lazy">`).join('');
+  const relHtml=rel.length?`<section class="art-related"><div class="d-h">${t('related')}</div><div class="art-rel">${rel.map(x=>`<a class="bcard" data-slug="${x.slug}"><span class="bc-cover" style="background-image:url('${x.cover}')"></span><span class="bc-meta mono">${esc(x.category)}</span><span class="bc-title">${esc(x.title)}</span></a>`).join('')}</div></section>`:'';
+  const ctaText=a.cta_text||"Let’s build something great.";
+  document.getElementById('article-inner').innerHTML=`
+    <div class="d-top"><button class="d-back" id="art-back">${t('blogBack')}</button><span class="d-count mono">${esc(a.category)}</span></div>
+    <div class="art-in">
+      <div class="art-eyebrow mono">${esc(a.category)}</div>
+      <h1 class="art-title">${esc(a.title)}</h1>
+      <div class="art-meta mono">${t('byLabel')} ${esc(a.author||'miawmiaw team')} · ${fmtDate(a.published_at||a.created_at)}</div>
+      <div class="art-cover" style="background-image:url('${a.cover}')"></div>
+      <div class="art-body">${a.body||''}</div>
+      ${gallery?`<div class="art-gallery">${gallery}</div>`:''}
+      <section class="art-cta"><div class="art-cta-h">${esc(ctaText)}</div><a class="cta" id="art-cta-btn">${t('getInTouch')}</a></section>
+      ${relHtml}
+    </div>`;
+  document.getElementById('art-back').onclick=()=>{location.hash='#/blog';go('blog');};
+  const cb=document.getElementById('art-cta-btn');if(cb)cb.onclick=()=>{if(a.cta_url){if(a.cta_url.indexOf('http')===0)window.open(a.cta_url,'_blank');else location.href=a.cta_url;}else go('contact');};
+  document.querySelectorAll('#article-inner .bcard').forEach(c=>c.onclick=()=>openArticleBySlug(c.dataset.slug));
+}
+function openArticleBySlug(slug){const a=ARTICLES.find(x=>x.slug===slug);if(!a){go('blog');return;}currentArticle=a;buildArticle(a);const sc=document.querySelector('#page-article .article');if(sc)sc.scrollTop=0;go('article');if(location.hash!=='#/article/'+slug)location.hash='#/article/'+slug;setMeta(a.title+' — miawmiaw studio',a.excerpt||META_DEF.desc,a.cover);}
+function handleHash(){const h=location.hash||'';if(h.indexOf('#/article/')===0){openArticleBySlug(decodeURIComponent(h.slice(10)));return true;}if(h==='#/blog'){go('blog');return true;}return false;}
+window.addEventListener('hashchange',handleHash);
+
 /* ---- router ---- */
 /* ---- contact stepper ---- */
 const cState={step:1,services:new Set(),budget:''};
@@ -897,7 +992,7 @@ document.getElementById('c-submit').onclick=async()=>{
 };
 
 /* ---- router ---- */
-const pP=document.getElementById('page-portfolio'),pA=document.getElementById('page-about'),pD=document.getElementById('page-detail'),pC=document.getElementById('page-contact'),pS=document.getElementById('page-services'),pSv=document.getElementById('page-service');
+const pP=document.getElementById('page-portfolio'),pA=document.getElementById('page-about'),pD=document.getElementById('page-detail'),pC=document.getElementById('page-contact'),pS=document.getElementById('page-services'),pSv=document.getElementById('page-service'),pB=document.getElementById('page-blog'),pAr=document.getElementById('page-article');
 const sub=document.getElementById('sub');
 function go(page){
   pP.classList.toggle('show',page==='portfolio');
@@ -907,12 +1002,17 @@ function go(page){
   pS.classList.toggle('show',page==='services');
   pSv.classList.toggle('show',page==='service');
   if(page==='services')renderServicesList();
+  pB.classList.toggle('show',page==='blog');
+  pAr.classList.toggle('show',page==='article');
+  if(page==='blog')renderBlog();
   const showSub=page==='portfolio';
   sub.style.opacity=showSub?'1':'0';sub.style.transform=showSub?'none':'translateY(-6px)';sub.style.pointerEvents=showSub?'auto':'none';
   const _cta=document.querySelector('.cta');if(_cta)_cta.style.display=(page==='contact')?'none':'';
   document.querySelectorAll('.nav [data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===page||(page==='detail'&&b.dataset.go==='portfolio')||(page==='service'&&b.dataset.go==='services')));
   if(page==='about')document.querySelectorAll('#page-about .rv').forEach((el,i)=>setTimeout(()=>el.classList.add('in'),80+i*90));
   if(page==='contact')resetContact();
+  if(page!=='article')resetMeta();
+  if(page!=='blog'&&page!=='article'&&(location.hash||'').indexOf('#/')===0){history.replaceState(null,'',location.pathname+location.search);}
   try{toggleMenu(false);}catch(e){}
 }
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
@@ -947,7 +1047,7 @@ function renderAboutExtra(){
 /* ---- init after data ---- */
 function init(){
   buildStage();applyFilters();renderContactOptions();
-  let _sl="en";try{_sl=localStorage.getItem("miaw_lang")||"en";}catch(e){}setLang(_sl);
+  let _sl="en";try{_sl=localStorage.getItem("miaw_lang")||"en";}catch(e){}setLang(_sl);handleHash();
   setTimeout(()=>{document.querySelectorAll('#list-scroller .row').forEach((r,i)=>{if(i>7)return;r.style.opacity='0';r.style.transform='translateY(12px)';r.style.transition='opacity .6s var(--ease-out),transform .6s var(--ease-out)';setTimeout(()=>{r.style.opacity='';r.style.transform='';},60+i*55);});},60);
 }
 
@@ -965,19 +1065,21 @@ function _plFinish(){if(_plDone)return;_plDone=true;const pl=document.getElement
 const _plStart=Date.now();
 (async function boot(){
   try{
-    const [pr,fo,ab,sv,te,cl]=await Promise.all([
+    const [pr,fo,ab,sv,te,cl,ar]=await Promise.all([
       sb.from('projects').select('*').eq('status','Published').order('position'),
       sb.from('filter_options').select('*').order('position'),
       sb.from('site_about').select('*').eq('id',1).single(),
       sb.from('services').select('*').eq('status','Published').order('position'),
       sb.from('testimonials').select('*').eq('status','Published').order('position'),
-      sb.from('clients').select('*').eq('status','Published').order('position')
+      sb.from('clients').select('*').eq('status','Published').order('position'),
+      sb.from('articles').select('*').eq('status','Published').order('position')
     ]);
     SERVICES_DATA=(sv.data||[]).map((x,i)=>({n:i+1,name:x.name,tagline:x.tagline,overview:x.overview,best_for:x.best_for||[],deliverables:x.deliverables||[],timeline:x.timeline,related:x.related||[]}));
     TESTI=(te.data||[]).map(x=>({quote:x.quote,author:x.author,role:x.role}));
     CLIENTS=(cl.data||[]).map(x=>({name:x.name,logo:x.logo}));
+    ARTICLES=(ar.data||[]).map(x=>({slug:x.slug,title:x.title,category:x.category,cover:x.cover,excerpt:x.excerpt,body:x.body,gallery:x.gallery||[],tags:x.tags||[],author:x.author,cta_text:x.cta_text,cta_url:x.cta_url,published_at:x.published_at,created_at:x.created_at}));
     const projs=pr.data||[];
-    WORKS=projs.map((p,i)=>({n:i+1,id:p.id,name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,link:p.link,cover:p.cover,thumb:(p.cover_thumb||p.cover),images:(p.images||[])}));
+    WORKS=projs.map((p,i)=>({n:i+1,id:p.id,tags:(p.tags||[]),name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,link:p.link,cover:p.cover,thumb:(p.cover_thumb||p.cover),images:(p.images||[])}));
     FILTERS={device:[],industry:[],type:[]};(fo.data||[]).forEach(o=>{if(FILTERS[o.grp])FILTERS[o.grp].push(o.value);});
     if(ab.data){aboutData=ab.data;renderAboutData(ab.data);}
     init();
