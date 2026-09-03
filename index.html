@@ -372,9 +372,58 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .testi-left{position:static}
   .cta-sec{padding:12vh 20px}
 }
+
+/* PRELOADER */
+.preload{position:fixed;inset:0;z-index:200;background:var(--paper);display:flex;align-items:center;justify-content:center;transition:opacity .6s var(--ease),transform .7s var(--ease-out)}
+.preload.done{opacity:0;transform:translateY(-2%);pointer-events:none}
+.pl-center{display:flex;flex-direction:column;align-items:center;width:min(260px,72vw)}
+.pl-logo{width:60px;height:60px;border-radius:50%;opacity:0;transform:scale(.85);animation:plLogo .8s var(--ease-out) .1s forwards}
+.pl-word{overflow:hidden;margin-top:20px}
+.pl-word>span{display:inline-block;font-weight:600;font-size:20px;letter-spacing:-.01em;transform:translateY(115%);animation:plUp .7s var(--ease-out) .4s forwards}
+.pl-sub{overflow:hidden;margin-top:-2px}
+.pl-sub>span{display:inline-block;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);transform:translateY(115%);animation:plUp .7s var(--ease-out) .52s forwards}
+.pl-bar{position:relative;width:100%;height:1px;background:var(--hair);margin-top:34px;overflow:hidden}
+.pl-bar i{position:absolute;left:0;top:0;height:100%;width:0;background:var(--accent);transition:width .2s linear}
+.pl-pct{margin-top:12px;font-size:10px;letter-spacing:.14em;color:var(--muted)}
+@keyframes plLogo{to{opacity:1;transform:scale(1)}}
+@keyframes plUp{to{transform:none}}
+@media(prefers-reduced-motion:reduce){.pl-logo,.pl-word>span,.pl-sub>span{animation:none;opacity:1;transform:none}}
+
+/* Clutch badge (testimonials left column) */
+.clutch{display:inline-flex;flex-direction:column;gap:4px;margin-top:34px;text-decoration:none;color:var(--ink)}
+.clutch .cl-top{display:flex;align-items:center;gap:8px}
+.clutch .cl-score{font-size:22px;font-weight:600;letter-spacing:-.01em}
+.clutch .cl-stars{color:var(--accent);font-size:14px;letter-spacing:1px}
+.clutch .cl-label{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .25s var(--ease)}
+.clutch:hover .cl-label{color:var(--ink)}
+
+/* TRUSTED BY (client logos) */
+.trust{border-top:1px solid var(--hair)}
+.trust-in{max-width:1100px;margin:0 auto;padding:12vh 24px}
+.trust-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-bottom:46px;flex-wrap:wrap}
+.trust-eyebrow{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.trust-title{font-size:clamp(28px,4.2vw,50px);font-weight:500;letter-spacing:-.03em;line-height:1.02}
+.trust-sub{max-width:38ch;font-size:13.5px;color:var(--muted);line-height:1.55}
+.trust-sub b{color:var(--ink);font-weight:600}
+.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--hair);border-left:1px solid var(--hair)}
+.tlogo{aspect-ratio:5/2;display:flex;align-items:center;justify-content:center;padding:24px;border-right:1px solid var(--hair);border-bottom:1px solid var(--hair);opacity:0;transform:translateY(12px);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out)}
+.trust-grid.in .tlogo{opacity:1;transform:none}
+.tlogo img{max-width:72%;max-height:46px;object-fit:contain;filter:grayscale(1);opacity:.5;transition:opacity .3s var(--ease)}
+.tlogo:hover img{opacity:.95}
+@media(max-width:860px){.trust-grid{grid-template-columns:repeat(2,1fr)}.trust-in{padding:8vh 20px}.trust-head{align-items:flex-start}.tlogo{padding:20px}}
 </style>
 </head>
 <body>
+
+<div class="preload" id="preload">
+  <div class="pl-center">
+    <img class="pl-logo" src="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/logo_256.png?v=3" alt="">
+    <div class="pl-word"><span>miawmiaw</span></div>
+    <div class="pl-sub"><span>studio</span></div>
+    <div class="pl-bar"><i id="pl-bar-i"></i></div>
+    <div class="pl-pct mono" id="pl-pct">0</div>
+  </div>
+</div>
 
 <header class="head">
   <button class="brand" data-go="portfolio"><img class="blogo" src="https://unhrdsxnyaiyrnngqasp.supabase.co/storage/v1/object/public/media/brand/logo_256.png?v=3" alt="miawmiaw studio"> miawmiaw <b>studio</b></button>
@@ -522,13 +571,13 @@ const isMobile=()=>window.matchMedia('(max-width:860px)').matches;
 let activeWork=null;
 let curView='index';
 let searchQ='';
-let currentDetailN=null,currentServiceN=null,aboutData=null,SERVICES_DATA=[],TESTI=[],LANG='en';
+let currentDetailN=null,currentServiceN=null,aboutData=null,SERVICES_DATA=[],TESTI=[],CLIENTS=[],LANG='en';
 const GROUP_KEY={device:'byDevice',industry:'byIndustry',type:'byCategory'};
 const SERVICES=[["Landing Page UI/UX Design HTML","svc1"],["Website Design","svc2"],["SaaS Dashboard / CRM / ERP","svc3"],["Mobile App Design","svc4"],["UX Audit","svc5"],["Clean Up Vibe-Coded Apps","svc6"],["Custom UI/UX Design","svc7"]];
 const BUDGETS=[["Under $500","bud1"],["$500–2k","bud2"],["$2k–5k","bud3"],["$5k+","bud4"]];
 const I18N={
- en:{work:"Work",about:"About",getInTouch:"Get in touch",vIndex:"Index",vGrid:"Grid",vList:"List",filter:"Filter",close:"Close ×",clearAll:"Clear all",searchPh:"Search projects",works:"works",worksView:"works — View",byDevice:"By device",byIndustry:"By industry",byCategory:"By category",noMatch:"No works match",contactTag:"Contact",back:"← Back",project:"Project",secCover:"Cover",secOverview:"Overview",secApproach:"Approach",secGallery:"Gallery",secNext:"Next",mClient:"Client",mRole:"Role",mDevice:"Device",mIndustry:"Industry",mCategory:"Category",mYear:"Year",mLink:"Link",visit:"Visit →",navServices:"Services",sBestFor:"Best for",sIncluded:"What\u2019s included",sTimeline:"Timeline",sRelated:"Relevant work",testiTitle:"What they say.",ctaBuild:"Let\u2019s build",ctaGreat:"something great.",approach2:"Every deliverable ships as a single-file, developer-ready handoff — no ambiguity between design and build. The system is documented so it holds up as the work scales beyond this first release.",practice:"Practice",contact:"Contact",st1eyebrow:"01 — You",st2eyebrow:"02 — Services",st3eyebrow:"03 — Brief",st1h:"Let’s start with you.",st2h:"What do you need?",st3h:"Tell us about it.",lName:"Name *",lEmail:"Email *",lCompany:"Company",lPhone:"Phone / WhatsApp",lReferrer:"Referred by",lBrief:"Project brief *",optional:"optional",optionalTeam:"optional — team member",phName:"Your name",phCompany:"Company",phReferrer:"Who referred you?",phBrief:"A few lines about your project, goals, and timeline…",budget:"Budget",cBack:"← Back",next:"Next →",send:"Send inquiry",sending:"Sending…",err1:"Please enter your name and a valid email.",err2:"Please select at least one service and a budget.",err3:"Please add a short brief (at least a sentence).",errSubmit:"Something went wrong — please try again.",sent:"Sent",thanks:"Thanks — we’ll get back to you shortly.",thanksLead:"We’ve received your inquiry and will reply to your email as soon as we can.",backHome:"Back to homepage",svc1:"Landing Page UI/UX Design HTML",svc2:"Website Design",svc3:"SaaS Dashboard / CRM / ERP",svc4:"Mobile App Design",svc5:"UX Audit",svc6:"Clean Up Vibe-Coded Apps",svc7:"Custom UI/UX Design",bud1:"Under $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"},
- zh:{work:"作品",about:"關於",getInTouch:"聯絡我們",vIndex:"索引",vGrid:"網格",vList:"清單",filter:"篩選",close:"關閉 ×",clearAll:"全部清除",searchPh:"搜尋作品",works:"件作品",worksView:"件作品 — 查看",byDevice:"依裝置",byIndustry:"依產業",byCategory:"依類別",noMatch:"沒有符合的作品",contactTag:"聯絡",back:"← 返回",project:"專案",secCover:"封面",secOverview:"概覽",secApproach:"方法",secGallery:"作品集",secNext:"下一個",mClient:"客戶",mRole:"角色",mDevice:"裝置",mIndustry:"產業",mCategory:"類別",mYear:"年份",mLink:"連結",visit:"前往 →",navServices:"服務",sBestFor:"適合對象",sIncluded:"包含內容",sTimeline:"時程",sRelated:"相關作品",testiTitle:"客戶怎麼說。",ctaBuild:"一起打造",ctaGreat:"很棒的作品。",approach2:"每個交付物都是單一檔案、可直接交給開發者的成果 — 設計與實作之間毫無歧義。系統皆有文件記錄，讓作品在首次發佈之後持續擴充時依然穩固。",practice:"服務項目",contact:"聯絡",st1eyebrow:"01 — 您",st2eyebrow:"02 — 服務",st3eyebrow:"03 — 需求",st1h:"先從您開始。",st2h:"您需要什麼？",st3h:"告訴我們細節。",lName:"姓名 *",lEmail:"電郵 *",lCompany:"公司",lPhone:"電話 / WhatsApp",lReferrer:"推薦人",lBrief:"專案需求 *",optional:"選填",optionalTeam:"選填 — 團隊成員",phName:"您的姓名",phCompany:"公司",phReferrer:"誰推薦您？",phBrief:"簡述您的專案、目標與時程…",budget:"預算",cBack:"← 返回",next:"下一步 →",send:"送出需求",sending:"送出中…",err1:"請輸入姓名與有效電郵。",err2:"請至少選擇一項服務與預算。",err3:"請簡短描述需求（至少一句）。",errSubmit:"發生錯誤 — 請再試一次。",sent:"已送出",thanks:"感謝您 — 我們會盡快回覆。",thanksLead:"我們已收到您的需求，會盡快回覆您的電郵。",backHome:"返回首頁",svc1:"到達頁 UI/UX 設計 (HTML)",svc2:"網站設計",svc3:"SaaS 儀表板 / CRM / ERP",svc4:"行動應用程式設計",svc5:"UX 稽核",svc6:"整理 Vibe-Coded 應用程式",svc7:"客製 UI/UX 設計",bud1:"低於 $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"}
+ en:{work:"Work",about:"About",getInTouch:"Get in touch",vIndex:"Index",vGrid:"Grid",vList:"List",filter:"Filter",close:"Close ×",clearAll:"Clear all",searchPh:"Search projects",works:"works",worksView:"works — View",byDevice:"By device",byIndustry:"By industry",byCategory:"By category",noMatch:"No works match",contactTag:"Contact",back:"← Back",project:"Project",secCover:"Cover",secOverview:"Overview",secApproach:"Approach",secGallery:"Gallery",secNext:"Next",mClient:"Client",mRole:"Role",mDevice:"Device",mIndustry:"Industry",mCategory:"Category",mYear:"Year",mLink:"Link",visit:"Visit →",navServices:"Services",sBestFor:"Best for",sIncluded:"What\u2019s included",sTimeline:"Timeline",sRelated:"Relevant work",testiTitle:"What they say.",ctaBuild:"Let\u2019s build",ctaGreat:"something great.",trustEyebrow:"Trusted by",trustTitle:"Trusted by innovators.",trustSub:"We collaborate with forward-thinking brands to build digital experiences that matter. <b>30+ companies.</b>",approach2:"Every deliverable ships as a single-file, developer-ready handoff — no ambiguity between design and build. The system is documented so it holds up as the work scales beyond this first release.",practice:"Practice",contact:"Contact",st1eyebrow:"01 — You",st2eyebrow:"02 — Services",st3eyebrow:"03 — Brief",st1h:"Let’s start with you.",st2h:"What do you need?",st3h:"Tell us about it.",lName:"Name *",lEmail:"Email *",lCompany:"Company",lPhone:"Phone / WhatsApp",lReferrer:"Referred by",lBrief:"Project brief *",optional:"optional",optionalTeam:"optional — team member",phName:"Your name",phCompany:"Company",phReferrer:"Who referred you?",phBrief:"A few lines about your project, goals, and timeline…",budget:"Budget",cBack:"← Back",next:"Next →",send:"Send inquiry",sending:"Sending…",err1:"Please enter your name and a valid email.",err2:"Please select at least one service and a budget.",err3:"Please add a short brief (at least a sentence).",errSubmit:"Something went wrong — please try again.",sent:"Sent",thanks:"Thanks — we’ll get back to you shortly.",thanksLead:"We’ve received your inquiry and will reply to your email as soon as we can.",backHome:"Back to homepage",svc1:"Landing Page UI/UX Design HTML",svc2:"Website Design",svc3:"SaaS Dashboard / CRM / ERP",svc4:"Mobile App Design",svc5:"UX Audit",svc6:"Clean Up Vibe-Coded Apps",svc7:"Custom UI/UX Design",bud1:"Under $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"},
+ zh:{work:"作品",about:"關於",getInTouch:"聯絡我們",vIndex:"索引",vGrid:"網格",vList:"清單",filter:"篩選",close:"關閉 ×",clearAll:"全部清除",searchPh:"搜尋作品",works:"件作品",worksView:"件作品 — 查看",byDevice:"依裝置",byIndustry:"依產業",byCategory:"依類別",noMatch:"沒有符合的作品",contactTag:"聯絡",back:"← 返回",project:"專案",secCover:"封面",secOverview:"概覽",secApproach:"方法",secGallery:"作品集",secNext:"下一個",mClient:"客戶",mRole:"角色",mDevice:"裝置",mIndustry:"產業",mCategory:"類別",mYear:"年份",mLink:"連結",visit:"前往 →",navServices:"服務",sBestFor:"適合對象",sIncluded:"包含內容",sTimeline:"時程",sRelated:"相關作品",testiTitle:"客戶怎麼說。",ctaBuild:"一起打造",ctaGreat:"很棒的作品。",trustEyebrow:"合作夥伴",trustTitle:"值得信賴的創新夥伴。",trustSub:"我們與具前瞻性的品牌合作，打造真正重要的數位體驗。<b>30+ 家企業。</b>",approach2:"每個交付物都是單一檔案、可直接交給開發者的成果 — 設計與實作之間毫無歧義。系統皆有文件記錄，讓作品在首次發佈之後持續擴充時依然穩固。",practice:"服務項目",contact:"聯絡",st1eyebrow:"01 — 您",st2eyebrow:"02 — 服務",st3eyebrow:"03 — 需求",st1h:"先從您開始。",st2h:"您需要什麼？",st3h:"告訴我們細節。",lName:"姓名 *",lEmail:"電郵 *",lCompany:"公司",lPhone:"電話 / WhatsApp",lReferrer:"推薦人",lBrief:"專案需求 *",optional:"選填",optionalTeam:"選填 — 團隊成員",phName:"您的姓名",phCompany:"公司",phReferrer:"誰推薦您？",phBrief:"簡述您的專案、目標與時程…",budget:"預算",cBack:"← 返回",next:"下一步 →",send:"送出需求",sending:"送出中…",err1:"請輸入姓名與有效電郵。",err2:"請至少選擇一項服務與預算。",err3:"請簡短描述需求（至少一句）。",errSubmit:"發生錯誤 — 請再試一次。",sent:"已送出",thanks:"感謝您 — 我們會盡快回覆。",thanksLead:"我們已收到您的需求，會盡快回覆您的電郵。",backHome:"返回首頁",svc1:"到達頁 UI/UX 設計 (HTML)",svc2:"網站設計",svc3:"SaaS 儀表板 / CRM / ERP",svc4:"行動應用程式設計",svc5:"UX 稽核",svc6:"整理 Vibe-Coded 應用程式",svc7:"客製 UI/UX 設計",bud1:"低於 $500",bud2:"$500–2k",bud3:"$2k–5k",bud4:"$5k+"}
 };
 function t(k){return (I18N[LANG]&&I18N[LANG][k])||I18N.en[k]||k;}
 function applyStatic(){document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.setAttribute('placeholder',t(el.dataset.i18nPh));});}
@@ -880,10 +929,11 @@ function renderAboutData(ab){
 function renderAboutExtra(){
   const el=document.getElementById('about-extra');if(!el)return;
   const testi=TESTI.length?`<section class="testi"><div class="testi-in">
-      <div class="testi-left"><div class="testi-eyebrow mono">#BuildBetterWithMiawmiaw</div><h2 class="testi-title">${t('testiTitle')}</h2></div>
+      <div class="testi-left"><div class="testi-eyebrow mono">#BuildBetterWithMiawmiaw</div><h2 class="testi-title">${t('testiTitle')}</h2><a class="clutch" href="https://clutch.co/profile/miawmiaw" target="_blank" rel="noopener"><span class="cl-top"><span class="cl-score">5.0</span><span class="cl-stars">★★★★★</span></span><span class="cl-label">Review score on Clutch</span></a></div>
       <div class="testi-right">${TESTI.map(x=>`<div class="tcard"><div class="q">${esc(x.quote)}</div><div class="a">${esc(x.author)}</div>${x.role?`<div class="r">${esc(x.role)}</div>`:''}</div>`).join('')}</div>
     </div></section>`:'';
-  el.innerHTML=testi+`
+  const trust=CLIENTS.length?`<section class="trust"><div class="trust-in"><div class="trust-head"><div><div class="trust-eyebrow mono">${t('trustEyebrow')}</div><h2 class="trust-title">${t('trustTitle')}</h2></div><p class="trust-sub">${t('trustSub')}</p></div><div class="trust-grid" id="trust-grid">${CLIENTS.map((c,i)=>`<div class="tlogo" style="transition-delay:${i*45}ms"><img src="${c.logo}" alt="${esc(c.name)}" loading="lazy"></div>`).join('')}</div></div></section>`:'';
+  el.innerHTML=testi+trust+`
     <section class="cta-sec" id="cta-sec"><div class="cta-in">
       <h2 class="cta-h"><span class="rvm"><span>${t('ctaBuild')}</span></span><span class="rvm"><span>${t('ctaGreat')}</span></span></h2>
       <button class="cta cta-big" id="about-cta">${t('getInTouch')}</button>
@@ -891,6 +941,7 @@ function renderAboutExtra(){
   const cbtn=document.getElementById('about-cta');if(cbtn)cbtn.onclick=()=>go('contact');
   const cta=document.getElementById('cta-sec');
   if(cta){const io=new IntersectionObserver(ents=>{ents.forEach(e=>{if(e.isIntersecting){cta.classList.add('in');io.disconnect();}});},{threshold:.3});io.observe(cta);}
+  const tg=document.getElementById('trust-grid');if(tg){const io2=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){tg.classList.add('in');io2.disconnect();}});},{threshold:.15});io2.observe(tg);}
 }
 
 /* ---- init after data ---- */
@@ -901,25 +952,40 @@ function init(){
 }
 
 /* ---- boot: load from Supabase ---- */
+let _plDone=false;
+function _plFinish(){if(_plDone)return;_plDone=true;const pl=document.getElementById('preload');const bi=document.getElementById('pl-bar-i');const pc=document.getElementById('pl-pct');if(bi)bi.style.width='100%';if(pc)pc.textContent='100';if(pl)setTimeout(()=>pl.classList.add('done'),260);}
+(function _plInit(){
+  const pl=document.getElementById('preload');if(!pl)return;
+  let shown=false;try{shown=sessionStorage.getItem('miaw_preloaded')==='1';}catch(e){}
+  if(shown){pl.classList.add('done');pl.style.transition='none';_plDone=true;return;}
+  try{sessionStorage.setItem('miaw_preloaded','1');}catch(e){}
+  const bi=document.getElementById('pl-bar-i'),pc=document.getElementById('pl-pct');let p=0;
+  const iv=setInterval(()=>{if(_plDone){clearInterval(iv);return;}p+=Math.random()*9+3;if(p>92)p=92;if(bi)bi.style.width=p+'%';if(pc)pc.textContent=Math.round(p);},180);
+})();
+const _plStart=Date.now();
 (async function boot(){
   try{
-    const [pr,fo,ab,sv,te]=await Promise.all([
+    const [pr,fo,ab,sv,te,cl]=await Promise.all([
       sb.from('projects').select('*').eq('status','Published').order('position'),
       sb.from('filter_options').select('*').order('position'),
       sb.from('site_about').select('*').eq('id',1).single(),
       sb.from('services').select('*').eq('status','Published').order('position'),
-      sb.from('testimonials').select('*').eq('status','Published').order('position')
+      sb.from('testimonials').select('*').eq('status','Published').order('position'),
+      sb.from('clients').select('*').eq('status','Published').order('position')
     ]);
     SERVICES_DATA=(sv.data||[]).map((x,i)=>({n:i+1,name:x.name,tagline:x.tagline,overview:x.overview,best_for:x.best_for||[],deliverables:x.deliverables||[],timeline:x.timeline,related:x.related||[]}));
     TESTI=(te.data||[]).map(x=>({quote:x.quote,author:x.author,role:x.role}));
+    CLIENTS=(cl.data||[]).map(x=>({name:x.name,logo:x.logo}));
     const projs=pr.data||[];
     WORKS=projs.map((p,i)=>({n:i+1,id:p.id,name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,link:p.link,cover:p.cover,thumb:(p.cover_thumb||p.cover),images:(p.images||[])}));
     FILTERS={device:[],industry:[],type:[]};(fo.data||[]).forEach(o=>{if(FILTERS[o.grp])FILTERS[o.grp].push(o.value);});
     if(ab.data){aboutData=ab.data;renderAboutData(ab.data);}
     init();
+    setTimeout(_plFinish,Math.max(0,1200-(Date.now()-_plStart)));
   }catch(err){
     console.error('load failed',err);
     document.getElementById('list-scroller').innerHTML='<div style="padding:40px 34px;color:var(--muted);font-family:Space Mono,monospace;font-size:12px">Failed to load content.</div>';
+    _plFinish();
   }
 })();
 </script>
