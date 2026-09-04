@@ -454,6 +454,12 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .art-related .d-h{margin-bottom:22px}
 .art-rel{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 @media(max-width:860px){.blog-grid{grid-template-columns:repeat(2,1fr)}.art-rel{grid-template-columns:1fr}}
+
+.sv-cover{width:100%;aspect-ratio:16/9;background-size:cover;background-position:center;background-color:var(--stage);border-radius:2px;margin-top:34px}
+.sv-pager{display:flex;gap:6px;justify-content:center;margin-top:30px}
+.sv-pager button{min-width:34px;height:34px;padding:0 8px;border:1px solid var(--hair);border-radius:7px;font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);transition:.2s var(--ease)}
+.sv-pager button:hover{color:var(--ink);border-color:var(--ink)}
+.sv-pager button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 </style>
 </head>
 <body>
@@ -621,7 +627,7 @@ const isMobile=()=>window.matchMedia('(max-width:860px)').matches;
 let activeWork=null;
 let curView='index';
 let searchQ='';
-let currentDetailN=null,currentServiceN=null,aboutData=null,SERVICES_DATA=[],TESTI=[],CLIENTS=[],ARTICLES=[],LANG='en';
+let currentDetailN=null,currentServiceN=null,detailBack=null,aboutData=null,SERVICES_DATA=[],TESTI=[],CLIENTS=[],ARTICLES=[],LANG='en';
 const GROUP_KEY={device:'byDevice',industry:'byIndustry',type:'byCategory'};
 const SERVICES=[["Landing Page UI/UX Design HTML","svc1"],["Website Design","svc2"],["SaaS Dashboard / CRM / ERP","svc3"],["Mobile App Design","svc4"],["UX Audit","svc5"],["Clean Up Vibe-Coded Apps","svc6"],["Custom UI/UX Design","svc7"]];
 const BUDGETS=[["Under $500","bud1"],["$500–2k","bud2"],["$2k–5k","bud3"],["$5k+","bud4"]];
@@ -813,7 +819,7 @@ function buildDetail(w){
     <div class="d-top"><button class="d-back" id="d-back">${t('back')}</button><span class="d-count mono">${pad(w.n)} / ${pad(WORKS.length)}</span></div>
     ${toc}
     <div class="d-wrap">${coverSec}${overviewSec}${gallerySec}${nextSec}</div>`;
-  document.getElementById('d-back').onclick=()=>go('portfolio');
+  document.getElementById('d-back').onclick=()=>{(detailBack||(()=>go('portfolio')))();};
   document.getElementById('d-next').onclick=()=>openDetail(nx.n);
   const sc=document.querySelector('.detail');
   document.querySelectorAll('#d-toc .ti').forEach(ti=>ti.onclick=()=>{const el=document.getElementById(ti.dataset.target);sc.scrollTo({top:el.offsetTop-64,behavior:'smooth'});});
@@ -829,7 +835,7 @@ function setupDetailScroll(){
   }
   sc.onscroll=upd;upd();
 }
-function openDetail(n){const w=WORKS.find(x=>x.n===n);if(!w)return;currentDetailN=n;buildDetail(w);document.querySelector('.detail').scrollTop=0;go('detail');requestAnimationFrame(setupDetailScroll);}
+function openDetail(n,backFn){const w=WORKS.find(x=>x.n===n);if(!w)return;currentDetailN=n;detailBack=backFn||(()=>go('portfolio'));buildDetail(w);document.querySelector('.detail').scrollTop=0;go('detail');requestAnimationFrame(setupDetailScroll);}
 
 /* ---- FILTER DRAWER ---- */
 const drawer=document.getElementById('drawer');const backdrop=document.getElementById('backdrop');
@@ -888,8 +894,8 @@ function renderServicesList(){
   el.querySelectorAll('.svrow').forEach(r=>r.onclick=()=>openService(+r.dataset.n));
 }
 function buildServiceDetail(s){
-  const rel=(s.related||[]).map(id=>WORKS.find(w=>w.id===id)).filter(Boolean);
-  const relHtml=rel.length?`<section class="d-section"><div class="d-h">${t('sRelated')}</div><div class="svrel">${rel.map(w=>`<a class="svrelc" data-n="${w.n}"><span class="ri" style="background-image:url('${w.thumb}')"></span><span class="rl">${esc(w.name)}</span></a>`).join('')}</div></section>`:'';
+  const rel=WORKS.filter(w=>(s.related||[]).includes(w.id)||(w.relatedServices||[]).includes(s.id));
+  const relHtml=rel.length?`<section class="d-section"><div class="d-h">${t('sRelated')}</div><div class="svrel" id="sv-rel-grid"></div><div class="sv-pager" id="sv-rel-pager"></div></section>`:'';
   const bf=`<ul class="svul">${(s.best_for||[]).map((x,i)=>`<li><span class="k">${pad(i+1)}</span><span>${esc(x)}</span></li>`).join('')}</ul>`;
   const dl=`<ul class="svul">${(s.deliverables||[]).map((x,i)=>`<li><span class="k">${pad(i+1)}</span><span>${esc(x)}</span></li>`).join('')}</ul>`;
   document.getElementById('svdetail').innerHTML=`
@@ -898,7 +904,7 @@ function buildServiceDetail(s){
       <section class="d-section cover">
         <span class="d-k">${t('navServices')}</span>
         <h1 class="d-title">${esc(s.name)}</h1>
-        <p class="d-lead">${esc(s.tagline)}</p>
+        <p class="d-lead">${esc(s.tagline)}</p>${s.cover?`<div class="sv-cover" style="background-image:url('${s.cover}')"></div>`:''}
       </section>
       <section class="d-section"><div class="d-h">${t('secOverview')}</div><div class="d-ov">${esc(s.overview)}</div></section>
       <section class="d-section"><div class="d-h">${t('sBestFor')}</div>${bf}</section>
@@ -909,7 +915,16 @@ function buildServiceDetail(s){
     </div>`;
   document.getElementById('sv-back').onclick=()=>go('services');
   document.getElementById('sv-cta').onclick=()=>go('contact');
-  document.querySelectorAll('#svdetail .svrelc').forEach(a=>a.onclick=()=>openDetail(+a.dataset.n));
+  if(rel.length){
+    let relPage=0;const grid=document.getElementById('sv-rel-grid'),pager=document.getElementById('sv-rel-pager');
+    const renderRel=()=>{
+      const ps=isMobile()?6:9;const pages=Math.ceil(rel.length/ps);if(relPage>=pages)relPage=0;
+      const items=rel.slice(relPage*ps,relPage*ps+ps);
+      grid.innerHTML=items.map(w=>`<a class="svrelc" data-n="${w.n}"><span class="ri" style="background-image:url('${w.thumb}')"></span><span class="rl">${esc(w.name)}</span></a>`).join('');
+      grid.querySelectorAll('.svrelc').forEach(a=>a.onclick=()=>openDetail(+a.dataset.n,()=>openService(s.n)));
+      if(pages>1){let ph='<button data-p="prev">\u2039</button>';for(let i=0;i<pages;i++)ph+=`<button class="${i===relPage?'on':''}" data-p="${i}">${i+1}</button>`;ph+='<button data-p="next">\u203a</button>';pager.innerHTML=ph;pager.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.p;if(v==='prev')relPage=Math.max(0,relPage-1);else if(v==='next')relPage=Math.min(pages-1,relPage+1);else relPage=+v;renderRel();});}else pager.innerHTML='';
+    };renderRel();
+  }
 }
 function openService(n){const s=SERVICES_DATA.find(x=>x.n===n);if(!s)return;currentServiceN=n;buildServiceDetail(s);const sc=document.querySelector('.svdetail');if(sc)sc.scrollTop=0;go('service');}
 
@@ -1072,12 +1087,12 @@ const _plStart=Date.now();
       sb.from('clients').select('*').eq('status','Published').order('position'),
       sb.from('articles').select('*').eq('status','Published').order('position')
     ]);
-    SERVICES_DATA=(sv.data||[]).map((x,i)=>({n:i+1,name:x.name,tagline:x.tagline,overview:x.overview,best_for:x.best_for||[],deliverables:x.deliverables||[],timeline:x.timeline,related:x.related||[]}));
+    SERVICES_DATA=(sv.data||[]).map((x,i)=>({n:i+1,id:x.id,name:x.name,tagline:x.tagline,overview:x.overview,best_for:x.best_for||[],deliverables:x.deliverables||[],timeline:x.timeline,related:x.related||[],cover:x.cover}));
     TESTI=(te.data||[]).map(x=>({quote:x.quote,author:x.author,role:x.role}));
     CLIENTS=(cl.data||[]).map(x=>({name:x.name,logo:x.logo}));
     ARTICLES=(ar.data||[]).map(x=>({slug:x.slug,title:x.title,category:x.category,cover:x.cover,excerpt:x.excerpt,body:x.body,gallery:x.gallery||[],tags:x.tags||[],author:x.author,cta_text:x.cta_text,cta_url:x.cta_url,published_at:x.published_at,created_at:x.created_at}));
     const projs=pr.data||[];
-    WORKS=projs.map((p,i)=>({n:i+1,id:p.id,tags:(p.tags||[]),name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,link:p.link,cover:p.cover,thumb:(p.cover_thumb||p.cover),images:(p.images||[])}));
+    WORKS=projs.map((p,i)=>({n:i+1,id:p.id,tags:(p.tags||[]),relatedServices:(p.related_services||[]),name:p.name,device:p.device,industry:p.industry,type:p.type,shape:(p.device==='Mobile'?'port':p.device==='Desktop'?'land':'sq'),yr:p.year,client:p.client,role:p.role,desc:p.caption,overview:p.overview,approach:p.approach,link:p.link,cover:p.cover,thumb:(p.cover_thumb||p.cover),images:(p.images||[])}));
     FILTERS={device:[],industry:[],type:[]};(fo.data||[]).forEach(o=>{if(FILTERS[o.grp])FILTERS[o.grp].push(o.value);});
     if(ab.data){aboutData=ab.data;renderAboutData(ab.data);}
     init();

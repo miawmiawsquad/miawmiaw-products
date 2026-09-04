@@ -584,7 +584,7 @@ function opts(list,val){return (list||[]).map(o=>`<option ${o===val?'selected':'
 function openEditor(id){
   editingId=id;
   const src=id?state.projects.find(x=>x.id===id):null;
-  editDraft=src?JSON.parse(JSON.stringify(src)):{name:"",device:state.filters.device[0]||"Desktop",industry:state.filters.industry[0]||"Fintech",type:state.filters.type[0]||"Landing Page",year:new Date().getFullYear()+"",client:"",role:"Product designer",caption:"",overview:"",approach:"",link:"",cover:"",cover_thumb:"",images:[],tags:[],views:0,status:'Draft'};
+  editDraft=src?JSON.parse(JSON.stringify(src)):{name:"",device:state.filters.device[0]||"Desktop",industry:state.filters.industry[0]||"Fintech",type:state.filters.type[0]||"Landing Page",year:new Date().getFullYear()+"",client:"",role:"Product designer",caption:"",overview:"",approach:"",link:"",cover:"",cover_thumb:"",images:[],tags:[],related_services:[],views:0,status:'Draft'};
   nav('editor');renderEditor();
 }
 function renderEditor(){
@@ -607,6 +607,7 @@ function renderEditor(){
     </div>
     <div class="fld"><label>Link <span style="text-transform:none;letter-spacing:0;color:var(--muted)">optional</span></label><input class="inp" id="f-link" value="${(p.link||'').replace(/"/g,'&quot;')}" placeholder="https://…"></div>
     <div class="fld"><label>Tags <span style="text-transform:none;letter-spacing:0;color:var(--muted)">search only — not shown on site</span></label><div class="taginput" id="p-tags"></div></div>
+    <div class="fld"><label>Related services <span style="text-transform:none;letter-spacing:0;color:var(--muted)">optional — shows this project under those services</span></label><div class="chips" id="p-relsvc"></div></div>
     <div class="esec"><div class="st">Detail content</div>
       <div class="fld"><label>Overview</label><textarea class="ta" id="f-ov" placeholder="Use a blank line to separate paragraphs" style="min-height:180px">${p.overview||''}</textarea></div>
     </div>
@@ -616,6 +617,7 @@ function renderEditor(){
   $('#ed-toggle').onclick=()=>{editDraft.status=editDraft.status==='Published'?'Draft':'Published';$('#ed-toggle').classList.toggle('on');};
   renderGimgs();
   editDraft.tags=editDraft.tags||[];mountTags('p-tags',editDraft.tags);
+  editDraft.related_services=editDraft.related_services||[];const _rs=$('#p-relsvc');if(_rs){_rs.innerHTML=state.services.map(sv=>`<button type="button" class="chip ${editDraft.related_services.includes(sv.id)?'on':''}" data-id="${sv.id}">${sv.name}</button>`).join('');_rs.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{const id=c.dataset.id;const i=editDraft.related_services.indexOf(id);if(i>=0)editDraft.related_services.splice(i,1);else editDraft.related_services.push(id);c.classList.toggle('on');});}
 }
 function renderGimgs(){
   const g=$('#ed-gimgs');
@@ -748,11 +750,12 @@ function renderServicesTable(){
 }
 let editingSvc=null,svcDraft=null;
 function openSvc(id){editingSvc=id;const src=id?state.services.find(x=>x.id===id):null;
-  svcDraft=src?JSON.parse(JSON.stringify(src)):{name:'',tagline:'',overview:'',timeline:'',best_for:[],deliverables:[],related:[],status:'Draft'};
+  svcDraft=src?JSON.parse(JSON.stringify(src)):{name:'',tagline:'',overview:'',timeline:'',best_for:[],deliverables:[],related:[],cover:'',status:'Draft'};
   nav('svcedit');renderSvcEditor();}
 function renderSvcEditor(){
   const p=svcDraft;
   $('#svcedit').innerHTML=`
+    <div class="fld"><label>Cover <span style="text-transform:none;letter-spacing:0;color:var(--muted)">16:9</span></label><div class="cover" style="aspect-ratio:16/9;background-image:url('${p.cover||''}')"><button class="change" id="s-cover">Upload cover</button></div></div>
     <div class="fld"><label>Service name</label><input class="inp" id="s-name" value="${(p.name||'').replace(/"/g,'&quot;')}"></div>
     <div class="fld"><label>Tagline</label><input class="inp" id="s-tag" value="${(p.tagline||'').replace(/"/g,'&quot;')}"></div>
     <div class="fld"><label>Overview</label><textarea class="ta" id="s-ov" style="min-height:150px" placeholder="Use a blank line to separate paragraphs">${p.overview||''}</textarea></div>
@@ -771,6 +774,7 @@ function renderSvcEditor(){
   rel.innerHTML=state.projects.map(pr=>`<button type="button" class="chip ${p.related.includes(pr.id)?'on':''}" data-id="${pr.id}">${pr.name}</button>`).join('');
   rel.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{const id=c.dataset.id;const idx=p.related.indexOf(id);if(idx>=0)p.related.splice(idx,1);else p.related.push(id);c.classList.toggle('on');});
   $('#s-toggle').onclick=()=>{p.status=p.status==='Published'?'Draft':'Published';$('#s-toggle').classList.toggle('on');};
+  $('#s-cover').onclick=()=>pickUpload(u=>{svcDraft.cover=u;const cv=$('#svcedit .cover');if(cv)cv.style.backgroundImage=`url('${u}')`;});
 }
 function collectSvc(){const p=svcDraft;p.name=$('#s-name').value.trim()||'Untitled';p.tagline=$('#s-tag').value.trim();p.overview=$('#s-ov').value.trim();p.timeline=$('#s-time').value.trim();p.best_for=(p.best_for||[]).filter(x=>x.trim());p.deliverables=(p.deliverables||[]).filter(x=>x.trim());}
 async function saveSvc(){collectSvc();const p=svcDraft;
